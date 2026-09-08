@@ -1,6 +1,6 @@
 # BASE60 website · 몸짓
 
-Company website, participant web service, and mobile PWA. The existing frontend content uses the working brand **Koreo**; this repository and hosting project are named BASE60.
+**BASE60** company website, 몸짓 participant web service, and mobile PWA.
 
 | Screen | URL |
 | --- | --- |

@@ -1,4 +1,4 @@
-const CACHE = 'momjit-frontend-20260907-v1';
+const CACHE = 'momjit-frontend-20260908-base60-v2';
 const SHELL = [
   '/', '/index.html', '/styles.css', '/main.js',
   '/studio/', '/studio/index.html', '/studio/studio.css', '/studio/studio.js',

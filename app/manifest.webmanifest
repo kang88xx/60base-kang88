@@ -1,7 +1,7 @@
 {
-  "name": "몸짓 by Koreo",
+  "name": "몸짓 by BASE60",
   "short_name": "몸짓",
-  "description": "Koreo 참여자용 로컬 기록 PWA",
+  "description": "BASE60 참여자용 로컬 기록 PWA",
   "lang": "ko-KR",
   "start_url": "/app/",
   "scope": "/app/",

@@ -1,9 +1,9 @@
-/* Koreo site runtime. Dependency-free. Hero scene is an independent reconstruction of the
+/* BASE60 site runtime. Dependency-free. Hero scene is an independent reconstruction of the
    Lusion "kinetic field" idea (rounded cross modules, matcap-like shading), native WebGL with a Canvas 2D fallback. */
 (() => {
   'use strict';
-  const BRAND = 'KOREO';           // change once: wordmark + footer follow
-  const BRAND_TITLE = 'Koreo';
+  const BRAND = 'BASE60';           // change once: wordmark + footer follow
+  const BRAND_TITLE = 'BASE60';
   document.documentElement.classList.remove('no-js');
   const $ = (id) => document.getElementById(id);
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
