@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="몸짓">
+  <rect width="512" height="512" rx="112" fill="#f7f8fa"/>
+  <rect x="64" y="64" width="384" height="384" rx="96" fill="#172026"/>
+  <path d="M216 118h80v98h98v80h-98v98h-80v-98h-98v-80h98z" fill="#dcf79c"/>
+  <circle cx="256" cy="256" r="70" fill="none" stroke="#254cf2" stroke-width="34"/>
+</svg>

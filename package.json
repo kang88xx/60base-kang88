@@ -1,0 +1,14 @@
+{
+  "name": "base60-kang88",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Company website and Momjit web/mobile PWA frontends",
+  "scripts": {
+    "start": "node dev-server.mjs",
+    "build": "node scripts/build.mjs",
+    "check": "node tests/static-check.mjs",
+    "test": "node tests/koreo-playwright.mjs",
+    "test:pending-service": "node tests/pending-service-playwright.mjs"
+  }
+}

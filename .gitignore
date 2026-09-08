@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vercel/
+.artifacts/
+.omx/
+.env
+.env.*
+!.env.example
+._*
+.DS_Store
+*.log
+
+.vercel
+.env*
