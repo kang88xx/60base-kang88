@@ -1,5 +1,11 @@
 export function escapeHTML(value = '') { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 const paths = {
+  wallet:'<path d="M4 5h15v15H4a2 2 0 0 1-2-2V6a3 3 0 0 1 3-3h12v3M16 10h6v6h-6z"/><path d="M18 13h.01"/>',
+  bank:'<path d="m2 8 10-6 10 6H2zm2 12h16M6 10v7m6-7v7m6-7v7M2 22h20"/>',
+  shop:'<path d="m3 9 2-6h14l2 6M3 9v12h18V9M8 21v-8h8v8"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/>',
+  package:'<path d="m3 7 9-5 9 5v10l-9 5-9-5V7zm0 0 9 5 9-5M12 12v10M7 4l10 6"/>',
+  receipt:'<path d="M5 2h14v20l-3-2-4 2-4-2-3 2V2zm3 5h8M8 11h8M8 15h5"/>',
+  shield:'<path d="m12 2 9 4v6c0 5-5 9-9 10-4-1-9-5-9-10V6l9-4z"/><path d="m8 12 3 3 5-6"/>',
   home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   camera:'<path d="m7 6 2-3h6l2 3h3a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><circle cx="12" cy="13" r="4"/>',

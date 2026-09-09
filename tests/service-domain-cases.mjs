@@ -30,6 +30,13 @@ export function registerServiceTests({ test, assert, baseUrl, generateValidVideo
     } finally { await context.close(); }
   }
 
+  test('concurrent cart increments preserve every item', async ({ browser }) => fixture(browser, page => page.evaluate(async () => {
+    const {service, data, require} = window.domain;
+    const id = data.products[0].id;
+    await Promise.all([service.changeCartQuantity(id, 1), service.changeCartQuantity(id, 1)]);
+    require((await service.getServiceState()).cart.find(row => row.productId === id)?.quantity === 2, 'concurrent increments must both persist');
+  })));
+
   test('service review refuses examples and duplicate submissions while preserving rejection history', async ({ browser }) => fixture(browser, page => page.evaluate(async () => {
     const {service, store, require, rejects, clip} = window.domain;
     await store.addExamples();

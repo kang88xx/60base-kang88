@@ -768,3 +768,88 @@ h3 {
     animation-iteration-count: 1 !important;
   }
 }
+
+.service-preview-notice {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid #d5dced;
+  border-radius: 14px;
+  background: #eef1fc;
+  color: #33416b;
+  font-size: 12px;
+}
+
+.service-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.service-shortcuts a {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 6px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.earnings-highlight {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--ink);
+  color: var(--lime);
+  font-size: 13px;
+}
+
+.earnings-highlight strong {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(26px, 7vw, 36px);
+  overflow-wrap: anywhere;
+}
+
+.profile-service-menu {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.profile-service-menu > a,
+.profile-service-menu > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 78px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+.profile-service-menu > :last-child { border-bottom: 0; }
+.profile-service-menu strong,
+.profile-service-menu small { display: block; }
+.profile-service-menu small { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.view-title > p:not(.eyebrow) { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.service-mount { min-width: 0; }
+.operator-demo-link { justify-self: start; min-height: 44px; padding: 8px 2px; background: transparent; color: var(--muted); font-size: 12px; text-decoration: underline; }
+.status-submitted,
+.status-reviewing { background: #e6ebff !important; color: var(--blue-dark) !important; }
+.status-approved { background: var(--lime) !important; color: #23310b !important; }
+.status-rejected { background: #fbe9e6 !important; color: #932e27 !important; }
+
+.service-preview-notice[hidden] { display: none; }

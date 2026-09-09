@@ -1,12 +1,15 @@
-import { missions, getMission, formatDuration, formatBytes, statusLabel } from '../shared/data.js';
+import { missions, getMission, formatDuration, formatBytes, statusLabel, formatMoney, reviewStatusLabel } from '../shared/data.js';
 import { getClips, subscribe, getProfile, saveProfile } from '../shared/store.js';
 import { openCapture, openClip, openGuide } from '../shared/capture.js';
 import { icon, escapeHTML } from '../shared/ui.js';
+import { getServiceState } from '../shared/service-store.js';
+import { renderWallet, renderShop, renderReviews, openAccount, openReviewDemo } from '../shared/service-ui.js';
 
-const routes = new Set(['home', 'missions', 'capture', 'library', 'profile']);
+const routes = new Set(['home', 'missions', 'capture', 'library', 'profile', 'reviews', 'wallet', 'shop']);
 const state = {
   route: 'home',
   clips: [],
+  service: null,
   profile: { name: '참여자', goal: 3 },
   loading: true,
   error: '',
@@ -110,6 +113,7 @@ function missionCard(mission, compact = false) {
             <span>${text(mission.category)}</span>
             <span>${text(mission.duration)}분</span>
             <span>${text(mission.level)}</span>
+            <span>통과 보상 예시 ${text(formatMoney(mission.reward))}</span>
             <span>기록 ${completed}개</span>
           </div>
           <h3>${text(mission.title)}</h3>
@@ -132,6 +136,7 @@ function clipCard(clip) {
   const mission = clipMission(clip);
   const status = normalizeStatus(clip.status);
   const title = clip.title || mission?.title || '제목 없는 기록';
+  const submission = state.service?.submissions.find((item) => item.clipId === clip.id);
   return `
     <article class="clip-card">
       <header>
@@ -144,7 +149,7 @@ function clipCard(clip) {
         </button>
       </header>
       <div class="clip-meta">
-        <span class="status-${status}">${text(statusLabel(status))}</span>
+        <span class="status-${text(submission?.status || status)}">${text(submission ? reviewStatusLabel(submission.status) : statusLabel(status))}</span>
         ${clip.example ? '<span class="status-sample">예시 기록</span>' : ''}
         <span>${text(formatDuration(clip.duration || 0))}</span>
         <span>${text(formatBytes(clip.size || 0))}</span>
@@ -175,11 +180,13 @@ function renderHome() {
   });
 
   const realClips = actualClips();
-  const ready = realClips.filter((clip) => normalizeStatus(clip.status) === 'ready').length;
-  const draft = realClips.filter((clip) => normalizeStatus(clip.status) === 'draft').length;
+  const submissions = state.service?.submissions || [];
+  const pending = submissions.filter((item) => ['submitted', 'reviewing'].includes(item.status)).length;
+  const approved = submissions.filter((item) => item.status === 'approved').length;
   $('[data-stat="total"]').textContent = realClips.length;
-  $('[data-stat="ready"]').textContent = ready;
-  $('[data-stat="draft"]').textContent = draft;
+  $('[data-stat="pending"]').textContent = pending;
+  $('[data-stat="approved"]').textContent = approved;
+  $('[data-wallet-available]').textContent = state.service ? formatMoney(state.service.wallet.available) : '—';
   $('[data-goal-line]').textContent = `실제 기록 ${realClips.length} / 목표 ${Number(state.profile.goal || 3)}`;
 
   const recommended = $('#recommended-mission');
@@ -195,6 +202,7 @@ function renderHome() {
           <span>${text(mission.category)}</span>
           <span>${text(mission.duration)}분</span>
           <span>${text(mission.level)}</span>
+            <span>통과 보상 예시 ${text(formatMoney(mission.reward))}</span>
           <span>내 기록 ${missionClips}개</span>
         </div>
         <h3>${text(mission.title)}</h3>
@@ -277,14 +285,32 @@ function renderProfile() {
     nameInput.value = state.profile.name || '참여자';
     goalInput.value = Number(state.profile.goal || 3);
   }
+  $('[data-profile-wallet]').textContent = state.service ? `출금 가능 ${formatMoney(state.service.wallet.available)}` : '수익을 불러오는 중';
+  const account = state.service?.account;
+  $('[data-profile-account]').textContent = account ? `시연 계좌 · 끝 4자리 ${account.last4}` : '시연 계좌를 등록하세요';
   $('#install-help').textContent = installHelpText();
   const installButton = $('#install-button');
   installButton.disabled = state.installed;
   installButton.innerHTML = `<span data-icon="phone"></span>${state.installed ? '설치됨' : '설치'}`;
 }
 
+function renderServiceView() {
+  const containers = { reviews: '#app-reviews', wallet: '#app-wallet', shop: '#app-shop' };
+  const selector = containers[state.route];
+  if (!selector) return;
+  const container = $(selector);
+  if (!state.service) {
+    container.innerHTML = renderStateCard({ title: state.error ? '내역을 불러오지 못했습니다' : '내역을 불러오는 중', body: state.error || '저장된 참여 내역을 확인하고 있습니다.' });
+    return;
+  }
+  if (state.route === 'reviews') renderReviews(container, state.service, state.clips);
+  if (state.route === 'wallet') renderWallet(container, state.service);
+  if (state.route === 'shop') renderShop(container, state.service);
+}
+
 function renderRoute() {
   state.route = currentRoute();
+  $('.service-preview-notice').hidden = Boolean(state.service && ['reviews', 'wallet', 'shop'].includes(state.route));
   $$('.view').forEach((view) => view.classList.toggle('is-active', view.dataset.view === state.route));
   $$('.bottom-nav a').forEach((tab) => {
     if (tab.dataset.tab === state.route) tab.setAttribute('aria-current', 'page');
@@ -320,24 +346,33 @@ function render() {
   renderCapture();
   renderLibrary();
   renderProfile();
+  renderServiceView();
   renderIcons();
   restoreFocus(key);
 }
 
 function navigate() {
   renderRoute();
+  renderServiceView();
+  renderIcons();
   $('#main').focus({ preventScroll: true });
 }
 
+let refreshVersion = 0;
 async function refresh() {
+  const version = ++refreshVersion;
   state.error = '';
   try {
-    const [clips, profile] = await Promise.all([getClips(), getProfile()]);
+    const [clips, profile, service] = await Promise.all([getClips(), getProfile(), getServiceState()]);
+    if (version !== refreshVersion) return;
+    state.service = service;
     state.clips = Array.isArray(clips) ? clips : [];
     state.profile = profile || { name: '참여자', goal: 3 };
   } catch (error) {
+    if (version !== refreshVersion) return;
     state.error = error?.message || '브라우저 저장소 접근 중 문제가 생겼습니다.';
   } finally {
+    if (version !== refreshVersion) return;
     state.loading = false;
     render();
   }
@@ -351,6 +386,8 @@ function bindActions() {
     const missionId = button.dataset.missionId || undefined;
     const clipId = button.dataset.clipId;
 
+    if (action === 'app-account') openAccount();
+    if (action === 'app-review-demo') openReviewDemo();
     if (action === 'capture-camera') openCapture({ mode: 'camera', missionId });
     if (action === 'capture-upload') openCapture({ mode: 'upload', missionId });
     if (action === 'guide' && missionId) openGuide(missionId);
