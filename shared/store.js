@@ -2,7 +2,7 @@ const DB_NAME = 'momjit-local-v1';
 let database;
 const listeners = new Set();
 const channel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('momjit-records-v1') : null;
-function notify(remote = false) {
+export function notify(remote = false) {
   for (const fn of listeners) { try { fn(); } catch (error) { console.error(error); } }
   if (!remote) channel?.postMessage({ type: 'changed' });
 }
@@ -10,7 +10,7 @@ if (channel) channel.onmessage = () => notify(true);
 addEventListener('focus', () => notify(true));
 document.addEventListener('visibilitychange', () => { if (!document.hidden) notify(true); });
 export function subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); }
-function db() {
+export function db() {
   if (!database) database = new Promise((resolve, reject) => {
     if (!globalThis.indexedDB) { reject(new Error('이 브라우저에서는 로컬 저장소를 사용할 수 없어요. 일반 브라우저 창으로 열어주세요.')); return; }
     const request = indexedDB.open(DB_NAME, 1);
@@ -40,12 +40,32 @@ export async function saveClip(input) {
   const clip = { ...input, id: crypto.randomUUID(), createdAt: new Date().toISOString(), status: input.status === 'ready' ? 'ready' : 'draft' };
   await write('clips', store => store.put(clip)); return clip;
 }
-export async function updateClip(id, changes) {
-  let record;
-  await write('clips', store => { const request = store.get(id); request.onsuccess = () => { if (request.result) { const {title, notes, status} = changes; record = {...request.result, ...(title !== undefined ? {title} : {}), ...(notes !== undefined ? {notes} : {}), ...(status !== undefined ? {status: status === 'ready' ? 'ready' : 'draft'} : {})}; store.put(record); } }; });
-  if (!record) throw new Error('다른 화면에서 삭제된 기록이에요. 목록을 새로 확인해주세요.'); return record;
+async function changeClip(id, changes, remove = false) {
+  const connection = await db();
+  return new Promise((resolve, reject) => {
+    const tx = connection.transaction(['clips', 'settings'], 'readwrite');
+    let record, failure;
+    tx.oncomplete = () => { notify(); resolve(record); };
+    tx.onerror = tx.onabort = () => reject(failure || tx.error || new Error('기록을 변경하지 못했어요.'));
+    const request = tx.objectStore('settings').get('service');
+    request.onsuccess = () => {
+      if (request.result?.submissions?.some(item => item.clipId === id && item.status !== 'rejected')) {
+        failure = new Error('심사 중이거나 통과한 영상은 수정하거나 삭제할 수 없어요.'); tx.abort(); return;
+      }
+      const clips = tx.objectStore('clips');
+      const current = clips.get(id);
+      current.onsuccess = () => {
+        if (!current.result) { failure = new Error('다른 화면에서 삭제된 기록이에요. 목록을 새로 확인해주세요.'); tx.abort(); return; }
+        if (remove) { clips.delete(id); return; }
+        const {title, notes, status} = changes;
+        record = {...current.result, ...(title !== undefined ? {title} : {}), ...(notes !== undefined ? {notes} : {}), ...(status !== undefined ? {status: status === 'ready' ? 'ready' : 'draft'} : {})};
+        clips.put(record);
+      };
+    };
+  });
 }
-export const deleteClip = id => write('clips', store => store.delete(id));
+export const updateClip = (id, changes) => changeClip(id, changes);
+export const deleteClip = id => changeClip(id, {}, true);
 export async function getProfile() { const profile = await read('settings', 'profile'); return profile || { name: '참여자', goal: 3 }; }
 export async function saveProfile(profile) { const item = { id: 'profile', name: String(profile.name || '').trim().slice(0, 24) || '참여자', goal: Math.min(30, Math.max(1, Number(profile.goal) || 3)) }; await write('settings', store => store.put(item)); return item; }
 export async function addExamples() {

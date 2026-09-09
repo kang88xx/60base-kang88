@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>몸짓 by BASE60</title>
-<meta name="description" content="몸짓은 BASE60 참여자가 미션을 고르고 영상을 이 브라우저에 저장하는 모바일 PWA입니다.">
+<meta name="description" content="몸짓 by BASE60: 미션 촬영부터 심사, 수익 확인, 계좌 관리와 촬영용품 상점까지.">
 <meta name="theme-color" content="#f7f8fa">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="몸짓">
@@ -14,6 +14,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="../shared/base.css">
 <link rel="stylesheet" href="../shared/capture.css">
+<link rel="stylesheet" href="../shared/service.css">
 <link rel="stylesheet" href="app.css">
 <script type="module" src="app.js"></script>
 </head>
@@ -38,6 +39,7 @@
   </header>
 
   <main id="main" class="app-main" tabindex="-1">
+    <aside class="service-preview-notice" aria-label="서비스 시연 안내"><strong>심사·수익 시연</strong><span>현재 이 브라우저에서만 동작합니다. 실제 송금·결제·배송은 이루어지지 않습니다.</span></aside>
     <section class="view is-active" id="view-home" data-view="home" aria-labelledby="home-title">
       <div class="hero-panel">
         <div>
@@ -64,18 +66,25 @@
         </button>
       </div>
 
-      <div class="stats-grid" aria-label="내 기록 요약">
+      <nav class="service-shortcuts" aria-label="참여 관리">
+        <a href="#reviews"><span data-icon="checkCircle"></span>심사 현황</a>
+        <a href="#wallet"><span data-icon="folder"></span>수익·출금</a>
+        <a href="#shop"><span data-icon="grid"></span>촬영 상점</a>
+      </nav>
+
+      <a class="earnings-highlight" href="#wallet"><span>출금 가능한 시연 수익<strong data-wallet-available>0원</strong></span><span data-icon="chevron"></span></a>
+      <div class="stats-grid" aria-label="내 참여 요약">
         <article>
           <span class="stat-value" data-stat="total">0</span>
           <span class="stat-label">전체 기록</span>
         </article>
         <article>
-          <span class="stat-value" data-stat="ready">0</span>
-          <span class="stat-label">준비 완료</span>
+          <span class="stat-value" data-stat="pending">0</span>
+          <span class="stat-label">심사 대기·진행</span>
         </article>
         <article>
-          <span class="stat-value" data-stat="draft">0</span>
-          <span class="stat-label">초안</span>
+          <span class="stat-value" data-stat="approved">0</span>
+          <span class="stat-label">통과</span>
         </article>
       </div>
 
@@ -161,11 +170,35 @@
       <div id="library-list" class="clip-list" aria-live="polite"></div>
     </section>
 
+    <section class="view" id="view-reviews" data-view="reviews" aria-labelledby="reviews-title">
+      <div class="view-title"><p class="eyebrow">심사 현황</p><h1 id="reviews-title">제출부터 통과까지.</h1><p>통과한 영상의 보상이 적립됩니다. 반려 사유를 확인하고 다시 제출할 수 있어요.</p></div>
+      <nav class="link-row" aria-label="심사 관련 메뉴"><a href="#library">내 영상</a><a href="#wallet">수익 확인</a></nav>
+      <div id="app-reviews" class="service-mount" aria-live="polite"></div>
+    </section>
+
+    <section class="view" id="view-wallet" data-view="wallet" aria-labelledby="wallet-title">
+      <div class="view-title"><p class="eyebrow">수익·출금</p><h1 id="wallet-title">내 참여가 만든 수익.</h1><p>적립 내역과 출금 진행 상황을 확인하세요.</p></div>
+      <nav class="link-row" aria-label="수익 관련 메뉴"><a href="#reviews">심사 현황</a><a href="#shop">상점에서 사용</a></nav>
+      <div id="app-wallet" class="service-mount" aria-live="polite"></div>
+    </section>
+
+    <section class="view" id="view-shop" data-view="shop" aria-labelledby="shop-title">
+      <div class="view-title"><p class="eyebrow">촬영 상점</p><h1 id="shop-title">더 편하게 기록하는 도구.</h1><p>촬영용품을 둘러보고 장바구니와 주문 내역을 관리하세요.</p></div>
+      <nav class="link-row" aria-label="상점 관련 메뉴"><a href="#wallet">내 수익</a><a href="#capture">촬영하기</a></nav>
+      <div id="app-shop" class="service-mount" aria-live="polite"></div>
+    </section>
+
     <section class="view" id="view-profile" data-view="profile" aria-labelledby="profile-title">
       <div class="view-title">
         <p class="eyebrow">프로필</p>
-        <h1 id="profile-title">내 기록 목표를 정해요.</h1>
+        <h1 id="profile-title">내 참여와 수익을 한곳에.</h1>
       </div>
+      <nav class="profile-service-menu" aria-label="내 서비스 메뉴">
+        <a href="#reviews"><span><strong>심사 현황</strong><small>결과·반려 사유·다시 제출</small></span><span data-icon="chevron"></span></a>
+        <a href="#wallet"><span><strong>수익·출금 내역</strong><small data-profile-wallet>시연 수익 0원</small></span><span data-icon="chevron"></span></a>
+        <button type="button" data-action="app-account"><span><strong>출금 계좌 관리</strong><small data-profile-account>시연 계좌를 등록하세요</small></span><span data-icon="chevron"></span></button>
+        <a href="#shop"><span><strong>상점·주문 내역</strong><small>촬영용품과 장바구니</small></span><span data-icon="chevron"></span></a>
+      </nav>
       <form class="profile-card" id="profile-form" novalidate>
         <label>
           이름
@@ -196,7 +229,7 @@
 
       <section class="notice-card" aria-labelledby="notice-title">
         <h2 id="notice-title">로컬 저장 안내</h2>
-        <p>몸짓은 현재 로그인, 동기화, 제출 기능이 없는 프론트엔드 프로토타입입니다. 기록과 프로필은 이 브라우저에만 저장됩니다.</p>
+        <p>기록과 프로필, 심사 및 수익 시연 내역은 이 브라우저에 저장됩니다. 같은 브라우저의 웹 스튜디오에서도 확인할 수 있습니다. 브라우저 데이터를 지우면 기록이 삭제됩니다.</p>
         <div class="link-row">
           <a href="../studio/">웹 스튜디오 열기</a>
           <a href="../">BASE60 사이트</a>
@@ -210,7 +243,7 @@
     <a href="#missions" data-tab="missions"><span data-icon="grid"></span><b>미션</b></a>
     <a href="#capture" data-tab="capture"><span data-icon="camera"></span><b>촬영</b></a>
     <a href="#library" data-tab="library"><span data-icon="video"></span><b>기록</b></a>
-    <a href="#profile" data-tab="profile"><span data-icon="user"></span><b>프로필</b></a>
+    <a href="#profile" data-tab="profile"><span data-icon="user"></span><b>내 정보</b></a>
   </nav>
 </div>
 </body>

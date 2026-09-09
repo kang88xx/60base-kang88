@@ -1,9 +1,10 @@
-const CACHE = 'momjit-frontend-20260908-base60-v2';
+const CACHE = 'momjit-frontend-20260909-service-v3';
 const SHELL = [
   '/', '/index.html', '/styles.css', '/main.js',
   '/studio/', '/studio/index.html', '/studio/studio.css', '/studio/studio.js',
   '/app/', '/app/index.html', '/app/app.css', '/app/app.js', '/app/manifest.webmanifest',
   '/app/icons/icon.svg', '/app/icons/icon-192.png', '/app/icons/icon-512.png',
+  '/shared/service-store.js', '/shared/service-ui.js', '/shared/service.css',
   '/shared/base.css', '/shared/capture.css', '/shared/data.js', '/shared/store.js', '/shared/ui.js', '/shared/capture.js',
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))); });
