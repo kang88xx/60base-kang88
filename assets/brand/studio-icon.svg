@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Momjit Studio service icon</title>
+  <rect width="256" height="256" rx="56" fill="#245BFF"/>
+  <path transform="translate(54 54) scale(.880952381)" fill="#FFFFFF" d="M64 0h104v48H64a16 16 0 0 0-16 16v40H0V64A64 64 0 0 1 64 0Zm56 64h48v40a64 64 0 0 1-64 64H0v-48h104a16 16 0 0 0 16-16Z"/>
+</svg>

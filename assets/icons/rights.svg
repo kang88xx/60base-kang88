@@ -1,0 +1,17 @@
+<svg class="AnimatedIcon__icon" width="64" height="64" preserveAspectRatio="xMidYMid meet" viewBox="13.245156249999997 27.8225373840332 40.540937500000005 40.540937500000005" xmlns="http://www.w3.org/2000/svg" data-js-controller="ShieldWithCheckmarkIcon" fill="#000000">
+      <defs>
+      <path id="g31x2" d="M29.5 31.2727C29.5 31.2727 35.8 35.866 43 35.866V45.9713C43 60.6698 31.3 66.1818 29.5 66.1818C27.7 66.1818 16 60.6698 16 45.9713V35.866C23.2 35.866 29.5 31.2727 29.5 31.2727Z"></path>
+      <path id="g31x1" fill-rule="evenodd" clip-rule="evenodd" d="M12 31.27H47V66.27H12V31.27ZM26.0385 46.7422C26.0385 44.8246 27.5882 43.27 29.5 43.27C31.4118 43.27 32.9615 44.8246 32.9615 46.7422V48.1311H33.3077C33.69 48.1311 34 48.442 34 48.8256V52.9922C34 53.7593 33.3801 54.3811 32.6154 54.3811H26.3846C25.6199 54.3811 25 53.7593 25 52.9922V48.8256C25 48.442 25.31 48.1311 25.6923 48.1311H26.0385V46.7422ZM29.5 44.6589C30.6471 44.6589 31.5769 45.5917 31.5769 46.7423V48.1312H27.4231V46.7423C27.4231 45.5917 28.353 44.6589 29.5 44.6589Z"></path>
+      <path id="g31x3" class="ShieldWithCheckmarkIcon__check" d="M42 30C46.9706 30 51 34.0294 51 39C51 43.9706 46.9706 48 42 48C37.0294 48 33 43.9706 33 39C33 34.0294 37.0294 30 42 30ZM45.94 34.73L40 40.78L38.43 39C38.1336 38.7182 37.6762 38.6943 37.352 38.9436C37.0279 39.193 36.9337 39.6413 37.13 40L39 43.2C39.1823 43.4942 39.5039 43.6732 39.85 43.6732C40.1961 43.6732 40.5177 43.4942 40.7 43.2C41 42.79 46.7 35.63 46.7 35.63C47.45 34.83 46.54 34.12 45.94 34.73Z" data-js-target-list="ShieldWithCheckmarkIcon.checks"></path>
+      <clipPath id="g31x0">
+        <use href="#g31x2"></use>
+      </clipPath>
+    </defs>
+
+    <use class="ShieldWithCheckmarkIcon__check" href="#g31x3" fill="#FF5A0A" data-js-target-list="ShieldWithCheckmarkIcon.checks"></use>
+
+    <g clip-path="url(#g31x0)" fill="#000000">
+      <use class="ShieldWithCheckmarkIcon__content" href="#g31x1" fill="#FEBE3D" data-js-target="ShieldWithCheckmarkIcon.content"></use>
+      <use class="ShieldWithCheckmarkIcon__check" href="#g31x3" fill="#B11B07" data-js-target-list="ShieldWithCheckmarkIcon.checks"></use>
+    </g>
+    </svg>

@@ -1,0 +1,30 @@
+{
+  "status": "DONE",
+  "policy": "points-only/Korea filming, bank withdrawals disabled",
+  "updatedAt": "2026-09-17T04:20:43.815Z",
+  "diagrams": [
+    {
+      "name": "video-system",
+      "elements": 42,
+      "width": 1950,
+      "height": 1367
+    },
+    {
+      "name": "video-lifecycle",
+      "elements": 45,
+      "width": 1950,
+      "height": 2708
+    }
+  ],
+  "sha256": {
+    "README.md": "82d9d08abcb5a180857a2d26c6b9c063e3278af1ac1e81b5c0128be8a254866c",
+    "video-system.mmd": "76bdc196675f7fe57129127389093e675c7cfa8eb45a6871e48742a5c932653b",
+    "video-system.svg": "8cc021d8aa1d9e023374926191f06516b0bde31c7d3d8d9144390bada63b147a",
+    "video-system.png": "771b0fc019c36d85ab218152eb47bc32f737bc1270eb126f4197c100c869311a",
+    "video-system.excalidraw": "07da1cdac55377d72e85e928eabbcc81acff43a1cffd1446fad0418c8475925b",
+    "video-lifecycle.mmd": "d9d58f4fe15c78e5023f7382593921a9e116b3010f7720c1fad98de6112533fc",
+    "video-lifecycle.svg": "1bd75caf5b7ef3c2f10596dd6fdf15788c938ca6dc486f2af9b925c168c4bf65",
+    "video-lifecycle.png": "726a511ecaf6c9c8585a425ff62c4909e3b7a5dac79ca0c25176f964f99276b4",
+    "video-lifecycle.excalidraw": "7862f673ba914f6c24149f5858615e1b566973e6e00270352673a134c0b10219"
+  }
+}

@@ -1,21 +1,19 @@
 {
-  "name": "몸짓 by BASE60",
-  "short_name": "몸짓",
-  "description": "BASE60 참여자용 로컬 기록 PWA",
+  "id": "/app/",
+  "name": "60BASE · 촬영 참여",
+  "short_name": "60BASE",
+  "description": "한국의 일상을 촬영하고, 심사와 포인트를 확인하는 60BASE 앱",
   "lang": "ko-KR",
   "start_url": "/app/",
   "scope": "/app/",
   "display": "standalone",
-  "background_color": "#f7f8fa",
-  "theme_color": "#f7f8fa",
-  "orientation": "portrait-primary",
+  "background_color": "#f7f8fc",
+  "theme_color": "#08183e",
+  "orientation": "any",
+  "categories": [
+    "productivity"
+  ],
   "icons": [
-    {
-      "src": "icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
@@ -27,6 +25,16 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "촬영 활동",
+      "url": "/app/#missions"
+    },
+    {
+      "name": "보관한 영상",
+      "url": "/app/#library"
     }
   ]
 }

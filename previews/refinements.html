@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>60BASE refinement previews</title>
+<style>
+  :root {
+    --bg: #fbfaf9;
+    --surface: #fff;
+    --ink: #343433;
+    --body: #494440;
+    --muted: #74706c;
+    --line: #e2ddd7;
+    --soft: #f4f1ec;
+    --orange: #ff5310;
+    --orange-soft: #fff0e9;
+    --blue: #245bb8;
+    --green: #187444;
+    --shadow: 0 18px 50px rgba(52, 52, 51, .12);
+    --radius: 18px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .86), rgba(251, 250, 249, .94)),
+      radial-gradient(circle at 10% 10%, rgba(255, 83, 16, .08), transparent 32rem);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  .shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0 42px;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 760;
+    color: var(--orange);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  h1, h2, h3, p { margin: 0; }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.18;
+    font-weight: 760;
+    letter-spacing: 0;
+  }
+
+  .lede {
+    margin-top: 9px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .mode-switch {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    min-width: min(100%, 328px);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(52, 52, 51, .05);
+    isolation: isolate;
+  }
+
+  .mode-switch::before {
+    content: "";
+    position: absolute;
+    inset: 4px auto 4px 4px;
+    width: calc(50% - 4px);
+    border-radius: inherit;
+    background: var(--ink);
+    transition: transform 220ms cubic-bezier(.19, 1, .22, 1);
+  }
+
+  body[data-mode="interaction"] .mode-switch::before {
+    transform: translateX(100%);
+  }
+
+  .mode-switch button {
+    position: relative;
+    z-index: 1;
+    border: 0;
+    background: transparent;
+    min-height: 40px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 720;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .mode-switch button[aria-pressed="true"] { color: #fff; }
+
+  .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 24px 0 16px;
+  }
+
+  .variant-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .variant-picker button,
+  .copy-button {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    min-height: 36px;
+    padding: 7px 13px;
+    font-size: 12px;
+    font-weight: 760;
+    cursor: pointer;
+  }
+
+  .variant-picker button[aria-pressed="true"] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .copy-button {
+    color: var(--orange);
+    border-color: rgba(255, 83, 16, .3);
+    background: var(--orange-soft);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .preview-card {
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 8px 26px rgba(52, 52, 51, .07);
+    overflow: hidden;
+  }
+
+  .card-copy {
+    padding: 14px 15px 16px;
+  }
+
+  .card-copy h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 25px;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--orange);
+    font-size: 11px;
+    font-weight: 820;
+  }
+
+  .card-copy p {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .video-stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #191918;
+  }
+
+  .video-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, transparent 54%, rgba(15, 13, 11, .34));
+  }
+
+  .glass-label {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    max-width: calc(100% - 28px);
+    min-height: 37px;
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 760;
+    line-height: 1.25;
+    white-space: nowrap;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    backdrop-filter: blur(13px) saturate(1.32);
+    -webkit-backdrop-filter: blur(13px) saturate(1.32);
+  }
+
+  .video-stage:hover .glass-label,
+  .video-stage:focus-within .glass-label {
+    transform: translateY(3px);
+  }
+
+  .g1 .glass-label {
+    color: #302d2a;
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid rgba(255, 255, 255, .72);
+    box-shadow: 0 10px 26px rgba(31, 28, 24, .18);
+  }
+
+  .g1 .video-stage:hover .glass-label {
+    background: rgba(255, 255, 255, .84);
+    box-shadow: 0 15px 36px rgba(31, 28, 24, .22);
+  }
+
+  .g2 .glass-label {
+    color: #fff;
+    background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.08));
+    border: 1px solid rgba(255, 255, 255, .55);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .75),
+      inset 0 -1px 0 rgba(255, 255, 255, .12),
+      0 13px 30px rgba(0, 0, 0, .22);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, .45);
+  }
+
+  .g2 .video-stage:hover .glass-label {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .9),
+      0 18px 36px rgba(0, 0, 0, .25);
+  }
+
+  .g3 .glass-label {
+    color: #fff8f4;
+    background: linear-gradient(145deg, rgba(255, 112, 45, .38), rgba(46, 38, 31, .28));
+    border: 1px solid rgba(255, 203, 173, .52);
+    box-shadow:
+      0 0 0 1px rgba(255, 120, 48, .1),
+      0 0 24px rgba(255, 83, 16, .36),
+      0 13px 30px rgba(44, 28, 20, .24);
+    text-shadow: 0 1px 8px rgba(45, 20, 8, .4);
+  }
+
+  .g3 .video-stage:hover .glass-label {
+    box-shadow:
+      0 0 0 1px rgba(255, 120, 48, .16),
+      0 0 34px rgba(255, 83, 16, .48),
+      0 18px 40px rgba(44, 28, 20, .26);
+  }
+
+  .interaction-demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 13px;
+    background: linear-gradient(180deg, #fff, #fbfaf9);
+  }
+
+  .quality-shell {
+    position: relative;
+    min-height: 452px;
+    border: 1px solid #ebe7e1;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
+  .quality-tabs {
+    position: relative;
+    display: grid;
+    gap: 7px;
+    padding: 12px;
+    border-bottom: 1px solid #ece8e2;
+    background: #fff;
+  }
+
+  .quality-tab {
+    position: relative;
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 58px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    isolation: isolate;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .quality-tab:focus-visible,
+  .variant-picker button:focus-visible,
+  .mode-switch button:focus-visible,
+  .copy-button:focus-visible {
+    outline: 3px solid rgba(36, 91, 184, .3);
+    outline-offset: 2px;
+  }
+
+  .quality-tab img {
+    display: block;
+    width: 33px;
+    height: 33px;
+    object-fit: contain;
+  }
+
+  .quality-tab .icon-wrap {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f4f1ec;
+    transition: transform 220ms cubic-bezier(.19,1,.22,1), background 180ms ease;
+  }
+
+  .quality-tab strong {
+    display: block;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .quality-tab span:last-child span {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .quality-preview {
+    padding: 16px;
+  }
+
+  .quality-preview article {
+    min-height: 170px;
+    border-radius: 13px;
+    background: #f7f5f1;
+    padding: 17px;
+  }
+
+  .quality-preview h3 {
+    font-size: 18px;
+    line-height: 1.32;
+  }
+
+  .quality-preview p {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .mini-artifact {
+    margin-top: 18px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .mini-line {
+    height: 9px;
+    border-radius: 999px;
+    background: #e4ded7;
+  }
+
+  .mini-line:nth-child(1) { width: 86%; }
+  .mini-line:nth-child(2) { width: 65%; background: #ece7e0; }
+  .mini-line:nth-child(3) { width: 76%; background: rgba(255,83,16,.2); }
+
+  .i1 .selection-surface {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 12px;
+    height: 58px;
+    border-radius: 11px;
+    background: #f2f0eb;
+    box-shadow: inset 0 0 0 1px rgba(52, 52, 51, .04);
+    transform: translateY(calc(var(--active-index, 0) * 65px));
+    transition: transform 260ms cubic-bezier(.19, 1, .22, 1);
+    pointer-events: none;
+  }
+
+  .i1 .quality-tab[aria-selected="true"] {
+    color: var(--ink);
+  }
+
+  .i1 .quality-tab[aria-selected="true"] .icon-wrap {
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(52, 52, 51, .08);
+  }
+
+  .i2 .accent-rail {
+    position: absolute;
+    left: 12px;
+    top: 20px;
+    width: 4px;
+    height: 42px;
+    border-radius: 999px;
+    background: var(--orange);
+    box-shadow: 0 0 18px rgba(255, 83, 16, .32);
+    transform: translateY(calc(var(--active-index, 0) * 65px));
+    transition: transform 230ms cubic-bezier(.19, 1, .22, 1);
+    pointer-events: none;
+  }
+
+  .i2 .quality-tab {
+    padding-left: 17px;
+  }
+
+  .i2 .quality-tab[aria-selected="true"] {
+    background: linear-gradient(90deg, rgba(255, 83, 16, .08), transparent 76%);
+  }
+
+  .i2 .quality-tab[aria-selected="true"] .icon-wrap {
+    background: #fff0e9;
+  }
+
+  .i3 .quality-tab[aria-selected="true"] {
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(52, 52, 51, .08);
+  }
+
+  .i3 .quality-tab[aria-selected="true"] .icon-wrap {
+    background: #fff4ee;
+  }
+
+  .i3 .quality-tab.is-spring .icon-wrap {
+    animation: iconSpring 420ms cubic-bezier(.19, 1, .22, 1);
+  }
+
+  .i3 .quality-tab.is-spring .icon-wrap::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 15px;
+    background: rgba(255, 83, 16, .16);
+    animation: softHalo 520ms ease-out both;
+    z-index: -1;
+  }
+
+  .notes {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .note {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .72);
+    padding: 12px 13px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .note strong {
+    display: block;
+    color: var(--ink);
+    margin-bottom: 3px;
+  }
+
+  .status {
+    min-height: 18px;
+    margin-top: 10px;
+    color: var(--green);
+    font-size: 12px;
+  }
+
+  [hidden] { display: none !important; }
+
+  @keyframes iconSpring {
+    0% { transform: scale(.92) rotate(-2deg); }
+    45% { transform: scale(1.12) rotate(2deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  @keyframes softHalo {
+    0% { opacity: 0; transform: scale(.78); }
+    35% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+
+  @media (max-width: 1199px) {
+    .grid,
+    .notes {
+      grid-template-columns: 1fr;
+    }
+
+    .video-stage {
+      aspect-ratio: 16 / 8.2;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .shell {
+      width: min(100% - 22px, 620px);
+      padding-top: 22px;
+    }
+
+    .topbar,
+    .panel-head {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    h1 { font-size: 24px; }
+
+    .mode-switch { width: 100%; }
+
+    .variant-picker button,
+    .copy-button {
+      flex: 1 1 auto;
+    }
+
+    .video-stage {
+      aspect-ratio: 4 / 3;
+    }
+
+    .glass-label {
+      left: 10px;
+      top: 10px;
+      max-width: calc(100% - 20px);
+      font-size: 11px;
+      white-space: normal;
+    }
+
+    .quality-shell {
+      min-height: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 1ms !important;
+    }
+  }
+</style>
+</head>
+<body data-mode="label">
+<main class="shell">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">60BASE refinement preview</p>
+      <h1>서비스 영상 라벨과 품질 메뉴 인터랙션 시안</h1>
+      <p class="lede">실제 의류 접기 영상과 기존 아이콘으로만 만든 선택용 미리보기입니다. 적용 기능은 없고, 필요한 코드명만 복사할 수 있습니다.</p>
+    </div>
+    <div class="mode-switch" aria-label="미리보기 모드">
+      <button type="button" data-mode-target="label" aria-pressed="true">영상 라벨</button>
+      <button type="button" data-mode-target="interaction" aria-pressed="false">메뉴 인터랙션</button>
+    </div>
+  </header>
+
+  <section id="label-mode" aria-labelledby="label-title">
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Glass / Glow Labels</p>
+        <h2 id="label-title">라벨이 영상 위에서 읽히는 방식</h2>
+      </div>
+      <div class="variant-picker" aria-label="영상 라벨 시안 선택">
+        <button type="button" data-copy="G1 clean frosted white" aria-pressed="true">G1</button>
+        <button type="button" data-copy="G2 clear glass edge highlight" aria-pressed="false">G2</button>
+        <button type="button" data-copy="G3 subtle warm glass glow" aria-pressed="false">G3</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <article class="preview-card g1">
+        <div class="video-stage">
+          <video src="../assets/videos/collection/folding-clothes.mp4" poster="../assets/videos/collection/folding-clothes.jpg" preload="metadata" playsinline muted loop controls aria-label="의류 접기 촬영 예시 G1"></video>
+          <span class="glass-label">의류 접기 · 촬영 예시</span>
+        </div>
+        <div class="card-copy">
+          <h2>Clean frosted white <span class="badge">G1</span></h2>
+          <p>기존 흰 배경 톤과 가장 가깝습니다. 밝은 유리감이라 서비스 카드 전체가 깨끗하고 조용하게 보입니다.</p>
+        </div>
+      </article>
+
+      <article class="preview-card g2">
+        <div class="video-stage">
+          <video src="../assets/videos/collection/folding-clothes.mp4" poster="../assets/videos/collection/folding-clothes.jpg" preload="metadata" playsinline muted loop controls aria-label="의류 접기 촬영 예시 G2"></video>
+          <span class="glass-label">의류 접기 · 촬영 예시</span>
+        </div>
+        <div class="card-copy">
+          <h2>Clear glass edge <span class="badge">G2</span></h2>
+          <p>투명도를 가장 살린 안입니다. 얇은 가장자리 하이라이트로 영상 위에 떠 있는 느낌이 뚜렷합니다.</p>
+        </div>
+      </article>
+
+      <article class="preview-card g3">
+        <div class="video-stage">
+          <video src="../assets/videos/collection/folding-clothes.mp4" poster="../assets/videos/collection/folding-clothes.jpg" preload="metadata" playsinline muted loop controls aria-label="의류 접기 촬영 예시 G3"></video>
+          <span class="glass-label">의류 접기 · 촬영 예시</span>
+        </div>
+        <div class="card-copy">
+          <h2>Warm glass glow <span class="badge">G3</span></h2>
+          <p>브랜드 오렌지를 가장 은근하게 드러냅니다. 어두운 영상 구간에서 존재감이 좋고, hover 때 따뜻한 빛이 커집니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="interaction-mode" aria-labelledby="interaction-title" hidden>
+    <div class="panel-head">
+      <div>
+        <p class="eyebrow">Quality Sidebar Interactions</p>
+        <h2 id="interaction-title">네 가지 품질 선택의 움직임</h2>
+      </div>
+      <div class="variant-picker" aria-label="메뉴 인터랙션 시안 선택">
+        <button type="button" data-copy="I1 sliding selection surface" aria-pressed="true">I1</button>
+        <button type="button" data-copy="I2 moving accent rail" aria-pressed="false">I2</button>
+        <button type="button" data-copy="I3 one-shot icon spring and soft halo" aria-pressed="false">I3</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <article class="preview-card i1">
+        <div class="interaction-demo" data-quality-demo>
+          <div class="quality-shell">
+            <div class="quality-tabs" role="tablist" aria-label="I1 품질 메뉴">
+              <span class="selection-surface" aria-hidden="true"></span>
+            </div>
+            <div class="quality-preview"></div>
+          </div>
+        </div>
+        <div class="card-copy">
+          <h2>Sliding surface <span class="badge">I1</span></h2>
+          <p>선택한 항목의 배경 면이 아래위로 미끄러집니다. 차분하고 앱 같은 반응이라 가장 안정적입니다.</p>
+        </div>
+      </article>
+
+      <article class="preview-card i2">
+        <div class="interaction-demo" data-quality-demo>
+          <div class="quality-shell">
+            <div class="quality-tabs" role="tablist" aria-label="I2 품질 메뉴">
+              <span class="accent-rail" aria-hidden="true"></span>
+            </div>
+            <div class="quality-preview"></div>
+          </div>
+        </div>
+        <div class="card-copy">
+          <h2>Moving accent rail <span class="badge">I2</span></h2>
+          <p>왼쪽 오렌지 레일이 선택 위치를 따라갑니다. 메뉴의 현재 위치를 빠르게 읽게 해줍니다.</p>
+        </div>
+      </article>
+
+      <article class="preview-card i3">
+        <div class="interaction-demo" data-quality-demo>
+          <div class="quality-shell">
+            <div class="quality-tabs" role="tablist" aria-label="I3 품질 메뉴"></div>
+            <div class="quality-preview"></div>
+          </div>
+        </div>
+        <div class="card-copy">
+          <h2>Icon spring halo <span class="badge">I3</span></h2>
+          <p>선택 순간에 아이콘만 한 번 튀고 부드러운 빛이 사라집니다. 작은 보상감이 필요한 쪽에 맞습니다.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div class="notes" aria-label="비교 메모">
+    <p class="note"><strong>라벨 후보</strong>G1은 가장 안전하고, G2는 유리 질감이 선명하며, G3는 브랜드 색이 가장 잘 남습니다.</p>
+    <p class="note"><strong>인터랙션 후보</strong>I1은 정돈감, I2는 위치 인지, I3는 터치 반응감이 강점입니다.</p>
+    <p class="note"><strong>선택 보조</strong>위쪽 G/I 버튼을 누르면 코드명이 클립보드에 복사됩니다. 실제 사이트에는 아무 것도 저장하지 않습니다.</p>
+  </div>
+  <p class="status" role="status" aria-live="polite"></p>
+</main>
+
+<script>
+  const qualityItems = [
+    {
+      title: "샘플 승인",
+      kicker: "촬영 기준을 먼저 한 편으로 맞춥니다.",
+      body: "구도, 손과 물체의 가시성, 완료 조건을 승인 샘플에 고정합니다.",
+      icon: "../assets/icons/samples.svg"
+    },
+    {
+      title: "촬영·라벨 품질",
+      kicker: "영상과 작업 구간을 함께 확인합니다.",
+      body: "의류 접기처럼 동작 구간이 나뉘는 작업은 클립과 JSONL 기준을 함께 봅니다.",
+      icon: "../assets/icons/review.svg"
+    },
+    {
+      title: "동의·이용 권리",
+      kicker: "참여자 동의와 이용 범위를 연결합니다.",
+      body: "촬영 장소, 참여자, 학습·상업적 이용 조건을 클립 단위 참조로 남깁니다.",
+      icon: "../assets/icons/rights.svg"
+    },
+    {
+      title: "납품·품질 보증",
+      kicker: "영상, 라벨, 문서를 함께 전달합니다.",
+      body: "클립 메타데이터, 검수 결과, 권리 문서를 매니페스트로 묶어 확인합니다.",
+      icon: "../assets/icons/video-files.svg"
+    }
+  ];
+
+  const status = document.querySelector(".status");
+  const modeButtons = Array.from(document.querySelectorAll("[data-mode-target]"));
+  const sections = {
+    label: document.querySelector("#label-mode"),
+    interaction: document.querySelector("#interaction-mode")
+  };
+
+  function setMode(mode) {
+    document.body.dataset.mode = mode;
+    modeButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.modeTarget === mode));
+    });
+    sections.label.hidden = mode !== "label";
+    sections.interaction.hidden = mode !== "interaction";
+  }
+
+  modeButtons.forEach((button) => {
+    button.addEventListener("click", () => setMode(button.dataset.modeTarget));
+  });
+
+  document.querySelectorAll(".variant-picker button").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const picker = button.closest(".variant-picker");
+      picker.querySelectorAll("button").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+
+      const value = button.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(value);
+        status.textContent = `${value} 복사됨`;
+      } catch {
+        status.textContent = `${value} 선택됨`;
+      }
+    });
+  });
+
+  document.querySelectorAll("video").forEach((video) => {
+    video.addEventListener("mouseenter", () => {
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    });
+  });
+
+  function createTab(item, index, demoIndex) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "quality-tab";
+    button.id = `quality-${demoIndex}-tab-${index}`;
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(index === 0));
+    button.setAttribute("aria-controls", `quality-${demoIndex}-panel`);
+    button.tabIndex = index === 0 ? 0 : -1;
+    button.dataset.index = String(index);
+
+    const iconWrap = document.createElement("span");
+    iconWrap.className = "icon-wrap";
+    const icon = document.createElement("img");
+    icon.src = item.icon;
+    icon.alt = "";
+    icon.width = 42;
+    icon.height = 42;
+    iconWrap.appendChild(icon);
+
+    const copy = document.createElement("span");
+    const title = document.createElement("strong");
+    title.textContent = item.title;
+    const kicker = document.createElement("span");
+    kicker.textContent = item.kicker;
+    copy.append(title, kicker);
+
+    button.append(iconWrap, copy);
+    return button;
+  }
+
+  function updateDemo(demo, index, animate) {
+    const tabs = Array.from(demo.querySelectorAll(".quality-tab"));
+    const shell = demo.querySelector(".quality-shell");
+    const preview = demo.querySelector(".quality-preview");
+    const item = qualityItems[index];
+
+    shell.style.setProperty("--active-index", index);
+    tabs.forEach((tab, tabIndex) => {
+      const selected = tabIndex === index;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      tab.classList.toggle("is-spring", false);
+    });
+
+    preview.innerHTML = `
+      <article id="${tabs[index].getAttribute("aria-controls")}" role="tabpanel" aria-labelledby="${tabs[index].id}" tabindex="0">
+        <h3>${item.title}</h3>
+        <p>${item.body}</p>
+        <div class="mini-artifact" aria-hidden="true">
+          <span class="mini-line"></span>
+          <span class="mini-line"></span>
+          <span class="mini-line"></span>
+        </div>
+      </article>
+    `;
+
+    if (animate && demo.closest(".i3")) {
+      requestAnimationFrame(() => tabs[index].classList.add("is-spring"));
+    }
+  }
+
+  function moveTab(demo, currentIndex, direction) {
+    if (direction === "Home") return 0;
+    if (direction === "End") return qualityItems.length - 1;
+    if (direction === "ArrowDown" || direction === "ArrowRight") return (currentIndex + 1) % qualityItems.length;
+    if (direction === "ArrowUp" || direction === "ArrowLeft") return (currentIndex - 1 + qualityItems.length) % qualityItems.length;
+    return currentIndex;
+  }
+
+  document.querySelectorAll("[data-quality-demo]").forEach((demo, demoIndex) => {
+    const tablist = demo.querySelector(".quality-tabs");
+    qualityItems.forEach((item, index) => {
+      tablist.appendChild(createTab(item, index, demoIndex));
+    });
+
+    tablist.addEventListener("click", (event) => {
+      const tab = event.target.closest(".quality-tab");
+      if (!tab) return;
+      updateDemo(demo, Number(tab.dataset.index), true);
+      tab.focus();
+    });
+
+    tablist.addEventListener("keydown", (event) => {
+      const keys = ["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "Home", "End", "Enter", " "];
+      if (!keys.includes(event.key)) return;
+      event.preventDefault();
+
+      const current = Number(document.activeElement.closest(".quality-tab")?.dataset.index || 0);
+      if (event.key === "Enter" || event.key === " ") {
+        updateDemo(demo, current, true);
+        return;
+      }
+
+      const next = moveTab(demo, current, event.key);
+      updateDemo(demo, next, true);
+      demo.querySelectorAll(".quality-tab")[next].focus();
+    });
+
+    updateDemo(demo, 0, false);
+  });
+</script>
+</body>
+</html>

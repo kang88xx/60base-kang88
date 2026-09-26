@@ -1,0 +1,17 @@
+<svg class="AnimatedIcon__icon" width="64" height="64" preserveAspectRatio="xMidYMid meet" viewBox="12.208437499999999 26.685 42.63 42.63" xmlns="http://www.w3.org/2000/svg" data-js-controller="DocumentWithCheckmarkIcon" fill="#000000">
+      <defs>
+      <path id="g143x1" d="M42 37C42 34.7909 40.2091 33 38 33H20C17.7909 33 16 34.7909 16 37V63C16 65.2091 17.7909 67 20 67H38C40.2091 67 42 65.2091 42 63V37Z"></path>
+      <path id="g143x2" d="M16 33H20H38H46H64H68V37V63V67H64H46H38H20H16V63V37V33ZM20 63H38V61H20V63ZM46 63H64V61H46V63ZM20 37V39H28V37H20ZM38 56H34V58H38V56ZM32 56H20V58H32V56ZM38 51H20V53H38V51ZM32 46H20V48H32V46ZM64 56H60V58H64V56ZM58 56H46V58H58V56ZM64 51H46V53H64V51ZM58 46H46V48H58V46ZM54 37H46V39H54V37Z"></path>
+      <path id="g143x3" class="DocumentWithCheckmarkIcon__check" d="M42 29C46.9706 29 51 33.0294 51 38C51 42.9706 46.9706 47 42 47C37.0294 47 33 42.9706 33 38C33 33.0294 37.0294 29 42 29ZM45.94 33.73L40 39.78L38.43 38C38.1336 37.7182 37.6762 37.6943 37.352 37.9436C37.0279 38.193 36.9337 38.6413 37.13 39L39 42.2C39.1823 42.4942 39.5039 42.6732 39.85 42.6732C40.1961 42.6732 40.5177 42.4942 40.7 42.2C41 41.79 46.7 34.63 46.7 34.63C47.45 33.83 46.54 33.12 45.94 33.73Z" data-js-target-list="DocumentWithCheckmarkIcon.checks"></path>
+      <clipPath id="g143x0">
+        <use href="#g143x1"></use>
+      </clipPath>
+    </defs>
+
+    <use class="DocumentWithCheckmarkIcon__check" href="#g143x3" fill="#FF5A0A" data-js-target-list="DocumentWithCheckmarkIcon.checks"></use>
+
+    <g clip-path="url(#g143x0)" fill="#000000">
+      <use class="DocumentWithCheckmarkIcon__content" href="#g143x2" fill="#FEBE3D" data-js-target="DocumentWithCheckmarkIcon.content"></use>
+      <use class="DocumentWithCheckmarkIcon__check" href="#g143x3" fill="#B11B07" data-js-target-list="DocumentWithCheckmarkIcon.checks"></use>
+    </g>
+    </svg>

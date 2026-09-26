@@ -3,21 +3,134 @@
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "trailingSlash": true,
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      "src": "^/api/contact/?$",
+      "dest": "/api/contact"
+    },
+    {
+      "src": "^/api(?:/(.*))?$",
+      "dest": "/api/operations?path=$1"
+    },
+    {
+      "src": "^/(.*)$",
+      "has": [
+        {
+          "type": "host",
+          "value": "60base.kr"
+        }
+      ],
+      "headers": {
+        "Location": "https://60base.ai/$1"
+      },
+      "status": 308
+    },
+    {
+      "src": "^/\\.well-known(?:/.*)?$"
+    },
+    {
+      "src": "^/((?:[^/]+/)*[^/\\.]+)$",
+      "headers": {
+        "Location": "/$1/"
+      },
+      "status": 308
+    },
+    {
+      "src": "^/((?:[^/]+/)*[^/]+\\.\\w+)/$",
+      "headers": {
+        "Location": "/$1"
+      },
+      "status": 308
+    },
+    {
+      "src": "^/index\\.html$",
+      "headers": {
+        "Location": "/"
+      },
+      "status": 307
+    },
+    {
+      "src": "^/$",
+      "headers": {
+        "Vary": "X-Vercel-IP-Country"
+      },
+      "continue": true
+    },
+    {
+      "src": "^(?:/(.*))$",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/sw\\.js$",
+      "headers": {
+        "Service-Worker-Allowed": "/",
+        "Cache-Control": "no-cache"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/admin(?:/(.*))$",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow",
+        "X-Frame-Options": "DENY"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/api(?:/(.*))$",
+      "headers": {
+        "Cache-Control": "no-store"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/$",
+      "dest": "/index.en.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "en"
+        }
       ]
     },
     {
-      "source": "/sw.js",
-      "headers": [
-        { "key": "Service-Worker-Allowed", "value": "/" },
-        { "key": "Cache-Control", "value": "no-cache" }
+      "src": "^/$",
+      "dest": "/index.ko.html",
+      "has": [
+        {
+          "type": "query",
+          "key": "lang",
+          "value": "ko"
+        }
       ]
+    },
+    {
+      "src": "^/$",
+      "dest": "/index.en.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "handle": "error"
+    },
+    {
+      "status": 404,
+      "src": "^(?!/api).*$",
+      "dest": "/404.html"
     }
-  ]
+  ],
+  "functions": {
+    "api/contact.js": {
+      "maxDuration": 15
+    },
+    "api/operations.js": {
+      "maxDuration": 300
+    }
+  }
 }

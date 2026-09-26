@@ -1,0 +1,36 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial, Apple SD Gothic Neo, sans-serif","fontSize":"17px","primaryTextColor":"#0F172A","lineColor":"#64748B","clusterBkg":"#FAFAFA","clusterBorder":"#CBD5E1"},"flowchart":{"htmlLabels":false,"curve":"basis","nodeSpacing":26,"rankSpacing":40}}}%%
+flowchart TD
+  U["사용자: 국내 촬영 영상 선택<br/>필수 동의 확인"]
+  X["2 MiB씩 업로드<br/>형식·크기·길이·중복 확인"]
+  D["uploaded<br/>원본 저장 완료·제출 전"]
+  S["submitted<br/>심사 접수"]
+  Q{"관리자 판정<br/>4개 검수 기준"}
+  R["reviewing<br/>관리자가 검토 중으로 표시"]
+  Y["approved<br/>승인"]
+  N["rejected<br/>반려 사유 전달"]
+  W["포인트 원장에 1회 적립<br/>현재 기본 활동 3,000P"]
+  P["포인트 내역 확인<br/>출금은 국내 은행 연동 예정"]
+  M["관리자: 원본 삭제 처리<br/>사유·대상 확인"]
+  Z["deleting<br/>원본 삭제 작업·실패 시 재시도"]
+  E["deleted<br/>원본 삭제 완료·관리 이력 유지"]
+  U --> X --> D
+  D -->|제출 요청| S
+  S --> Q
+  Q -->|검토 중으로| R
+  R -->|판정 계속| Q
+  Q -->|승인| Y
+  Q -->|반려| N
+  N -->|재검토 요청| S
+  Y --> W --> P
+  M --> Z --> E
+  classDef user fill:#EFF6FF,stroke:#2563EB,color:#0F172A;
+  classDef pending fill:#FFF7ED,stroke:#EA580C,color:#0F172A;
+  classDef approved fill:#ECFDF5,stroke:#047857,color:#0F172A;
+  classDef rejected fill:#FEF2F2,stroke:#DC2626,color:#0F172A;
+  classDef muted fill:#F3F4F6,stroke:#6B7280,color:#374151;
+  class U,X,D user;
+  class S,Q,R pending;
+  class Y,W approved;
+  class P muted;
+  class N rejected;
+  class M,Z,E muted;

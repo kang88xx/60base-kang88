@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <title>60BASE — Cobalt Depth G2 symbol</title>
+  <defs><linearGradient id="symbol-cobalt" gradientUnits="userSpaceOnUse" x1="46.4" y1="72" x2="353.6" y2="328"><stop offset="0" stop-color="#102FAD" /><stop offset="1" stop-color="#245BFF" /></linearGradient></defs><path fill="url(#symbol-cobalt)" d="M46.4 72h19.2v256h-19.2z M78.4 72h19.2v256h-19.2z M110.4 72h19.2v256h-19.2z M142.4 72h19.2v256h-19.2z M174.4 72h19.2v256h-19.2z M238.4 283.2h19.2v44.8h-19.2z M270.4 283.2h19.2v44.8h-19.2z M302.4 283.2h19.2v44.8h-19.2z M334.4 283.2h19.2v44.8h-19.2z" />
+  <path fill="url(#symbol-cobalt)" d="M206.4 72h19.2v256h-19.2z" />
+</svg>

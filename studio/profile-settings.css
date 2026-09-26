@@ -1,0 +1,90 @@
+/* Account settings: browser records stay separate from authenticated identity. */
+.capture-studio .workspace.settings-route {
+  max-width: 1120px;
+  padding-top: 40px;
+}
+.settings-route .page-heading { margin-bottom: 28px; }
+.capture-studio .settings-route .profile-grid {
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+  max-width: none;
+  gap: 36px;
+  margin-top: 32px;
+  align-items: start;
+}
+.capture-studio .settings-route .profile-panel { padding: 0; }
+.settings-route .profile-panel h2,
+.settings-route .device-storage-panel h2 {
+  margin: 0 0 14px;
+  font-size: 24px;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+}
+.settings-route .profile-panel .device-settings-note {
+  margin: 0 0 28px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.settings-route #profile-form { gap: 24px; }
+.settings-route #profile-form label { gap: 10px; font-size: 15px; }
+.settings-route #profile-form :is(input, select) { min-height: 50px; width: 100%; }
+.settings-route #profile-form > .button { min-height: 48px; padding: 12px 24px; font-size: 15px; }
+.settings-route .device-photo-settings { border-top: 1px solid var(--line); padding-top: 18px; }
+.settings-route .device-photo-settings summary {
+  padding: 8px 0;
+  color: #52606d;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.settings-route .device-photo-settings summary:focus-visible { outline: 2px solid #a93608; outline-offset: 4px; }
+.settings-route .device-photo-controls { display: flex; align-items: center; gap: 14px; padding-top: 12px; }
+.settings-route .device-photo-controls .avatar { width: 40px; height: 40px; overflow: hidden; }
+.settings-route .device-photo-controls .avatar img { width: 100%; height: 100%; object-fit: cover; }
+.settings-route .device-photo-controls p { margin: 0 0 4px; font-size: 13px; }
+.settings-route .profile-panel .form-message { margin: 0; }
+.settings-route .profile-storage { min-width: 0; }
+.capture-studio .settings-route .device-storage-panel {
+  padding: 30px;
+  border: 0;
+  border-radius: 12px;
+  background: #f5f6f8;
+}
+.settings-route .device-storage-panel p { margin: 0 0 22px; }
+.settings-route .device-storage-panel .button { background: #fff; }
+.settings-route .device-storage-panel .text-action {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+  color: #52606d;
+}
+.settings-route .profile-offline-note { margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+@media (max-width: 720px) {
+  .capture-studio .workspace.settings-route { padding-top: 24px; }
+  .capture-studio .settings-route .profile-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; margin-top: 26px; }
+  .capture-studio .settings-route .device-storage-panel { padding: 24px; }
+  .settings-route .profile-panel h2,
+  .settings-route .device-storage-panel h2 { font-size: 22px; }
+}
+.phone-verification-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.settings-route .phone-verification-heading h2{margin:0}
+.phone-maintenance-badge{display:inline-flex;align-items:center;padding:4px 9px;border-radius:6px;background:#fff0e8;color:#963806;font-size:12px;font-weight:600;line-height:1.5}
+.phone-maintenance-note{margin:0 0 20px;color:#66717d;font-size:14px;line-height:1.8}
+.phone-verification-steps{display:flex;flex-wrap:wrap;gap:8px 22px;margin:0 0 26px;padding:0;list-style:none;counter-reset:phone-step;color:#687480;font-size:13px}
+.phone-verification-steps li{counter-increment:phone-step}
+.phone-verification-steps li::before{content:counter(phone-step) '. ';font-weight:600}
+.phone-verification-fields{display:grid;gap:10px;min-width:0;margin:0;padding:0;border:0}
+.phone-verification-fields>label{font-size:14px;font-weight:600;color:#53606d}
+.phone-verification-row{display:flex;gap:10px;min-width:0;margin-bottom:18px}
+.phone-verification-row input{min-width:0;flex:1;width:100%;min-height:48px;padding:12px 14px;border:1px solid #dde1e6;border-radius:8px;font:inherit;font-size:15px}
+.capture-studio .phone-verification-row .button{flex:none;min-height:48px;padding:10px 14px;font-size:13px}
+.capture-studio .phone-verification-row :disabled{opacity:1;background:#f2f3f5;border-color:#e0e3e7;color:#747d87;cursor:not-allowed}
+.phone-verification-row input::placeholder{color:#818a94;opacity:1}
+.device-record-settings{margin-top:16px;padding-top:22px;border-top:1px solid var(--line)}
+.device-record-settings>summary{padding:10px 0;min-height:44px;color:#53606d;font-size:14px;line-height:1.6;cursor:pointer}
+.device-record-settings>summary:focus-visible{outline:2px solid #ff5d17;outline-offset:3px}
+.settings-route .device-record-settings>.device-settings-note{margin:14px 0 24px;font-size:13px}
+@media(max-width:360px){.phone-verification-row{gap:8px}.capture-studio .phone-verification-row .button{padding-inline:10px;font-size:12px}}
+.settings-route .phone-verification-row{align-items:center}
+.settings-route .phone-verification-row input,.capture-studio .phone-verification-row .button{height:48px;min-height:48px;margin:0;box-sizing:border-box}
+.capture-studio .phone-verification-row .button{flex:0 0 112px}
+@media(max-width:360px){.capture-studio .phone-verification-row .button{flex-basis:104px}}

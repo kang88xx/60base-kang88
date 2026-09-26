@@ -1,288 +1,66 @@
 <!doctype html>
-<html lang="en" class="no-js">
+<html lang="ko" class="no-js">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BASE60 — Korean first-person data programs for physical AI</title>
-<meta name="description" content="BASE60 scopes Korean first-person manipulation data programs for physical-AI teams and provides 몸짓 participant tools for guided mission capture.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css">
-<script src="main.js" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n-text="[&quot;60BASE | Action data sourcing &amp; custom collection&quot;]">60BASE | 행동 데이터 구매·맞춤 수집</title>
+<meta name="description" content="60BASE는 피지컬 AI 학습을 위한 한국의 1인칭 영상 데이터를 수집·가공·검수합니다." data-i18n-attrs="{&quot;content&quot;:&quot;60BASE sources, collects, annotates and reviews first-person action data from Korea for physical AI training.&quot;}">
+<link rel="canonical" href="https://60base.ai/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="60BASE">
+<meta property="og:url" content="https://60base.ai/?lang=ko" data-i18n-attrs="{&quot;content&quot;:&quot;https://60base.ai/?lang=en&quot;}">
+<meta property="og:locale" content="ko_KR" data-i18n-attrs="{&quot;content&quot;:&quot;en_US&quot;}">
+<meta property="og:title" content="60BASE | 행동 데이터 구매·맞춤 수집" data-i18n-attrs="{&quot;content&quot;:&quot;60BASE | Action data sourcing &amp; custom collection&quot;}">
+<meta property="og:description" content="60BASE는 피지컬 AI 학습을 위한 한국의 1인칭 영상 데이터를 수집·가공·검수합니다." data-i18n-attrs="{&quot;content&quot;:&quot;60BASE sources, collects, annotates and reviews first-person action data from Korea for physical AI training.&quot;}">
+<meta property="og:image" content="https://60base.ai/assets/social/60base-link-preview-symbol-20260915.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="60BASE | 피지컬 AI를 위한 사람의 동작 데이터. 60BASE 로고와 주황색 심볼." data-i18n-attrs="{&quot;content&quot;: &quot;60BASE | Human actions. Data for physical AI. 60BASE logo and orange symbol.&quot;}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="60BASE | 행동 데이터 구매·맞춤 수집" data-i18n-attrs="{&quot;content&quot;:&quot;60BASE | Action data sourcing &amp; custom collection&quot;}">
+<meta name="twitter:description" content="60BASE는 피지컬 AI 학습을 위한 한국의 1인칭 영상 데이터를 수집·가공·검수합니다." data-i18n-attrs="{&quot;content&quot;:&quot;60BASE sources, collects, annotates and reviews first-person action data from Korea for physical AI training.&quot;}">
+<meta name="twitter:image" content="https://60base.ai/assets/social/60base-link-preview-symbol-20260915.png">
+<meta name="twitter:image:alt" content="60BASE | 피지컬 AI를 위한 사람의 동작 데이터. 60BASE 로고와 주황색 심볼." data-i18n-attrs="{&quot;content&quot;: &quot;60BASE | Human actions. Data for physical AI. 60BASE logo and orange symbol.&quot;}">
+<link rel="icon" href="assets/brand/60base-logo3-20260914/homepage-favicon.png" type="image/png" sizes="171x171">
+<link rel="stylesheet" href="assets/opalhaus-requested/text-reveal.css"><link rel="stylesheet" href="assets/opalhaus-requested/service-list.css"><link rel="stylesheet" href="assets/opalhaus-requested/60base-motion.css"><link rel="stylesheet" href="assets/opalhaus-promo/promo-widget.css"><link rel="stylesheet" href="assets/opalhaus-promo/60base-promo.css"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="assets/opalhaus-requested/process-diagrams.css">
+<link rel="stylesheet" href="buyer-components.css">
+<script src="i18n.js" defer></script><script src="assets/opalhaus-requested/text-reveal.js" defer></script><script src="assets/opalhaus-requested/service-list.js" defer></script><script src="assets/opalhaus-requested/process-diagrams.js" defer></script><script src="assets/opalhaus-requested/60base-motion.js" defer></script><script src="main.js" defer></script><script src="buyer-components.js" defer></script><script src="assets/opalhaus-requested/faq-motion.js" defer></script><script src="assets/opalhaus-promo/promo-widget.js" defer></script><script src="assets/opalhaus-promo/60base-promo.js" defer></script>
 </head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
+<body class="fds opal-home" data-fds-theme="light">
+<a data-i18n-text="[&quot;Skip to content&quot;]" href="#main" class="skip">본문 바로가기</a>
+<header class="header-shell" data-menu-open="false"><div class="site-header wrap"><a class="brand" href="#hero" aria-label="60BASE"><img src="assets/brand/60base-logo3-20260914/60base-logo-web.svg" alt="60BASE" width="117.83" height="23.67"></a>
+<div class="header-middle"><div class="header-summary"><p class="header-tagline">Human actions.<br>Data for physical AI.</p><button class="language-toggle" id="language-toggle" type="button" role="switch" aria-checked="false" aria-label="영문 보기"><span class="language-thumb" aria-hidden="true"></span><span lang="ko">KR</span><span lang="en">EN</span></button></div><nav class="section-nav" id="site-navigation" aria-label="60BASE"><a href="#hero"><span class="nav-label"><span data-i18n-text="[&quot;Home&quot;]">처음으로</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a><a href="#about"><span class="nav-label"><span data-i18n-text="[&quot;About&quot;]">회사 소개</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a><a href="#services"><span class="nav-label"><span data-i18n-text="[&quot;Services&quot;]">서비스</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a><a href="#data"><span class="nav-label"><span data-i18n-text="[&quot;Data&quot;]">데이터</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a><a href="#standards"><span class="nav-label"><span data-i18n-text="[&quot;Quality&quot;]">품질 기준</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a><a href="#faq"><span class="nav-label"><span data-i18n-text="[&quot;FAQ&quot;]">FAQ</span></span><span class="nav-marker" aria-hidden="true"><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></a></nav></div>
+<div class="header-actions"><a href="#contact" class="fds-button header-contact"><span data-i18n-text="[&quot;Data inquiry&quot;]">데이터 문의</span><span class="button-arrow" aria-hidden="true"><span class="header-arrow-viewport"><span class="header-arrow-track"><svg data-icon="caret-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"/></svg><svg data-icon="arrow-right" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224.49,136.49l-72,72a12,12,0,0,1-17-17L187,140H40a12,12,0,0,1,0-24H187L135.51,64.48a12,12,0,0,1,17-17l72,72A12,12,0,0,1,224.49,136.49Z"/></svg></span></span></span></a></div>
+<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" aria-label="메뉴 열기" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Open menu&quot;}"><span></span><span></span></button>
+</div></header><main id="main" tabindex="-1"><section id="hero" class="opal-hero" aria-labelledby="hero-heading">
+<video id="hero-video" class="hero-background" data-src="assets/videos/collection/cutting-vegetables.mp4" poster="assets/videos/collection/cutting-vegetables.jpg" preload="none" autoplay playsinline muted loop aria-hidden="true" tabindex="-1"></video><div class="hero-shade"></div>
+<div class="hero-copy wrap"><div id="hero-motion-heading"><p class="eyebrow section-label">PHYSICAL AI · ACTION DATA</p>
+<h1 id="hero-heading"><span data-i18n-text="[&quot;Human actions.&quot;]" data-reveal>로봇이 배울 동작,</span><br><span data-i18n-text="[&quot;Data for physical AI.&quot;]" data-reveal>필요한 데이터로.</span></h1></div>
+<div class="hero-bottom"><div class="hero-index"><a href="#data"><span data-i18n-text="[&quot;Data purchase&quot;]" >데이터 구매</span><small aria-hidden="true">01</small></a><a href="#services"><span data-i18n-text="[&quot;Custom collection&quot;]" >맞춤 수집</span><small aria-hidden="true">02</small></a><a href="#standards"><span data-i18n-text="[&quot;Annotation &amp; review&quot;]" >가공·검수</span><small aria-hidden="true">03</small></a><a href="#contact"><span data-i18n-text="[&quot;Project inquiry&quot;]" >프로젝트 문의</span><small aria-hidden="true">04</small></a></div>
+</div></div></section><section id="about" class="page-section wrap" aria-labelledby="about-heading"><div class="about-intro section-title">
+<p class="eyebrow section-label">ABOUT US</p><div class="about-statement">
+<h2 data-i18n-text="[&quot;Human action data for physical AI.&quot;]" id="about-heading" data-reveal>사람의 일상적인 동작을, 로봇이 배울 수 있는 데이터로 만듭니다.</h2>
+<p data-i18n-text="[&quot;We collect first-person footage of everyday tasks in Korea for AI training. We plan tasks and recording conditions, train contributors, and annotate and review the data.&quot;]" class="intro-description">한국의 생활 공간에서 1인칭 영상을 수집합니다. 필요한 동작과 촬영 조건을 정하고, 교육·가공·검수를 거쳐 학습에 쓰일 데이터를 준비합니다.</p>
+<div class="about-links"><a data-i18n-text="[&quot;Company profile (Korean)&quot;]" class="text-link" href="docs/60BASE-Company-Profile-KO.pdf" target="_blank" rel="noopener">회사소개서 보기</a><a class="text-link huggingface-link" id="dataset-repository-link" href="https://huggingface.co/60base" target="_blank" rel="noopener"><img src="assets/brand/huggingface-logo.svg" width="18" height="18" alt="">Hugging Face</a></div></div></div></section><section id="data" class="page-section sample-section" aria-labelledby="data-heading"><div class="wrap"><div class="section-heading section-title"><p class="eyebrow section-label">SELECTED DATA</p><div class="section-title-body"><h2 data-i18n-text="[&quot;Everyday actions.\nCaptured up close.&quot;]" id="data-heading" data-reveal>일상의 동작,
+가까이에서.</h2></div></div><div class="video-feature"><div class="video-layout"><div class="video-mount"><div class="video-frame">
+<video id="sample-video" src="assets/videos/collection/cutting-vegetables.mp4" poster="assets/videos/collection/cutting-vegetables.jpg" preload="metadata" playsinline muted autoplay loop controls aria-label="60BASE 촬영 예시: 채소 손질" data-i18n-attrs="{&quot;aria-label&quot;: &quot;60BASE filming example: Cutting vegetables&quot;}"></video>
+<div class="sample-controls" hidden>
+<button id="sample-play-toggle" type="button" class="sample-play-toggle" aria-controls="sample-video" aria-label="영상 재생" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Play video&quot;}"><img class="sample-play-icon" src="assets/icons/sample-play.svg" alt="" width="26" height="26"><img class="sample-pause-icon" src="assets/icons/sample-pause.svg" alt="" width="26" height="26"></button>
+<input id="sample-seek" class="sample-seek" type="range" min="0" max="100" step="0.1" value="0" disabled aria-label="영상 재생 위치" aria-controls="sample-video" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Video playback position&quot;}">
+</div>
 
-<header class="header" id="header">
-  <a class="wordmark" href="#top" aria-label="BASE60 home"><span data-brand>BASE60</span><small>DATA · SEOUL</small></a>
-  <nav class="site-nav" aria-label="Primary">
-    <a href="#products">Services</a>
-    <a href="#participants">Participants</a>
-    <a href="./studio/">Studio</a>
-    <a href="./app/">App</a>
-  </nav>
-  <div class="header-actions">
-    <a class="pill" href="#contact"><span class="fill" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span>Draft an inquiry</a>
-    <button class="pill dark" type="button" id="menu-open" aria-haspopup="dialog" aria-controls="menu" aria-expanded="false"><span class="fill" aria-hidden="true"></span>Menu <span class="menu-dots" aria-hidden="true"><i></i><i></i></span></button>
-  </div>
-</header>
 
-<dialog class="menu" id="menu" aria-label="Site menu">
-  <nav class="menu-panel">
-    <a href="#data">Data <i aria-hidden="true"></i></a>
-    <a href="#products">Services <i aria-hidden="true"></i></a>
-    <a href="#participants">Participants <i aria-hidden="true"></i></a>
-    <a href="./studio/">Studio <i aria-hidden="true"></i></a>
-    <a href="./app/">Mobile app <i aria-hidden="true"></i></a>
-    <a href="#domains">Domains <i aria-hidden="true"></i></a>
-    <a href="#company">Company <i aria-hidden="true"></i></a>
-    <a href="#contact">Contact <i aria-hidden="true"></i></a>
-    <div class="menu-foot"><span>몸짓 참여자 도구 · 브라우저 로컬 저장</span><button type="button" id="menu-close">Close</button></div>
-  </nav>
-</dialog>
-
-<main id="main">
-  <span id="top"></span>
-
-  <!-- HERO: scene frame with kinetic cross modules (reconstruction, native WebGL with 2D fallback) -->
-  <section class="hero">
-    <div class="scene" id="scene">
-      <canvas id="hero-canvas" tabindex="0" role="img" aria-label="Rounded cross modules in cream, black and blue drifting in a dark frame. Arrow keys rotate, Enter changes the palette."></canvas>
-      <div class="scene-ui">
-        <div class="scene-top">
-          <span class="label">Korea · First-person manipulation data</span>
-          <span class="rec"><i aria-hidden="true"></i>REC · HEAD-MOUNT · 1080p30</span>
-        </div>
-        <div class="scene-bottom">
-          <p class="scene-title">Human motion,<br>recorded where <em>robots will work.</em></p>
-          <div class="scene-meta"><span><b>12 TASKS</b> = 1 HOUR</span><span><b>5 MIN</b> PER TASK</span><span>KR · SEOUL · <b id="clock">--:--</b></span></div>
-        </div>
-      </div>
-      <span class="scene-hint" aria-hidden="true">MOVE · CLICK · ARROWS</span>
-    </div>
-    <div class="scroll-row" aria-hidden="true"><span class="plus">+</span><span class="plus">+</span><span>SCROLL TO EXPLORE</span><span class="plus">+</span><span class="plus">+</span></div>
-  </section>
-
-  <!-- STATEMENT -->
-  <section class="section statement" id="data">
-    <h1 class="reveal">Korean hands,<br><span>buyer-scoped.</span></h1>
-    <div class="statement-bottom">
-      <p class="lede reveal">BASE60 is a Seoul company preparing first-person manipulation data programs for physical-AI teams. We focus on Korean homes, stores and kitchens, with clear task design, participant tooling, review criteria and rights workflows defined before field collection begins.</p>
-      <p class="kr reveal">BASE60은 한국 현장의 손 동작 데이터를 준비하는 회사입니다. 지금은 참여자용 웹 도구와 로컬 저장 프로토타입으로 촬영 흐름, 안내문, 검수 기준을 검증하고 있습니다.</p>
-    </div>
-    <dl class="stats reveal">
-      <div><dt>Capture</dt><dd>1080p<small>30 fps · head-mount</small></dd></div>
-      <div><dt>Review plan</dt><dd>7<small>draft QC criteria</small></dd></div>
-      <div><dt>Rights</dt><dd>KR / EN<small>templates in scope</small></dd></div>
-      <div><dt>Delivery proposal</dt><dd>MP4<small>+ JSON · dataset card</small></dd></div>
-    </dl>
-  </section>
-
-  <!-- WHY KOREA -->
-  <section class="section ruled" id="why">
-    <div class="section-heading">
-      <div><div class="eyebrow">01 / Why Korea</div><h2 class="reveal">Bulk video became free.<br><span>Deployment-country data did not.</span></h2></div>
-      <a class="text-link" href="#contact">Draft a scope note</a>
-    </div>
-    <div class="facts">
-      <article class="fact reveal"><span class="tag">Demand</span><h3>Teams need data that matches target use.</h3><p>First-person manipulation work depends on task context, camera perspective, rights, metadata and review quality.</p></article>
-      <article class="fact dark reveal"><span class="tag">Specificity</span><h3>Generic footage is not enough.</h3><p>Country, household layout, object mix, language and consent process matter when data moves from demo to deployment planning.</p></article>
-      <article class="fact reveal"><span class="tag">Locality</span><h3>Korean scenes only exist in Korea.</h3><p>Kimchi refrigerators, rice cookers, floor-seated dining, shoes off at the door, Hangul labels, Korean store and kitchen layouts.</p></article>
-      <article class="fact blue reveal"><span class="tag">Devices</span><div class="big">KR</div><h3>Phone-first capture is practical.</h3><p>Participant workflows can start with common Korean Android phones, a head mount and browser-local capture prototypes.</p></article>
-      <article class="fact reveal"><span class="tag">Program design</span><h3>Collection needs an operating system.</h3><p>Task cards, consent language, reshoot loops, clip metadata and participant support need to be designed together.</p></article>
-      <article class="fact reveal"><span class="tag">Evaluation</span><h3>Human review remains central.</h3><p>Korean-language labels and human judgments can be scoped as add-ons when a buyer already owns footage.</p></article>
-    </div>
-  </section>
-
-  <!-- PRODUCTS -->
-  <section class="section ruled" id="products">
-    <div class="section-heading">
-      <div><div class="eyebrow">02 / What we sell</div><h2 class="reveal">Five service areas.<br><span>One participant workflow underneath.</span></h2></div>
-      <span class="mono">Proposal-stage services</span>
-    </div>
-    <div class="products">
-      <article class="product reveal"><span class="idx">A / 01</span><h3>Custom collection design<small>Tasks, environment, rig and acceptance criteria.</small></h3><p>Proposed workflow: recruit → guide and consent → capture → automated checks → human review → de-identification → buyer delivery package. Home capture can use participant phones and head mounts; commercial capture can be scoped with on-site operators.</p><span class="role">Scoping</span></article>
-      <article class="product reveal"><span class="idx">B / 02</span><h3>Dataset license planning<small>Korean domain packs, non-exclusive by default.</small></h3><p>Planned domain libraries can be specified before collection starts. Hybrid projects can be discussed only with explicit buyer rights and resale terms in the contract.</p><span class="role">Proposed</span></article>
-      <article class="product reveal"><span class="idx">C / 03</span><h3>Annotation<small>Temporal segments, hand pose, object 6-DoF, KR/EN language.</small></h3><p>Korean-language and Korean-object semantic labels with human review can be scoped for footage a buyer already owns.</p><span class="role">Proposed</span></article>
-      <article class="product reveal"><span class="idx">D / 04</span><h3>Human evaluation<small>Korean raters review robot behavior.</small></h3><p>Safety, preference and task-success judgments can be scoped for recorded rollouts or simulations where Korean context matters.</p><span class="role">Proposed</span></article>
-      <article class="product soon reveal"><span class="idx">E / 05</span><h3>Teleoperation research<small>Future partner-robot data program.</small></h3><p>A later service area that would require hardware partners, safety procedures and separate operating approval.</p><span class="role">Future</span></article>
-    </div>
-  </section>
-
-  <!-- PARTICIPANT SURFACES -->
-  <section class="section ruled participant-section" id="participants">
-    <div class="section-heading">
-      <div><div class="eyebrow">03 / Participant tools</div><h2 class="reveal">몸짓 helps participants<br><span>record guided missions.</span></h2></div>
-      <div class="surface-actions">
-        <a class="pill blue" href="./studio/"><span class="fill" aria-hidden="true"></span>Open Studio <span class="arrow" aria-hidden="true">↗</span></a>
-        <a class="pill" href="./app/"><span class="fill" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span>Open App</a>
-      </div>
-    </div>
-    <div class="surfaces">
-      <article class="surface reveal">
-        <span class="idx">01</span>
-        <h3>Mission guide</h3>
-        <p>참여자는 미션을 고르고, 촬영 전에 필요한 동작과 화면 구도를 확인합니다.</p>
-      </article>
-      <article class="surface reveal">
-        <span class="idx">02</span>
-        <h3>몸짓 Studio</h3>
-        <p>데스크톱에서 영상을 촬영하거나 가져오고, 저장한 기록을 다시 확인합니다.</p>
-        <a class="text-link" href="./studio/">스튜디오 열기</a>
-      </article>
-      <article class="surface reveal">
-        <span class="idx">03</span>
-        <h3>몸짓 App</h3>
-        <p>휴대폰에서 미션을 보고 촬영을 시작할 수 있는 모바일 참여자 화면입니다.</p>
-        <a class="text-link" href="./app/">앱 열기</a>
-      </article>
-    </div>
-    <p class="participant-note reveal">현재 몸짓은 서버 제출 없이 이 브라우저에만 기록을 저장합니다. 실제 모집, 심사, 원격 업로드는 별도 안내가 필요합니다.</p>
-  </section>
-
-  <!-- PIPELINE -->
-  <section class="section" id="method">
-    <div class="pipeline-wrap reveal">
-      <div class="section-heading" style="margin-bottom:0">
-        <div><div class="eyebrow">04 / Method</div><h2>From a five-minute task<br><span style="color:#b8c0ff">to a proposed deliverable.</span></h2></div>
-        <p class="copy" style="max-width:26em">The order is the operation design. Every step needs an owner, a pass criterion and a recovery path before field collection starts.</p>
-      </div>
-      <ol class="steps">
-        <li class="step"><span class="n">01</span><h4>Recruit</h4><p>Participant channels and device-fit checks are defined during program scoping.</p><span class="who">BASE60</span></li>
-        <li class="step"><span class="n">02</span><h4>Guide &amp; consent</h4><p>Korean task cards, capture guide video, IP terms, PIPA consent and likeness language prepared for legal review.</p><span class="who">BASE60</span></li>
-        <li class="step"><span class="n">03</span><h4>Capture</h4><p>Head-mounted ultra-wide, landscape 1080p30. Start photo, task video and end photo are proposed capture elements.</p><span class="who">Participant</span></li>
-        <li class="step"><span class="n">04</span><h4>Auto checks</h4><p>Duration, resolution, shake and sensitive-frame checks planned before human review.</p><span class="who">BASE60</span></li>
-        <li class="step"><span class="n">05</span><h4>Human review</h4><p>Draft criteria cover framing, completeness, privacy, lighting, stability, object visibility and task fit.</p><span class="who">BASE60</span></li>
-        <li class="step"><span class="n">06</span><h4>Rights &amp; blur</h4><p>Third-party faces, documents and plates flagged for de-identification and review under the agreed process.</p><span class="who">BASE60</span></li>
-        <li class="step"><span class="n">07</span><h4>Package</h4><p>Proposed package: MP4, JSON, dataset card and QA report, with buyer acceptance criteria set in advance.</p><span class="who client">Client acceptance</span></li>
-      </ol>
-      <div class="pipeline-foot"><span>Segment-level review can reduce reshoots</span><span>Participant limits require explicit policy</span><span>No transaction flow on this prototype</span></div>
-    </div>
-  </section>
-
-  <!-- DOMAINS -->
-  <section class="section ruled" id="domains">
-    <div class="section-heading">
-      <div><div class="eyebrow">05 / Domain library</div><h2 class="reveal">Planned in the order<br><span>Korea is hardest to substitute.</span></h2></div>
-      <a class="text-link" href="#contact">Draft a domain inquiry</a>
-    </div>
-    <div class="domains">
-      <a class="domain reveal" data-theme="kitchen" href="#contact"><div class="art" aria-hidden="true"><i style="width:60%;height:60%;right:-18%;bottom:-22%"></i><i style="width:22%;height:22%;left:8%;top:34%"></i></div><div class="top"><span>01</span><b>2026 Q4</b></div><div><h3>Home kitchen &amp; housework</h3><p>Kimchi fridge, rice cooker, side-dish containers, floor-seated table setting, recycling, entryway shoes.</p></div></a>
-      <a class="domain reveal" data-theme="retail" href="#contact"><div class="art" aria-hidden="true"><i style="width:70%;height:70%;left:-25%;top:-25%"></i></div><div class="top"><span>02</span><b>2026 Q4</b></div><div><h3>Convenience store &amp; retail shelving</h3><p>Dense convenience-store workflows with restocking, disposal and parcel intake tasks.</p></div></a>
-      <a class="domain reveal" data-theme="fnb" href="#contact"><div class="art" aria-hidden="true"><i style="width:44%;height:44%;right:6%;top:26%"></i><i style="width:26%;height:26%;left:10%;bottom:6%"></i></div><div class="top"><span>03</span><b>2027 Q1</b></div><div><h3>Commercial F&amp;B kitchens</h3><p>Café, snack bar, fried chicken and franchise prep lines on stereo rigs.</p></div></a>
-      <a class="domain reveal" data-theme="logistics" href="#contact"><div class="art" aria-hidden="true"><i style="width:80%;height:80%;left:40%;top:40%"></i></div><div class="top"><span>04</span><b>2027 H1</b></div><div><h3>Parcel sorting &amp; logistics</h3><p>Parcel intake, sorting, packing and returns workflows can be scoped with local partners.</p></div></a>
-      <a class="domain reveal" data-theme="care" href="#contact"><div class="art" aria-hidden="true"><i style="width:50%;height:50%;right:-10%;top:-10%"></i><i style="width:30%;height:30%;left:20%;bottom:-8%"></i></div><div class="top"><span>05</span><b>2027 Q2</b></div><div><h3>Elder care &amp; nursing</h3><p>Standardized caregiver motions with institutional partners.</p></div></a>
-      <a class="domain reveal" data-theme="factory" href="#contact"><div class="art" aria-hidden="true"><i style="width:36%;height:36%;left:6%;top:8%"></i><i style="width:56%;height:56%;right:-14%;bottom:-20%"></i></div><div class="top"><span>06</span><b>2027 H2 · On-site</b></div><div><h3>Manufacturing assembly</h3><p>Footage cannot leave the plant, so our crew runs collection on the customer’s floor.</p></div></a>
-    </div>
-  </section>
-
-  <!-- SPEC + RIGHTS -->
-  <section class="section ruled" id="spec">
-    <div class="two">
-      <article class="panel reveal">
-        <div class="eyebrow">06 / Deliverable</div>
-        <h3>What can be specified in a buyer package.</h3>
-        <dl class="spec-list">
-          <div><dt>Video</dt><dd>MP4, landscape 1080p30, head-mounted ultra-wide. Stereo option on commercial track.</dd></div>
-          <div><dt>Format</dt><dd>Proposed formats include raw MP4, per-task JSON and dataset cards. Training-framework conversion can be scoped per buyer.</dd></div>
-          <div><dt>Metadata</dt><dd>Task id, environment, device, start/end photos, timestamps, review verdict and reason codes.</dd></div>
-          <div><dt>Labels</dt><dd>Temporal segments, optional 3D hand pose, object 6-DoF, KR/EN natural-language description.</dd></div>
-          <div><dt>Documents</dt><dd>Dataset card, QA report and privacy report templates can be prepared per batch.</dd></div>
-          <div><dt>Acceptance</dt><dd>Segment-level invalidation is proposed by default. Reshoot policy is set during scoping.</dd></div>
-        </dl>
-      </article>
-      <article class="panel dark reveal">
-        <div class="eyebrow">07 / Rights &amp; privacy</div>
-        <h3>The first thing foreign buyers ask. Designed up front.</h3>
-        <dl class="spec-list">
-          <div><dt>Contracts</dt><dd>Draft agreement set in Korean and English: IP terms, personal-data consent (PIPA), likeness release and facility permission.</dd></div>
-          <div><dt>De-identification</dt><dd>Automated flagging and blur can be paired with human verification when collection moves beyond prototype.</dd></div>
-          <div><dt>Exclusions</dt><dd>Participant faces, minors, medical documents and financial documents can be defined as excluded content.</dd></div>
-          <div><dt>License tiers</dt><dd>Exclusive custom · Hybrid custom (reduced fee, we keep resale) · Non-exclusive library.</dd></div>
-          <div><dt>Jurisdiction</dt><dd>Korean entity and cross-border buyer terms to be confirmed in final contracts.</dd></div>
-        </dl>
-      </article>
-    </div>
-  </section>
-
-  <!-- NETWORK + BUYERS -->
-  <section class="section ruled" id="network">
-    <div class="crew">
-      <div>
-        <div class="eyebrow">08 / Participant network</div>
-        <h2 class="reveal" style="margin-top:18px">People are the capacity.</h2>
-        <p class="copy reveal" style="margin-top:22px">A future field program will depend on trained participants, clear task guides and transparent review outcomes. The current tools demonstrate the participant workflow without promising remote submission or rewards.</p>
-        <div class="tiers reveal">
-          <div class="tier"><span class="n">T0</span><div><h4>Interested</h4><p>Reads the guide and checks device fit.</p></div></div>
-          <div class="tier"><span class="n">T1</span><div><h4>Prepared</h4><p>Completes sample missions and stores drafts locally.</p></div></div>
-          <div class="tier"><span class="n">T2</span><div><h4>Reviewed</h4><p>Receives clear feedback when a future review flow exists.</p></div></div>
-          <div class="tier"><span class="n">T3</span><div><h4>Coordinator</h4><p>Future site support role, subject to operating policy.</p></div></div>
-        </div>
-      </div>
-      <div>
-        <div class="eyebrow">09 / Who we work with</div>
-        <div class="buyers reveal" style="margin-top:22px">
-          <div><span class="n">01</span><div><h4>Data aggregators</h4><p>Country coverage, rights workflow and local program design. Hybrid custom + human evaluation can be scoped.</p></div><span class="fit">Korea coverage</span></div>
-          <div><span class="n">02</span><div><h4>Robot foundation-model teams</h4><p>Domain diversity, label quality and sample-first evaluation. Library packs can follow pilot scope.</p></div><span class="fit">Sample pack</span></div>
-          <div><span class="n">03</span><div><h4>Korean robotics &amp; enterprise</h4><p>Korean field data programs can be designed for sites where footage must stay under local controls.</p></div><span class="fit">On-site</span></div>
-          <div><span class="n">04</span><div><h4>Government &amp; public programs</h4><p>Domestic dataset construction, subject to program requirements and procurement rules.</p></div><span class="fit">Future</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- COMPANY -->
-  <section class="section ruled" id="company">
-    <div class="company">
-      <div>
-        <div class="eyebrow">10 / Company</div>
-        <h2 class="reveal" style="margin-top:18px">Two founders, Seoul.<br><span>A field operation, not a labeling desk.</span></h2>
-        <div class="people reveal">
-          <div class="person"><div class="avatar">KG</div><h4>Kang</h4><p>Co-founder. Product, design, participant operations, hardware sourcing and China channel.</p></div>
-          <div class="person"><div class="avatar">KL</div><h4>Kayla</h4><p>Co-founder. International sales and marketing. First point of contact for foreign buyers.</p></div>
-        </div>
-      </div>
-      <div>
-        <div class="eyebrow plain" style="margin-bottom:18px">Roadmap</div>
-        <div class="timeline reveal">
-          <div class="phase now"><span class="n">Phase 0 · 2026-09</span><h4>Prepare</h4><p>Brand, participant prototypes, sample capture plan, draft contracts and buyer discovery.</p></div>
-          <div class="phase"><span class="n">Phase 1 · 2026 Q4</span><h4>Prove</h4><p>Pilot scope, sample package, review criteria and participant workflow validation.</p></div>
-          <div class="phase"><span class="n">Phase 2 · 2027 H1</span><h4>Expand</h4><p>Domain library planning, annotation workflow and buyer-specific delivery format.</p></div>
-          <div class="phase"><span class="n">Phase 3 · 2027 H2</span><h4>Platform</h4><p>Future catalog, API delivery and partner-operated collection programs.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="section" id="contact">
-    <div class="contact reveal">
-      <svg class="glyph" viewBox="0 0 100 100" aria-hidden="true"><path d="M38 0h24v38h38v24H62v38H38V62H0V38h38z" fill="#fff"/></svg>
-      <div class="eyebrow">11 / Contact</div>
-      <h2>Draft your<br><span>Korean data brief.</span></h2>
-      <div class="contact-grid">
-        <form id="contact-form" novalidate>
-          <div class="field"><label class="sr-only" for="f-name">Name and company</label><input id="f-name" name="name" type="text" placeholder="Name · Company" autocomplete="organization" required></div>
-          <div class="field"><label class="sr-only" for="f-email">Work email</label><input id="f-email" name="email" type="email" placeholder="Work email" autocomplete="email" required></div>
-          <div class="field"><label class="sr-only" for="f-msg">What do you need</label><textarea id="f-msg" name="message" placeholder="Domain, hours, rig, timeline. Or just say hello." required></textarea></div>
-          <div class="form-tools"><button class="pill light" type="submit"><span class="fill" aria-hidden="true"></span>Save draft locally</button><button class="text-button" type="button" id="draft-clear">Clear draft</button><span class="status" id="form-status" role="status" aria-live="polite">This form saves only in your browser. It does not send email or network requests.</span></div>
-        </form>
-        <div class="contact-side">
-          <p>Use the draft to shape a buyer brief before sending it through your own channel. BASE60 can discuss sample packs, pilot scoping and delivery formats in English, Korean and Chinese.</p>
-          <span class="mono">hello@koreodata.com</span>
-          <div class="contact-links"><button class="text-link text-button" type="button" id="copy-email">Copy email</button><a class="text-link" href="./studio/">Participant Studio</a><a class="text-link" href="./app/">Mobile App</a></div>
-        </div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <a class="wordmark" href="#top"><span data-brand>BASE60</span><small>DATA</small></a>
-  <nav aria-label="Footer"><a href="#data">Data</a><a href="#products">Services</a><a href="#participants">Participants</a><a href="./studio/">Studio</a><a href="./app/">App</a><a href="#contact">Contact</a></nav>
-  <span>© 2026 <span data-brand-title>BASE60</span> · Seoul, Korea</span>
-</footer>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-</body>
-</html>
+<div class="video-labels" aria-live="polite" aria-atomic="true"><div class="video-task"><strong data-i18n-text="[&quot;Cutting vegetables&quot;]" id="sample-title">채소 손질</strong><span data-i18n-text="[&quot;Preparing and cutting vegetables&quot;]" id="sample-action">채소를 손질하고 써는 동작</span></div><div class="video-facts"><span data-i18n-text="[&quot;Kitchen&quot;]" id="sample-environment">주방</span><span data-i18n-text="[&quot;First-person view&quot;]">1인칭 시점</span></div></div>
+</div></div>
+<div class="video-selector" tabindex="0" role="group" aria-label="데이터 영상 선택" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Select a data video&quot;}"><button type="button" class="sample-choice" data-sample="cutting-vegetables" aria-pressed="true" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/cutting-vegetables.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Cutting vegetables&quot;]" class="sample-name">채소 손질</span></span></button><button type="button" class="sample-choice" data-sample="dishwashing" aria-pressed="false" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/dishwashing.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Washing dishes&quot;]" class="sample-name">설거지</span></span></button><button type="button" class="sample-choice" data-sample="folding-clothes" aria-pressed="false" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/folding-clothes.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Folding clothes&quot;]" class="sample-name">빨래 개기</span></span></button><button type="button" class="sample-choice" data-sample="vacuuming" aria-pressed="false" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/vacuuming.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Vacuuming&quot;]" class="sample-name">바닥 청소</span></span></button><button type="button" class="sample-choice" data-sample="folding-towels" aria-pressed="false" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/folding-towels.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Folding towels&quot;]" class="sample-name">수건 접기</span></span></button><button type="button" class="sample-choice" data-sample="dishwashing-2" aria-pressed="false" aria-controls="sample-video"><span class="sample-thumb"><img src="assets/videos/collection/dishwashing-2.jpg" alt="" width="320" height="180"><span class="sample-duration" aria-hidden="true">00:20</span></span><span class="sample-caption"><span data-i18n-text="[&quot;Rinsing dishes&quot;]" class="sample-name">식기 헹구기</span></span></button></div></div><p id="video-error" class="fds-error" role="status" hidden></p></div></div></section><section id="services" class="page-section" aria-labelledby="services-heading"><div class="service-projects wrap">
+<div class="project-heading section-title" data-reveal><p data-i18n-text="[&quot;DATA SERVICES&quot;]" class="eyebrow section-label">DATA SERVICES</p><div class="section-title-body"><h2 data-i18n-text="[&quot;Source existing data.\nCommission new data.&quot;]" id="services-heading">구매도, 맞춤 제작도.</h2></div><div class="service-navigation" hidden><button type="button" class="service-previous" aria-label="이전 서비스" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Previous service&quot;}" aria-controls="service-cards"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></button><button type="button" class="service-next" aria-label="다음 서비스" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Next service&quot;}" aria-controls="service-cards"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></button></div></div>
+<div class="service-grid service-films project-grid" id="service-cards" tabindex="0" role="group" aria-label="데이터 서비스" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Data services&quot;}"><article class="service-film" data-reveal id="service-capture" data-service-film="capture"><div class="evidence-video"><img class="project-poster" src="assets/images/service-concept-capture.webp" alt="" loading="lazy" width="1008" height="720"><video data-src="assets/videos/collection/cutting-vegetables.mp4" poster="assets/videos/collection/cutting-vegetables.jpg" preload="none" muted loop playsinline hidden aria-label="실사 데이터 수집 영상 예시" data-i18n-attrs="{&quot;aria-label&quot;: &quot;Collection footage example&quot;}"></video><noscript><a class="preview-fallback" href="assets/videos/collection/cutting-vegetables.mp4" data-i18n-text="[&quot;Watch video ↗&quot;]">영상 보기 ↗</a></noscript><span class="preview-error" role="status" hidden data-i18n-text="[&quot;Video could not load. Play again or choose another example.&quot;]">영상을 불러오지 못했습니다. 다시 재생하거나 다른 예시를 선택해주세요.</span></div><div class="service-film-copy"><h3 data-i18n-text="[&quot;Real-world data collection&quot;]">실사 데이터 수집</h3><p data-i18n-text="[&quot;Collect first-person footage for your tasks, settings and viewpoints.&quot;]">동작과 장소, 촬영 시점을 정하고 필요한 1인칭 영상을 수집합니다.</p></div></article><article class="service-film" data-reveal id="service-tracking" data-service-film="tracking"><div class="evidence-video"><img class="project-poster" src="assets/images/service-concept-tracking.webp" alt="" loading="lazy" width="1008" height="720"><video data-src="assets/videos/workflow/hand-tracking.mp4" poster="assets/videos/workflow/hand-tracking.jpg" preload="none" muted loop playsinline hidden aria-label="손 관절 추정 영상 예시" data-i18n-attrs="{&quot;aria-label&quot;: &quot;Hand landmark estimation example&quot;}"></video><noscript><a class="preview-fallback" href="assets/videos/workflow/hand-tracking.mp4" data-i18n-text="[&quot;Watch video ↗&quot;]">영상 보기 ↗</a></noscript><span class="preview-error" role="status" hidden data-i18n-text="[&quot;Video could not load. Play again or choose another example.&quot;]">영상을 불러오지 못했습니다. 다시 재생하거나 다른 예시를 선택해주세요.</span></div><div class="service-film-copy"><h3 data-i18n-text="[&quot;Hand tracking &amp; annotation&quot;]">손동작 추적·가공</h3><p data-i18n-text="[&quot;Estimate hand landmarks and label action segments in the footage.&quot;]">영상에서 손의 관절 좌표를 추정하고, 작업 구간과 함께 정리합니다.</p></div></article><article class="service-film" data-reveal id="service-review" data-service-film="review"><div class="evidence-video"><img class="project-poster" src="assets/images/service-concept-review.webp" alt="" loading="lazy" width="1008" height="720"><video data-src="assets/videos/workflow/review-desk.mp4" poster="assets/videos/workflow/review-desk.jpg" preload="none" muted loop playsinline hidden aria-label="검수 프로그램 화면 녹화" data-i18n-attrs="{&quot;aria-label&quot;: &quot;Review program screen recording&quot;}"></video><noscript><a class="preview-fallback" href="assets/videos/workflow/review-desk.mp4" data-i18n-text="[&quot;Watch video ↗&quot;]">영상 보기 ↗</a></noscript><span class="preview-error" role="status" hidden data-i18n-text="[&quot;Video could not load. Play again or choose another example.&quot;]">영상을 불러오지 못했습니다. 다시 재생하거나 다른 예시를 선택해주세요.</span></div><div class="service-film-copy"><h3 data-i18n-text="[&quot;Quality review&quot;]">데이터 검수</h3><p data-i18n-text="[&quot;Compare source footage, tracking outputs and labels to flag missing or occluded actions.&quot;]">원본과 추적 결과를 대조하고, 누락과 가림 구간을 확인합니다.</p></div></article></div></div></section><section class="process-section" id="purchase-process" aria-labelledby="process-heading"><div id="process-motion-host"></div><div class="process-fallback wrap"><div class="process-heading section-title"><p data-i18n-text="[&quot;HOW IT WORKS&quot;]" class="eyebrow section-label">HOW IT WORKS</p><h2 id="process-heading" data-i18n-text="[&quot;From brief to delivery&quot;]">데이터 구매·제작 절차</h2></div><div class="process-source-list" role="group" aria-label="데이터 구매·제작 단계" data-i18n-attrs="{&quot;aria-label&quot;:&quot;Data purchase and production steps&quot;}">
+<article class="process-source-step"><span class="panel-main"><span data-i18n-text="[&quot;Share your brief&quot;]" class="step-title">요구사항 전달</span><span data-i18n-text="[&quot;Define the actions and recording conditions.&quot;]" class="step-copy">필요한 동작과 촬영 조건을 정합니다.</span></span><span id="process-step-1" data-i18n-text="[&quot;Set the scope by task, location, viewpoint, volume and timeline.&quot;]" class="panel-extra">장소, 시점, 수량, 일정을 바탕으로 수집 범위를 정합니다.</span></article>
+<article class="process-source-step"><span class="panel-main"><span data-i18n-text="[&quot;Review samples &amp; pricing&quot;]" class="step-title">샘플·견적 확인</span><span data-i18n-text="[&quot;Review samples, deliverables and pricing.&quot;]" class="step-copy">샘플과 구성, 비용을 확인합니다.</span></span><span id="process-step-2" data-i18n-text="[&quot;Review samples and confirm deliverables and pricing before production.&quot;]" class="panel-extra">실제 샘플을 보고 납품 항목과 견적을 확정합니다.</span></article>
+<article class="process-source-step"><span class="panel-main"><span data-i18n-text="[&quot;Agree on terms&quot;]" class="step-title">계약·제작 진행</span><span data-i18n-text="[&quot;Produce data to the agreed criteria.&quot;]" class="step-copy">합의한 기준으로 제작합니다.</span></span><span id="process-step-3" data-i18n-text="[&quot;Agree on usage rights and acceptance criteria, then collect, annotate and review.&quot;]" class="panel-extra">이용 범위와 검수 기준을 계약에 담고 촬영·가공합니다.</span></article>
+<article class="process-source-step"><span class="panel-main"><span data-i18n-text="[&quot;Review &amp; deliver&quot;]" class="step-title">검수·납품</span><span data-i18n-text="[&quot;Deliver the data with review records.&quot;]" class="step-copy">검수 기록과 함께 납품합니다.</span></span><span id="process-step-4" data-i18n-text="[&quot;Receive footage, labels and usage documents, with corrections within the agreed scope.&quot;]" class="panel-extra">영상·라벨·이용 문서를 전달하고, 계약 범위에 따라 보완합니다.</span></article>
+</div></div></section><section id="standards" class="page-section quality-summary" aria-labelledby="standards-heading"><div class="wrap"><div class="section-title" data-reveal><p class="eyebrow section-label">QUALITY &amp; RIGHTS</p><h2 id="standards-heading" data-i18n-text="[&quot;Agreed standards.\nAt every stage.&quot;]">촬영부터 납품까지,
+합의한 기준을 지킵니다.</h2></div><div class="quality-summary-grid"><article class="quality-summary-card" id="quality-card-sample" aria-labelledby="quality-heading-1" data-reveal><img src="assets/images/quality-sample.webp" alt="" width="512" height="512" loading="lazy" decoding="async"><div><h3 id="quality-heading-1" data-i18n-text="[&quot;Sample criteria&quot;]">샘플 기준</h3><p data-i18n-text="[&quot;Review a sample to confirm framing and task scope before collection.&quot;]">본 수집 전에 구도와 동작 범위를 샘플로 확인합니다.</p></div></article><article class="quality-summary-card" id="quality-card-review" aria-labelledby="quality-heading-2" data-reveal><img src="assets/images/quality-review.webp" alt="" width="512" height="512" loading="lazy" decoding="async"><div><h3 id="quality-heading-2" data-i18n-text="[&quot;Data review&quot;]">데이터 검수</h3><p data-i18n-text="[&quot;Check footage against labels for missing or occluded segments.&quot;]">영상과 라벨을 대조해 누락·가림 구간을 확인합니다.</p></div></article><article class="quality-summary-card" id="quality-card-rights" aria-labelledby="quality-heading-3" data-reveal><img src="assets/images/quality-rights.webp" alt="" width="512" height="512" loading="lazy" decoding="async"><div><h3 id="quality-heading-3" data-i18n-text="[&quot;Consent &amp; usage&quot;]">동의·이용 범위</h3><p data-i18n-text="[&quot;Each project agreement sets recording consent, permitted uses, usage duration and redistribution terms.&quot;]">촬영 동의와 사용 목적·기간·재배포 조건을 프로젝트별 계약에서 정합니다.</p></div></article><article class="quality-summary-card" id="quality-card-delivery" aria-labelledby="quality-heading-4" data-reveal><img src="assets/images/quality-delivery.webp" alt="" width="512" height="512" loading="lazy" decoding="async"><div><h3 id="quality-heading-4" data-i18n-text="[&quot;Delivery &amp; corrections&quot;]">납품·보완</h3><p data-i18n-text="[&quot;Deliver footage, labels and review records. Correct quality shortfalls within the agreed scope.&quot;]">영상·라벨·검수 기록을 전달하고, 미달 항목은 합의한 범위에서 보완합니다.</p></div></article></div></div></section><section id="faq" class="page-section wrap" aria-labelledby="faq-heading"><div class="section-heading section-title"><p class="eyebrow section-label">FAQ</p><h2 data-i18n-text="[&quot;Common questions&quot;]" id="faq-heading" data-reveal>궁금한 점이
+있으신가요?</h2></div><div class="faq-list"><details class="faq-item" name="homepage-faq" open><summary data-i18n-text="[&quot;What data can I purchase?&quot;]" >어떤 데이터를 구매할 수 있나요?</summary> <p data-i18n-text="[&quot;We work with first-person footage of everyday tasks. Review public samples, then ask about available datasets, custom production and usage terms.&quot;]" >1인칭 시점의 생활 동작 영상을 다룹니다. 공개 샘플을 먼저 살펴보고, 구매 가능한 범위와 이용 조건을 문의해 주세요.</p></details><details class="faq-item" name="homepage-faq"><summary data-i18n-text="[&quot;Can you record specific actions?&quot;]" >원하는 동작을 따로 수집할 수 있나요?</summary> <p data-i18n-text="[&quot;Yes. We plan custom collection around your tasks, environments, viewpoints, volume and timeline.&quot;]" >가능합니다. 필요한 동작, 환경, 촬영 시점, 수량과 일정을 바탕으로 수집 계획을 협의합니다.</p></details><details class="faq-item" name="homepage-faq"><summary data-i18n-text="[&quot;How is quality reviewed?&quot;]" >품질은 어떤 기준으로 확인하나요?</summary> <p data-i18n-text="[&quot;A sample is approved before production, with agreed capture, annotation and review criteria. Items that fall short of the acceptance criteria are corrected within the agreed scope.&quot;]" >본 수집 전에 샘플을 승인하고 촬영·가공·검수 기준을 정합니다. 인수 기준에 미달한 항목은 계약에서 정한 범위에 따라 보완합니다.</p></details><details class="faq-item" name="homepage-faq"><summary data-i18n-text="[&quot;Can I use the data for training or commercial projects?&quot;]" >학습이나 상업적 용도로 사용할 수 있나요?</summary> <p data-i18n-text="[&quot;Training, evaluation, commercial use and redistribution terms are defined in each project agreement. Capture consent and data usage rights are reviewed together.&quot;]" >학습·평가·상업적 이용과 재배포 조건은 프로젝트별 계약에서 정합니다. 촬영 동의와 데이터 이용 범위를 함께 확인합니다.</p></details><details class="faq-item" name="homepage-faq"><summary data-i18n-text="[&quot;How is the data delivered?&quot;]" >어떤 형태로 납품받나요?</summary> <p data-i18n-text="[&quot;We deliver footage, labels, consent and usage documents, and review records in the agreed structure. File formats and delivery methods are agreed in advance.&quot;]" >영상, 라벨, 동의·이용 문서와 검수 기록을 협의한 구성으로 전달합니다. 필요한 파일 형식과 전달 경로는 사전에 정합니다.</p></details><details class="faq-item" name="homepage-faq"><summary data-i18n-text="[&quot;How can I contribute recordings?&quot;]" >촬영에 참여하고 싶어요.</summary> <p data-i18n-text="[&quot;Open Physical AI Studio from the 60BASE Studio badge for contributor information and recording guidance.&quot;]" >참여 안내와 촬영 교육은 화면에 고정된 60BASE Studio 배지에서 Physical AI Studio로 이동해 확인할 수 있습니다.</p></details></div></section><section id="contact" class="contact-area" aria-labelledby="contact-title"><div class="wrap"><div class="contact-inner"><div class="contact-heading section-title"><p class="eyebrow section-label">DATA INQUIRY</p><h2 data-i18n-text="[&quot;Tell us about your data needs&quot;]" id="contact-title">데이터 구매·제작 문의</h2></div><form id="contact-form" tabindex="-1" aria-labelledby="contact-title" novalidate><div class="contact-honeypot" aria-hidden="true"><label for="f-website">Website</label><input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off"></div><div class="form-row"><label class="fds-field" for="f-name"><span data-i18n-text="[&quot;Name or company&quot;]">이름 또는 회사명</span><input class="fds-input" id="f-name" name="name" maxlength="100" autocomplete="organization" required placeholder="이름 또는 회사명" data-i18n-attrs="{&quot;placeholder&quot;: &quot;Your name or company&quot;}"><span id="f-name-error" class="field-error" hidden data-i18n-text="[&quot;Enter your name or company (up to 100 characters).&quot;]">이름 또는 회사명을 100자 이내로 입력해주세요.</span></label><label class="fds-field" for="f-email"><span data-i18n-text="[&quot;Work email&quot;]">업무용 이메일</span><input class="fds-input" id="f-email" name="email" maxlength="254" type="email" autocomplete="email" placeholder="you@company.com" required><span id="f-email-error" class="field-error" hidden data-i18n-text="[&quot;Enter a valid email address (up to 254 characters).&quot;]">올바른 이메일 주소를 254자 이내로 입력해주세요.</span></label></div><label class="fds-field" for="f-type"><span class="field-label"><span data-i18n-text="[&quot;Data type or task&quot;]" >수집 데이터 타입</span><span data-i18n-text="[&quot;Optional&quot;]" class="field-optional">선택</span></span><input class="fds-input" id="f-type" name="dataType" maxlength="180" placeholder="예: 1인칭 영상, 작업 구간 라벨" data-i18n-attrs="{&quot;placeholder&quot;: &quot;e.g. first-person video&quot;}"><span id="f-type-error" class="field-error" hidden data-i18n-text="[&quot;Use up to 180 characters for the data type.&quot;]">수집 데이터 타입을 180자 이내로 입력해주세요.</span></label><label class="fds-field" for="f-msg"><span data-i18n-text="[&quot;Your brief&quot;]">필요한 데이터</span><textarea class="fds-textarea" id="f-msg" name="message" maxlength="5000" rows="4" required placeholder="작업 종류, 촬영 조건, 수량, 희망 납기를 알려주세요." data-i18n-attrs="{&quot;placeholder&quot;: &quot;Describe the tasks, recording conditions, volume and target delivery date.&quot;}"></textarea><span id="f-msg-error" class="field-error" hidden data-i18n-text="[&quot;Describe the data you need (up to 5,000 characters).&quot;]">필요한 데이터를 5,000자 이내로 입력해주세요.</span></label><div class="form-actions"><button type="submit" class="inquiry-submit" data-state="Default"><span class="inquiry-label"><span data-i18n-text="[&quot;Send inquiry&quot;]">문의 보내기</span><span aria-hidden="true" data-i18n-text="[&quot;Send inquiry&quot;]">문의 보내기</span></span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></button><a class="contact-email" href="mailto:60base.ai@gmail.com"><span class="contact-email-label" data-i18n-text="[&quot;Email us directly&quot;]">이메일로 직접 문의</span><span class="contact-email-address">60base.ai@gmail.com<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 19 19 5M5 5h14v14"/></svg></span></a></div><p data-i18n-text="[&quot;Your inquiry goes directly to our team. We reply to the email address you provide.&quot;]" class="email-note">문의가 60BASE 담당자에게 바로 전달됩니다. 입력하신 이메일로 답변드립니다.</p><p id="form-status" role="status" aria-live="polite"></p></form></div></div></section></main><footer class="site-footer"><div class="footer-copyright">© 2026 60BASE. All Rights Reserved.</div></footer><dialog id="service-film-dialog" class="service-film-dialog" aria-labelledby="service-film-title"><div class="film-dialog-heading"><h2 id="service-film-title">실사 데이터 수집</h2><button data-i18n-text="[&quot;Close&quot;]" type="button" id="service-film-close" autofocus>닫기</button></div><video id="service-detail-video" controls playsinline muted loop preload="none"></video><p id="film-detail-note"></p></dialog>
+<div id="fixed-promo-host"></div>
+</body></html>

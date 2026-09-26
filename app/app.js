@@ -1,491 +1,201 @@
-import { missions, getMission, formatDuration, formatBytes, statusLabel, formatMoney, reviewStatusLabel } from '../shared/data.js';
-import { getClips, subscribe, getProfile, saveProfile } from '../shared/store.js';
-import { openCapture, openClip, openGuide } from '../shared/capture.js';
-import { icon, escapeHTML } from '../shared/ui.js';
-import { getServiceState } from '../shared/service-store.js';
-import { renderWallet, renderShop, renderReviews, openAccount, openReviewDemo } from '../shared/service-ui.js';
+import { isNativeApp } from './native.js';
+import { openAccountDeletion } from './account-deletion.js';
+import { activities, categories, examples, exampleFor, activityFor } from './catalog.js';
+import { getAppState, subscribeApp, refreshApp, appReady, login, logout, manageAccount, record, importVideo, openClip, submitClip, viewSubmission, resubmitSubmission, mountSupport } from './service.js';
+import { dialog, esc, points, money, date, size } from '../studio/online-api.js';
+import { initializeInstall, requestInstall, getInstallState, applyAppUpdate } from './install.js';
+import { getPreparationState, subscribePreparation, toggleSavedActivity, selectPreparationActivity, renderEducation, handlePreparationClick, handlePreparationChange } from './preparation.js';
+import { openDeviceSettings, getDevicePhoto } from './device-settings.js';
+import { updateLaunch } from './launch.js';
 
-const routes = new Set(['home', 'missions', 'capture', 'library', 'profile', 'reviews', 'wallet', 'shop']);
-const state = {
-  route: 'home',
-  clips: [],
-  service: null,
-  profile: { name: '참여자', goal: 3 },
-  loading: true,
-  error: '',
-  missionCategory: 'all',
-  libraryQuery: '',
-  libraryStatus: 'all',
-  deferredInstall: null,
-  installed: matchMedia('(display-mode: standalone)').matches || navigator.standalone === true,
-  profileDirty: false,
-};
-
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-const missionColors = {
-  lime: '#dcf79c',
-  blue: '#254cf2',
-  peach: '#f1c7b7',
-  lavender: '#d8d3ff',
-  sand: '#ead9a7',
-  mint: '#bfead5',
-};
-
-function text(value, fallback = '') {
-  return escapeHTML(String(value ?? fallback));
+const main=document.querySelector('#app-main'), header=document.querySelector('#app-header'), shell=document.querySelector('.app-shell'), nav=document.querySelector('.app-bottom-nav');
+const ui={category:'전체',query:'',savedOnly:false,examplesOnly:false,reviewFilter:'all',reviewQuery:'',libraryQuery:'',libraryStatus:'all',librarySort:'newest',feature:0,estimateCount:3,estimateActivity:'dishwashing'};
+const titles={home:'홈',missions:'촬영 활동',activity:'활동 안내',guide:'촬영 가이드',education:'촬영 교육·점검',estimate:'포인트 계산',announcements:'운영 안내',library:'보관한 영상',reviews:'제출·심사',wallet:'내 포인트',profile:'프로필',settings:'설정',support:'문의·도움'};
+let toastTimer,renderQueued=false;
+const pendingActions=new Map();
+const markupCache=new WeakMap();
+let renderedRoute='',renderedAccount='',supportAccount='',composing=false;
+const actionMessages={login:'계정 연결을 확인하고 있어요.',logout:'로그아웃하고 있어요.',account:'계정 정보를 불러오고 있어요.', 'device-settings':'기기 설정을 불러오고 있어요.',record:'카메라를 준비하고 있어요.',import:'영상 가져오기를 준비하고 있어요.','open-clip':'영상을 열고 있어요.','submit-clip':'제출 화면을 준비하고 있어요.','submit-video':'제출 화면을 준비하고 있어요.','view-submission':'영상 내역을 불러오고 있어요.',resubmit:'재검토 화면을 준비하고 있어요.',refresh:'최신 내역을 확인하고 있어요.',install:'설치를 준비하고 있어요.'};
+function setMarkup(element,markup){
+ if(markupCache.get(element)===markup)return false;
+ element.innerHTML=markup;markupCache.set(element,markup);return true;
+}
+function loadingScreen(title='불러오고 있어요.',copy='잠시만 기다려주세요.'){
+ return `<section class="app-loading" role="status" aria-live="polite"><img class="app-loading-symbol" src="./icons/icon.svg" alt="" width="112" height="112"><h2>${esc(title)}</h2><p>${esc(copy)}</p></section>`;
+}
+function updateProgress(){
+ const state=getAppState(),current=route(),node=document.querySelector('#app-progress');
+ if(!node)return;
+ const action=Array.from(pendingActions.values()).at(-1);
+ const needsAccount=state.access==='checking'||state.accountConnecting;
+ const message=action?.message||(needsAccount?'계정을 확인하고 있어요.':state.loading?(['profile','wallet','reviews','library'].includes(current.name)?'내역을 불러오고 있어요.':'최신 활동을 확인하고 있어요.'):'');
+ const cameraOpen=Boolean(document.querySelector('.studio-camera-dialog[open]'));
+ node.hidden=!message||cameraOpen||Boolean(main.querySelector('.app-loading'));
+ node.querySelector('[data-progress-message]').textContent=message;
+ for(const button of document.querySelectorAll('[data-app-action]')){
+  const key=button.dataset.appAction+':'+(button.dataset.id||'');
+  const busy=pendingActions.has(key);
+  if(busy){button.disabled=true;button.setAttribute('aria-busy','true');button.dataset.appBusy='true';}
+  else if(button.dataset.appBusy){button.disabled=false;button.removeAttribute('aria-busy');delete button.dataset.appBusy;}
+ }
 }
 
-function missionIconSvg(mission) {
-  const fill = missionColors[mission?.color] || mission?.color || missionColors.lime;
-  return `
-    <svg viewBox="0 0 220 120" aria-hidden="true" focusable="false">
-      <rect x="8" y="18" width="88" height="64" rx="24" fill="${text(fill)}" opacity=".95"/>
-      <rect x="124" y="32" width="74" height="54" rx="20" fill="#172026" opacity=".92"/>
-      <path d="M77 38h24v24h24v24h-24v24H77V86H53V62h24z" fill="#254cf2"/>
-      <path d="M32 96c34-30 72-35 114-13 14 7 28 8 43 2" fill="none" stroke="#254cf2" stroke-width="10" stroke-linecap="round"/>
-      <circle cx="166" cy="30" r="10" fill="#dcf79c"/>
-    </svg>`;
+const guardedActions=new Set(['login','logout','account','device-settings','record','import','open-clip','submit-clip','submit-video','view-submission','resubmit','refresh','install','update-app']);
+function focusSelector(node){
+ if(!node||!shell.contains(node))return '';
+ if(node.id)return '#'+CSS.escape(node.id);
+ for(const key of ['data-category','data-review-filter','data-tab','data-prep-check'])if(node.hasAttribute(key))return `[${key}="${CSS.escape(node.getAttribute(key))}"]`;
+ if(node.hasAttribute('data-prep-action'))return '[data-prep-action="'+CSS.escape(node.dataset.prepAction)+'"]'+['id','example','question','answer'].filter(key=>node.dataset['prep'+key[0].toUpperCase()+key.slice(1)]).map(key=>'[data-prep-'+key+'="'+CSS.escape(node.getAttribute('data-prep-'+key))+'"]').join('');
+ if(node.hasAttribute('data-app-action'))return '[data-app-action="'+CSS.escape(node.dataset.appAction)+'"]'+['id','index','example'].filter(key=>node.dataset[key]).map(key=>'[data-'+key+'="'+CSS.escape(node.dataset[key])+'"]').join('');
+ return '';
 }
-
-function renderIcons() {
-  $$('[data-icon]').forEach((target) => {
-    const name = target.dataset.icon;
-    if (!target.firstElementChild) target.innerHTML = icon(name, 20);
-  });
+const icon=name=>`<span class="app-icon" style="--icon:url('./icons/phosphor/${name}.svg')" aria-hidden="true"></span>`;
+const pointPill=(amount,extra='')=>`<span class="point-pill ${extra}"><span class="point-mark" aria-hidden="true">P</span><span>${typeof amount==='number'?new Intl.NumberFormat('ko-KR').format(amount):esc(amount)}</span></span>`;
+const initial=name=>Array.from(name||'참여자')[0];
+const stamp=value=>{try{return new Intl.DateTimeFormat('ko-KR',{month:'long',day:'numeric'}).format(new Date(value));}catch{return '날짜 확인 중';}};
+const duration=value=>Number.isFinite(value)?`${Math.floor(value/60)}분 ${Math.floor(value%60)}초`:'길이 확인 중';
+const statusNames={uploaded:'제출 전',submitted:'접수 완료',reviewing:'검토 중',approved:'승인',rejected:'보완 필요',deleted:'삭제됨',deleting:'삭제 처리 중'};
+function route(){const [name,id,step]=location.hash.slice(1).split('/');return {name:titles[name]?name:name==='capture'?'guide':name==='shop'?'wallet':'home',id,step:Math.max(1,Math.min(3,Number(step)||1))};}
+function tasks(){const catalog=getAppState().catalog;return catalog?.tasks?.map(task=>({...activityFor(task.id),...task,actions:activityFor(task.id)?.actions||[],tips:activityFor(task.id)?.tips||[]}))||activities.map(item=>({...item,reward:null}));}
+function selectedTask(id){return tasks().find(item=>item.id===id)||tasks()[0]||{...activities[0],reward:null};}
+function reward(task){return task.reward!==null&&task.reward!==undefined&&Number.isFinite(Number(task.reward))?Number(task.reward):null;}
+function rewardPill(task,extra=''){return reward(task)===null?'<span class="reward-unavailable">연결 후 확인</span>':pointPill(reward(task),extra);}
+function empty(title,copy,action=''){return `<section class="app-empty"><span class="empty-icon">${icon('video-camera')}</span><h2>${esc(title)}</h2><p>${esc(copy)}</p>${action}</section>`;}
+function button(label,action,extra='',kind='primary'){return `<button type="button" class="app-button ${kind}" data-app-action="${action}" ${extra}>${label}</button>`;}
+function backHref(current){if(['activity','education','estimate'].includes(current.name))return '#missions';if(current.name==='guide')return current.step>1?`#guide/${current.id||tasks()[0]?.id}/${current.step-1}`:current.id?`#activity/${current.id}`:'#home';if(['settings','library','reviews','support'].includes(current.name))return '#profile';return '#home';}
+function renderHeader(current,state){
+ if(current.name==='home')setMarkup(header,`<a class="app-brand" href="#home" aria-label="60BASE 홈"><img src="../assets/brand/60base-logo3-20260914/60base-logo-dark.svg" width="118" height="24" alt="60BASE"></a>${state.access==='allowed'?`<a href="#wallet" class="header-points" aria-label="내 포인트 ${state.me?points(state.me.wallet.available):'확인'}">${pointPill(state.me?state.me.wallet.available:'—','compact')}</a>`:`<button type="button" class="header-signin" data-app-action="login">회원가입 / 로그인 ${icon('arrow-right')}</button>`}`);
+ else setMarkup(header,`<a class="app-back" href="${backHref(current)}" aria-label="이전 화면">${icon('arrow-left')}</a><span class="header-title">${esc(titles[current.name])}</span>${current.name==='profile'?`<a class="app-back" href="#settings" aria-label="설정">${icon('gear')}</a>`:current.name==='library'?`<button type="button" class="app-back" data-app-action="import" aria-label="영상 가져오기">${icon('plus')}</button>`:'<span class="header-spacer"></span>'}`);
 }
-
-function currentRoute() {
-  const route = location.hash.replace('#', '') || 'home';
-  return routes.has(route) ? route : 'home';
+function renderNav(current){
+ const active=['activity','guide','education','estimate'].includes(current.name)?'missions':['library','reviews','settings','support','announcements'].includes(current.name)?'profile':current.name;
+ setMarkup(nav,[['home','house','홈'],['missions','squares-four','활동'],['wallet','wallet','포인트'],['profile','user','프로필']].map(([id,image,label])=>`<a href="#${id}" data-tab="${id}" ${active===id?'aria-current="page"':''}>${icon(image)}<span>${label}</span></a>`).join(''));
+ nav.hidden=['activity','guide'].includes(current.name);
 }
-
-function clipMission(clip) {
-  return clip?.missionId ? getMission(clip.missionId) : null;
+function categoryRail(home=false){return `<div class="category-rail ${home?'on-blue':''}" role="group" aria-label="촬영 활동 분류">${categories.map(item=>`<button type="button" data-category="${esc(item.name)}" ${home?'data-home-category':''} aria-pressed="${ui.category===item.name}"><span class="category-icon">${icon(item.icon)}</span><span>${esc(item.label||item.name)}</span></button>`).join('')}</div>`;}
+function taskMedia(task,{hero=false}={}){const example=exampleFor(task);return example?`<div class="task-media"><img src="${example.poster}" width="640" height="360" ${hero?'':'loading="lazy"'} alt="${esc(example.label)} 촬영 예시"><span class="media-label">실제 촬영 예시</span></div>`:`<div class="task-icon-media">${icon(categories.find(item=>item.name===task.category)?.icon||'camera')}<span>${esc(task.category)}</span></div>`;}
+function home(state){
+ const task=tasks().find(item=>item.id==='folding-clothes')||tasks().find(item=>exampleFor(item))||tasks()[0];
+ const example=exampleFor(task)||examples[0];
+ return `<section class="home-photo-story"><p class="home-photo-eyebrow">오늘의 촬영</p><a class="home-photo" href="#activity/${encodeURIComponent(task.id)}" aria-label="${esc(task.title)} 촬영 안내"><img src="${example.poster}" width="640" height="360" fetchpriority="high" alt="${esc(example.label)} 실제 촬영 예시"></a><h1>평범한 하루가,<br>새로운 배움으로.</h1><div class="home-photo-meta"><p>${esc(task.title)} · 약 5분</p><p class="home-photo-reward">${reward(task)===null?(state.loading?'승인 포인트 확인 중':'연결 후 승인 포인트 확인'):`검수 승인 시 ${points(reward(task))}`}</p></div>${button(`${icon('camera')} 이 활동 촬영하기`,'record',`data-id="${esc(task.id)}"`)}<a class="home-browse" href="#missions">다른 활동 둘러보기 ${icon('arrow-right')}</a></section><div class="home-quick-links"><a href="#education">촬영 교육·점검 ${icon('caret-right')}</a><a href="#library">보관한 영상 ${icon('caret-right')}</a><a href="#estimate">예상 포인트 계산 ${icon('caret-right')}</a></div>`;
 }
-
-function createdLabel(value) {
-  if (!value) return '날짜 없음';
-  try {
-    return new Intl.DateTimeFormat('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
-  } catch {
-    return '날짜 없음';
-  }
+function taskCard(task){return `<a class="task-card" href="#activity/${encodeURIComponent(task.id)}">${taskMedia(task)}<div class="task-card-copy"><span>${esc(task.category)} · 약 5분</span><h2>${esc(task.title)}</h2><p>${esc(task.description)}</p><div><small>검수 승인 시</small>${rewardPill(task,'small')}</div></div></a>`;}
+function preparationNotice(){const {notice}=getPreparationState();return notice?`<p class="app-alert" role="status">${esc(notice)}</p>`:'';}
+function missions(){
+ const {plan}=getPreparationState();
+ const list=tasks().filter(task=>(ui.category==='전체'||task.category===ui.category)&&(!ui.savedOnly||plan.saved.includes(task.id))&&(!ui.examplesOnly||exampleFor(task))&&`${task.title} ${task.description} ${task.category}`.toLowerCase().includes(ui.query.trim().toLowerCase()));
+ return `<div class="screen-heading"><h1>익숙한 일상부터<br>시작해보세요.</h1><p>마음에 드는 활동을 고르고, 약 5분을 담아요.</p></div><label class="app-search">${icon('magnifying-glass')}<input id="app-search" type="search" value="${esc(ui.query)}" placeholder="어떤 활동을 찾으세요?" aria-label="촬영 활동 검색"></label>${categoryRail()}<div class="review-filters" role="group" aria-label="활동 보기"><button type="button" data-app-action="saved-filter" aria-pressed="${ui.savedOnly}">저장한 활동 · ${plan.saved.length}</button><button type="button" data-app-action="examples-filter" aria-pressed="${ui.examplesOnly}">예시 영상 있음</button></div>${preparationNotice()}<div class="section-row result-count"><p role="status">${list.length}개의 촬영 활동</p><button class="text-button" type="button" data-app-action="reset-search">초기화</button></div><div class="task-list">${list.map(task=>`<div class="task-with-save">${taskCard(task)}<button class="task-save" type="button" data-app-action="save-activity" data-id="${esc(task.id)}" aria-pressed="${plan.saved.includes(task.id)}" aria-label="${esc(task.title)} 활동 저장">${icon(plan.saved.includes(task.id)?'check':'plus')} ${plan.saved.includes(task.id)?'저장됨':'활동 저장'}</button></div>`).join('')||empty('일치하는 활동이 없어요.','검색어나 필터를 바꿔보세요.')}</div><a class="app-button secondary" href="#education">촬영 교육·점검</a>`;
 }
-
-function normalizeStatus(status) {
-  return status === 'ready' ? 'ready' : 'draft';
+function activity(current,state){const task=selectedTask(current.id),example=exampleFor(task),saved=getPreparationState().plan.saved.includes(task.id);return `<div class="screen-heading"><span class="step-chip">${esc(task.category)} · 영상 촬영</span><h1>${esc(task.title)}</h1><p>${esc(task.description)}</p></div>${preparationNotice()}<div class="action-pair">${button(saved?'저장 해제':'활동 저장','save-activity',`data-id="${task.id}" aria-pressed="${saved}"`,'secondary')}${button('이 활동 촬영 준비','prepare-activity',`data-id="${task.id}"`,'secondary')}</div><div class="reward-panel"><span>검수 승인 시</span><strong>${reward(task)===null?'<span class="reward-pending-value">연결 후 확인</span>':new Intl.NumberFormat('ko-KR').format(reward(task))+'<small>포인트</small>'}</strong><span class="reward-mark" aria-hidden="true">P</span><p>제출한 영상이 승인되면 적립돼요.</p></div>${example?`<button type="button" class="detail-sample" data-app-action="sample" data-example="${example.id}">${taskMedia(task)}<span class="sample-play">${icon('play')} 촬영 예시 보기</span></button>`:''}<section class="detail-section"><h2>이렇게 촬영해요</h2><ol class="activity-steps">${task.actions.map((action,index)=>`<li><span>${index+1}</span>${esc(action)}</li>`).join('')}</ol></section><section class="detail-section"><h2>촬영 전에 확인해주세요</h2><ul class="check-list"><li>${icon('check-circle')}한국 내 생활공간에서 직접 촬영해요.</li><li>${icon('check-circle')}가로 화면에 양손과 작업 대상을 담아요.</li><li>${icon('check-circle')}얼굴·주소·개인 문서는 미리 치워요.</li>${task.tips.map(tip=>`<li>${icon('check-circle')}${esc(tip)}</li>`).join('')}</ul></section><p class="muted-caption">영상은 먼저 이 기기에 저장됩니다. 제출할 때 이용 범위와 동의를 다시 확인해요.</p><div class="screen-footer"><a class="app-button secondary" href="#guide/${task.id}/1">가이드 보기</a>${button(`${icon('camera')} 촬영하기`,'record',`data-id="${task.id}"`)}</div>`;}
+const guideSteps=[
+ {title:'내 시점에서,\n가로로 담아요.',body:'휴대폰이나 노트북을 작업대 쪽으로 고정해주세요. 화면에 양손과 작업 공간이 함께 들어오도록 각도를 맞춰요.',label:'카메라 위치',checks:['카메라를 안정적으로 고정해요.','가로 화면으로 촬영해요.']},
+ {title:'양손과 작업 대상을\n함께 보여주세요.',body:'손이 무엇을 잡고 어떻게 움직이는지 잘 보여야 해요. 물건 전체가 프레임에 들어오는지 확인해주세요.',label:'화면 구도',checks:['손과 작업 대상이 잘리지 않아요.','얼굴·주소·문서가 보이지 않아요.']},
+ {title:'밝고 흔들림 없이,\n평소 하던 대로.',body:'하나의 집안일을 약 5분 동안 자연스럽게 이어가요. 빠르게 연출하거나 카메라를 보며 설명할 필요는 없어요.',label:'촬영 준비 완료',checks:['충분히 밝은 곳에서 촬영해요.','안전을 먼저 확인하고 시작해요.']},
+];
+function guide(current){const task=selectedTask(current.id),step=current.step,data=guideSteps[step-1],example=exampleFor(task)||examples[0];return `<div class="guide-progress"><span class="step-chip">3단계 중 ${step}단계</span><div class="step-dots" aria-label="${step}/3단계">${[1,2,3].map(value=>`<a href="#guide/${task.id}/${value}" aria-label="${value}단계" ${step===value?'aria-current="step"':''}></a>`).join('')}</div></div><div class="screen-heading guide-heading"><span class="blue-label">${data.label}</span><h1>${data.title.replace('\n','<br>')}</h1></div><figure class="guide-visual"><img src="${example.poster}" width="640" height="360" alt="${esc(example.label)}의 손과 작업 대상이 함께 보이는 실제 촬영 예시"><figcaption>실제 촬영 예시 · ${esc(example.label)}</figcaption></figure><p class="guide-explanation">${data.body}</p><div class="guide-checks">${data.checks.map(copy=>`<p>${icon('check-circle')}${copy}</p>`).join('')}</div><button type="button" class="settings-row sample-row" data-app-action="sample" data-example="${example.id}"><span class="row-icon navy">${icon('play')}</span><span><strong>샘플 영상 보기</strong><small>20초로 촬영 구도를 확인해요.</small></span>${icon('caret-right')}</button>${step===3?'<a class="app-button secondary" href="#education">교육 확인 문제·촬영 전 점검</a><p class="muted-caption">촬영 후 먼저 영상을 확인하고 저장해요.<br>심사 제출은 이용 동의를 확인한 뒤 직접 진행합니다.</p>':''}<div class="screen-footer">${step<3?`<a class="app-button primary" href="#guide/${task.id}/${step+1}">다음 ${icon('arrow-right')}</a>`:`${button('영상 가져오기','import','','secondary')}${button(`${icon('camera')} 촬영 시작`,'record',`data-id="${task.id}"`)}`}</div>`;}
+function gate(state,current){if(state.accountConnectionError)return empty('계정 연결을 확인해주세요.',state.accountConnectionError,button('다시 연결하기','login'));const checking=state.access==='checking'||state.accountConnecting;if(checking)return loadingScreen('계정을 확인하고 있어요.','연결이 끝나면 바로 이어서 이용할 수 있어요.')+'<a class="text-button" href="#missions">촬영 활동 둘러보기</a>';return `<section class="login-screen"><span class="login-symbol">${icon('user')}</span><h1>${checking?'계정을 확인하고 있어요.':'내 일상의 기록,\n한곳에서 이어가요.'.replace('\n','<br>')}</h1><p>${checking?'잠시만 기다려주세요.':'로그인하면 영상을 촬영·보관하고<br>심사 결과와 포인트를 확인할 수 있어요.'}</p>${checking?'':button(`${icon('arrow-right')} ${state.access==='registrationRequired'?'회원가입 완료하기':'로그인 / 회원가입'}`,'login')}<a class="text-button" href="#missions">먼저 촬영 활동 둘러보기</a><p class="login-note">촬영한 영상은 자동으로 제출되지 않아요.</p></section>`;}
+function loadingPrivate(state){if(state.loading&&!state.me)return loadingScreen('내역을 불러오고 있어요.','심사 결과와 포인트를 확인하고 있어요.');if(!state.online)return empty('연결이 필요해요.','심사 결과와 포인트는 인터넷에 연결한 뒤 확인할 수 있어요.',button('다시 연결하기','refresh'));if(state.error||!state.me)return empty('내역을 불러오지 못했어요.',state.error||'다시 연결해 확인해주세요.',button('다시 불러오기','refresh'));return '';}
+function localLibrary(state){const list=state.clips.filter(clip=>!clip.example&&(ui.libraryStatus==='all'||clip.status===ui.libraryStatus)&&`${clip.title} ${clip.category||''} ${clip.notes||''}`.toLowerCase().includes(ui.libraryQuery.trim().toLowerCase())).sort((a,b)=>ui.librarySort==='title'?a.title.localeCompare(b.title,'ko'):(new Date(b.createdAt)-new Date(a.createdAt))*(ui.librarySort==='oldest'?-1:1));return `<div class="screen-heading"><h1>내 기기에 보관한 영상</h1><p>저장된 영상은 자동 제출되지 않아요.<br>필요한 원본은 다운로드해 보관해주세요.</p></div><div class="action-pair">${button(`${icon('camera')} 바로 촬영`,'record')}${button(`${icon('upload-simple')} 가져오기`,'import','','secondary')}</div><label class="app-search">${icon('magnifying-glass')}<input id="app-search" type="search" value="${esc(ui.libraryQuery)}" placeholder="영상 제목·활동·메모 검색" aria-label="보관한 영상 검색"></label><div class="app-filters"><label>기록 상태<select id="app-library-status">${[['all','전체'],['ready','준비 완료'],['draft','초안'],...['submitted','reviewing','approved','rejected'].map(status=>[status,'이전 기록 · '+statusNames[status]])].map(([value,label])=>`<option value="${value}" ${ui.libraryStatus===value?'selected':''}>${label}</option>`).join('')}</select></label><label>정렬<select id="app-library-sort">${[['newest','최신순'],['oldest','오래된순'],['title','이름순']].map(([value,label])=>`<option value="${value}" ${ui.librarySort===value?'selected':''}>${label}</option>`).join('')}</select></label></div><div class="section-row"><p class="muted-caption" role="status">전체 ${state.clips.length}개 · 표시 ${list.length}개 · ${size(state.clips.reduce((n,c)=>n+(c.size||c.blob?.size||0),0))}</p><button class="text-button" type="button" data-app-action="reset-library">초기화</button></div>${state.localError?`<div class="app-alert" role="status">${esc(state.localError)}${button('다시 불러오기','refresh','','secondary')}</div>`:''}<div class="library-list">${list.map(clip=>`<article class="local-card"><button type="button" class="clip-open" data-app-action="open-clip" data-id="${esc(clip.id)}"><span class="clip-symbol">${icon('video-camera')}</span><span><b>${esc(clip.title)}</b><small>${stamp(clip.createdAt)} · ${duration(clip.duration)} · ${size(clip.size||clip.blob?.size)}</small><span class="status-pill local">이 기기에 저장됨</span></span>${icon('caret-right')}</button>${clip.blob?button('심사 제출하기','submit-clip',`data-id="${esc(clip.id)}"`,'secondary'):''}</article>`).join('')||empty(ui.libraryQuery||ui.libraryStatus!=='all'?'검색된 영상이 없어요.':'첫 영상을 담아보세요.',ui.libraryQuery||ui.libraryStatus!=='all'?'검색어나 상태를 바꿔보세요.':'촬영하거나 가져온 영상이 여기에 보관돼요.')}</div><p class="muted-caption">영상을 열면 이름·메모 수정, 다운로드와 삭제를 할 수 있어요.</p><p class="muted-caption">브라우저 데이터를 삭제하면 보관한 영상도 지워집니다. 제출한 영상의 처리 상태는 <a href="#reviews">제출·심사</a>에서 확인하세요.</p>`;}
+function filterVideos(videos){return videos.filter(video=>(ui.reviewFilter==='all'||(ui.reviewFilter==='pending'?['submitted','reviewing'].includes(video.status):video.status===ui.reviewFilter))&&video.title.toLowerCase().includes(ui.reviewQuery.trim().toLowerCase()));}
+function reviewList(videos,{compact=false}={}){return `<div class="submission-list">${(compact?videos:filterVideos(videos)).map(video=>`<article class="submission-card"><div class="submission-summary"><span class="submission-icon">${icon('video-camera')}</span><div><span class="status-pill ${esc(video.status)}">${esc(statusNames[video.status]||video.status)}</span><h3>${esc(video.title)}</h3><p>${stamp(video.submittedAt||video.createdAt)} · ${duration(video.duration)}</p></div></div>${!['deleted','deleting'].includes(video.status)?`<div class="submission-points"><small>${video.status==='approved'?'승인 포인트':'승인 시 예상 포인트'}</small><strong>${points(video.reward)}</strong></div>`:''}${video.reason?`<p class="review-reason">${esc(video.reason)}</p>`:''}<div class="submission-actions">${button('영상·상세','view-submission',`data-id="${esc(video.id)}"`,'secondary')}${['uploaded','rejected'].includes(video.status)?button(video.status==='uploaded'?'동의하고 제출':'같은 영상 재검토','resubmit',`data-id="${esc(video.id)}"`):''}${video.status==='rejected'?button('수정 영상 제출','submit-video','','secondary'):''}</div></article>`).join('')||empty(videos.length?'해당 상태의 영상이 없어요.':'아직 제출한 영상이 없어요.',videos.length?'다른 상태를 선택해보세요.':'촬영한 영상을 저장하고 동의 후 제출해주세요.',`<a class="app-button primary" href="#${videos.length?'reviews':'missions'}">${videos.length?'전체 내역 보기':'촬영 활동 고르기'}</a>`)}</div>`;}
+function reviewFilters(){return `<div class="review-filters" role="group" aria-label="심사 상태">${[['all','전체'],['pending','검토 중'],['approved','승인'],['rejected','보완 필요'],['uploaded','제출 전'],['deleting','삭제 처리 중'],['deleted','삭제됨']].map(([id,label])=>`<button type="button" data-review-filter="${id}" aria-pressed="${ui.reviewFilter===id}">${label}</button>`).join('')}</div>`;}
+function reviews(state){const issue=loadingPrivate(state);return `<div class="screen-heading"><h1>제출부터 승인까지</h1><p>실제 심사 상태를 확인해요.<br>포인트는 영상이 승인된 뒤 적립됩니다.</p></div>${issue||`<ol class="app-review-steps" aria-label="심사 진행 순서"><li>영상 제출</li><li>기준 확인</li><li>승인·보완</li><li>포인트 적립</li></ol><div class="action-pair">${button('영상 파일 제출','submit-video')}<a class="app-button secondary" href="#library">보관 영상 선택</a></div><label class="app-search">${icon('magnifying-glass')}<input id="app-review-search" type="search" value="${esc(ui.reviewQuery)}" placeholder="제출한 영상 제목 검색" aria-label="제출한 영상 검색"></label><div class="section-row"><a class="text-button" href="#library">보관한 영상 제출 ${icon('arrow-right')}</a><button type="button" class="round-button" data-app-action="refresh" aria-label="심사 내역 새로고침">${icon('arrow-clockwise')}</button></div>${reviewFilters()}${reviewList(state.me.videos)}`}`;}
+function wallet(state){const issue=loadingPrivate(state);if(issue)return issue;const me=state.me,pending=me.videos.filter(video=>['submitted','reviewing'].includes(video.status)),pendingPoints=pending.reduce((total,video)=>total+(Number(video.reward)||0),0);return `<section class="balance-card"><span>보유 포인트</span><strong data-points-balance>${new Intl.NumberFormat('ko-KR').format(me.wallet.available)}<small>P</small></strong><p>검수 승인으로 차곡차곡 쌓은 기록</p><span class="balance-icon" aria-hidden="true">P</span></section><div class="points-summary"><div><span>승인 대기 예상</span><strong data-pending-points>${points(pendingPoints)}</strong><small>${pending.length}개 영상 · 잔액에 미포함</small></div><div><span>누적 적립</span><strong>${points(me.wallet.earned)}</strong><small>실제 승인된 영상의 보상</small></div></div><section class="bank-coming"><span class="row-icon cyan">${icon('wallet')}</span><div><strong>국내 은행 연동 예정</strong><p>현재는 포인트 적립만 운영해요.</p></div><button type="button" disabled>준비 중</button></section><section class="detail-section"><div class="section-row"><h2>포인트 내역</h2><button type="button" class="round-button" data-app-action="refresh" aria-label="포인트 새로고침">${icon('arrow-clockwise')}</button></div><div class="ledger-list">${me.ledger.length?me.ledger.map(entry=>`<article><span class="row-icon mint">${icon('check-circle')}</span><div><h3>${esc({reward:'영상 승인',purchase:'포인트 사용',refund:'사용 취소 반환'}[entry.kind]||'포인트 조정')}</h3><small>${stamp(entry.createdAt)}</small></div><strong>${entry.amount>0?'+':''}${points(entry.amount)}</strong></article>`).join(''):empty('아직 적립 내역이 없어요.','영상이 승인되면 포인트와 내역이 표시됩니다.','<a class="app-button secondary" href="#reviews">제출·심사 확인</a>')}</div></section>${me.payouts?.length?`<section class="detail-section"><h2>기존 출금 기록</h2><p class="muted-caption">과거 기록은 조회만 가능합니다.</p><div class="ledger-list">${me.payouts.map(item=>`<article><div><h3>${esc({pending:'처리 대기',paid:'지급 확인',rejected:'반려',cancelled:'취소'}[item.status]||item.status)}</h3><small>${stamp(item.createdAt)}${item.note?' · '+esc(item.note):''}</small></div><strong>${money(item.amount)}</strong></article>`).join('')}</div></section>`:''}`;}
+function row(label,detail,image,target,{action=false,tone='',end=''}={}){const tag=action?'button':'a',attr=action?`type="button" data-app-action="${target}"`:`href="${target}"`;return `<${tag} class="settings-row" ${attr}><span class="row-icon ${tone}">${icon(image)}</span><span class="row-copy"><strong>${label}</strong>${detail?`<small>${esc(detail)}</small>`:''}</span>${end?`<span class="row-value">${end}</span>`:''}${icon('caret-right')}</${tag}>`;}
+function profile(state){const me=state.me,user=state.user;return `<a class="identity-card" href="#settings"><span class="identity-avatar">${getDevicePhoto()?`<img src="${getDevicePhoto()}" alt="이 기기의 기록용 사진">`:esc(initial(user?.name))}</span><span><strong>${esc(user?.name||'참여자')}</strong><small>${esc(user?.email||'가입한 계정')}</small><span class="identity-meta">${icon('shield-check')}한국 내 촬영 참여</span></span>${icon('caret-right')}</a><section class="contribution-card"><span class="blue-label">나의 영상 기여</span><h1>평소의 움직임이<br>새로운 배움으로.</h1><div class="contribution-stats"><div><strong>${me?me.videos.filter(v=>!['deleted','deleting'].includes(v.status)).length:'—'}<small>개</small></strong><span>제출한 영상</span></div><div><strong>${me?me.videos.filter(v=>v.status==='approved').length:'—'}<small>개</small></strong><span>승인된 영상</span></div><div><strong>${me?Math.floor(me.videos.filter(v=>!['deleted','deleting'].includes(v.status)).reduce((n,v)=>n+v.duration,0)/60):'—'}<small>분</small></strong><span>촬영 분량</span></div></div></section><div class="settings-group">${row('보관한 영상','이 기기의 원본과 아직 제출하지 않은 영상','video-camera','#library',{tone:'lavender'})}${row('제출·심사','접수 상태와 검수 결과 확인','cloud-check','#reviews',{tone:'cyan'})}${row('내 포인트',me?`현재 ${points(me.wallet.available)}`:'연결 후 잔액 확인','wallet','#wallet',{tone:'mint'})}</div><div class="section-row profile-review-title"><h2>최근 제출</h2><a class="text-button" href="#reviews">모두 보기</a></div>${loadingPrivate(state)||reviewList(me.videos.slice(0,2),{compact:true})}`;}
+function settings(state){const install=getInstallState();return `<div class="settings-section"><h2>계정</h2><div class="settings-group">${state.access==='allowed'?row('내 정보 수정',state.user?.email||'이름과 로그인 계정','user','account',{action:true,tone:'lavender'}):row('로그인 / 회원가입','계정으로 시작해요','user','login',{action:true,tone:'lavender'})}${state.access==='allowed'?row('이 기기의 기록 설정','기록용 이름·목표·사진','gear','device-settings',{action:true,tone:'cyan'}):''}<div class="settings-row is-disabled"><span class="row-icon cyan">${icon('wallet')}</span><span class="row-copy"><strong>국내 은행 연동</strong><small>현재는 포인트 적립만 운영합니다.</small></span><span class="row-value">예정</span></div></div></div><div class="settings-section"><h2>촬영과 데이터</h2><div class="settings-group">${row('촬영 교육·점검','예시 영상·확인 문제·촬영 전 점검','check-circle','#education',{tone:'mint'})}${row('예상 포인트 계산','승인될 영상 수로 계산해요','wallet','#estimate',{tone:'peach'})}${row('촬영 가이드','촬영 전에 확인하는 세 가지','camera','#guide/dishwashing/1',{tone:'lavender'})}${row('보관한 영상','자동으로 업로드되지 않습니다.','video-camera','#library',{tone:'cyan'})}${row('개인정보 안내','수집 항목·보관·삭제 요청','shield-check','../studio/privacy.html',{tone:'mint'})}</div></div><div class="settings-section"><h2>앱</h2><div class="settings-group">${install.updateAvailable?row('앱 업데이트','열린 작업을 마친 뒤 최신 버전으로 열어요.','arrow-clockwise','update-app',{action:true,tone:'mint'}):''}${row(install.installed?'홈 화면에서 사용 중':'홈 화면에 앱 설치',install.installed?'설치된 60BASE 앱입니다.':'빠르게 열고 촬영을 시작해요.','device-mobile','install',{action:true,tone:'peach'})}${row('문의하기','촬영·심사·계정에 대해 물어보세요.','question','#support',{tone:'cyan'})}${row('운영 안내','현재 운영 공지 확인','envelope','#announcements',{tone:'mint'})}${!isNativeApp()&&state.online&&state.user?.role==='admin'?row('관리자 콘솔','검수와 운영 관리','shield-check','/admin/',{tone:'lavender'}):''}${row('서비스 약관','','shield-check','../studio/terms.html',{tone:'lavender'})}<div class="settings-row"><span class="row-icon mint">${icon('squares-four')}</span><span class="row-copy"><strong>앱 버전</strong></span><span class="row-value">2026.09.17</span></div>${state.access==='allowed'?row('로그아웃','','sign-out','logout',{action:true,tone:'peach'}):''}</div></div>${install.error?`<p class="muted-caption" role="status">${esc(install.error)}</p>`:''}<p class="muted-caption">휴대폰 번호 인증은 웹과 동일하게 점검 중입니다.</p><button type="button" class="deletion-help" data-app-action="delete-account">계정과 데이터 삭제</button><p class="settings-footer"><a href="https://60base.ai/">60BASE</a><span>한국의 일상을 영상으로.</span></p>`;}
+function support(){return '<div class="screen-heading"><h1>무엇을 도와드릴까요?</h1><p>촬영부터 제출까지, 궁금한 점을 남겨주세요.</p></div><div id="app-support"></div>';}
+function announcements(state){
+ const catalog=state.catalog;
+ return `<div class="screen-heading"><h1>운영 안내</h1><p>현재 등록된 서비스 공지를 확인해요.</p></div>${!catalog?empty('안내를 불러오지 못했어요.','인터넷 연결을 확인한 뒤 다시 시도해주세요.',button('새로고침','refresh')):`${catalog.settings?.notice?`<p class="app-alert">${esc(catalog.settings.notice)}</p>`:''}<div class="app-announcements">${catalog.announcements?.length?catalog.announcements.map(item=>`<details><summary>${esc(item.title)}</summary><p>${esc(item.body)}</p></details>`).join(''):empty('등록된 공지가 없어요.','새로운 안내가 올라오면 이곳에서 확인할 수 있어요.')}</div>`}`;
 }
-
-function actualClips() {
-  return state.clips.filter((clip) => !clip.example);
+function estimateValue(){const task=selectedTask(ui.estimateActivity),amount=reward(task);return amount===null?'연결 후 포인트를 확인할 수 있어요.':`${ui.estimateCount}개 모두 승인 시 ${points(amount*ui.estimateCount)} · 촬영 약 ${ui.estimateCount*5}분`;}
+function updateEstimate(){const output=document.querySelector('#app-estimate-result');if(output)output.textContent=estimateValue();}
+function estimate(){return `<div class="screen-heading"><h1>승인 시 포인트는?</h1><p>촬영할 영상 수로 미리 계산해보세요.</p></div><div class="app-estimator"><label>촬영 활동<select id="app-estimate-activity">${tasks().map(task=>`<option value="${esc(task.id)}" ${task.id===ui.estimateActivity?'selected':''}>${esc(task.title)}</option>`).join('')}</select></label><label>영상 수<input id="app-estimate-count" type="number" min="1" max="20" step="1" inputmode="numeric" value="${ui.estimateCount}"></label><output id="app-estimate-result" role="status" aria-live="polite">${estimateValue()}</output><p>검수 승인 시 적립되는 예상값입니다. 계산값은 실제 보유 포인트에 반영되지 않아요. 1~20개는 계산 범위이며 참여 횟수 제한이 아닙니다.</p></div><a class="app-button primary" href="#missions">촬영 활동 고르기</a>`;}
+function render({navigation=false}={}){
+ const current=route(),state=getAppState(),focus=document.activeElement,focusTarget=focusSelector(focus),selection=focus&&typeof focus.selectionStart==='number'?[focus.selectionStart,focus.selectionEnd]:null;
+ const routeKey=current.name+':'+(current.id||'')+':'+current.step;
+ const accountKey=state.accountKey+'|'+(state.user?.id||'')+'|'+state.access;
+ const sameContext=renderedRoute===routeKey&&renderedAccount===accountKey;
+ if(!sameContext){markupCache.delete(main);supportAccount='';}
+ if(composing&&sameContext){updateProgress();return;}
+ const scrollTop=main.scrollTop;
+ shell.dataset.screen=current.name;
+ document.title=`${titles[current.name]} · 60BASE`;
+ renderHeader(current,state);renderNav(current);
+ document.querySelector('meta[name="theme-color"]').content=current.name==='home'?'#08183e':'#f7f8fc';
+ const privateRoute=['library','reviews','wallet','profile'].includes(current.name);
+ const content=privateRoute&&state.access!=='allowed'?gate(state,current):({home:()=>home(state),missions,activity:()=>activity(current,state),guide:()=>guide(current),education:()=>renderEducation({icon,esc}),estimate,announcements:()=>announcements(state),library:()=>localLibrary(state),reviews:()=>reviews(state),wallet:()=>wallet(state),profile:()=>profile(state),settings:()=>settings(state),support}[current.name]||(()=>home(state)))();
+ const changed=setMarkup(main,content);
+ if(changed&&sameContext&&focus?.matches('input[type="search"]')&&focus.id){
+  const replacement=main.querySelector('#'+CSS.escape(focus.id));
+  if(replacement){replacement.replaceWith(focus);}
+ }
+ renderedRoute=routeKey;renderedAccount=accountKey;
+ if(!navigator.onLine){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='오프라인 · 제출과 계정 내역은 연결 후 이용할 수 있어요.';}else if(state.catalogError&&['home','missions','activity'].includes(current.name)){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='최신 활동 정보를 연결하지 못했어요. 저장된 촬영 안내를 표시합니다.';}else document.querySelector('#app-connection').hidden=true;
+ if(current.name==='support'&&(changed||supportAccount!==accountKey)){supportAccount=accountKey;void mountSupport(document.querySelector('#app-support'));}
+ if(navigation){main.scrollTo({top:0,behavior:'instant'});window.scrollTo({top:0,behavior:'instant'});main.focus({preventScroll:true});}
+ else if(changed){main.scrollTop=scrollTop;if(focusTarget){const next=document.querySelector(focusTarget);if(next&&next!==document.activeElement){next.focus({preventScroll:true});if(selection&&next.setSelectionRange&&next.type!=='number')next.setSelectionRange(...selection);}}}
+ updateProgress();
+ updateLaunch(state);
 }
-
-function renderStateCard({ title, body, action, actionLabel, iconName = 'camera' }) {
-  return `
-    <article class="state-card">
-      <h3>${text(title)}</h3>
-      <p>${text(body)}</p>
-      ${action ? `<button class="primary-action" type="button" data-action="${text(action)}"><span data-icon="${text(iconName)}"></span>${text(actionLabel)}</button>` : ''}
-    </article>`;
-}
-
-function missionCard(mission, compact = false) {
-  const completed = actualClips().filter((clip) => clip.missionId === mission.id).length;
-  if (compact) {
-    return `
-      <article class="mini-mission">
-        <div>
-          <strong>${text(mission.title)}</strong>
-          <span>${text(mission.category)} · ${text(mission.duration)}분 · 기록 ${completed}개</span>
-        </div>
-        <button class="icon-button" type="button" data-action="capture-camera" data-mission-id="${text(mission.id)}" aria-label="${text(mission.title)} 촬영">
-          ${icon('camera', 20)}
-        </button>
-      </article>`;
-  }
-
-  return `
-    <article class="mission-card">
-      <header>
-        <div class="mission-copy">
-          <div class="mission-meta">
-            <span>${text(mission.category)}</span>
-            <span>${text(mission.duration)}분</span>
-            <span>${text(mission.level)}</span>
-            <span>통과 보상 예시 ${text(formatMoney(mission.reward))}</span>
-            <span>기록 ${completed}개</span>
-          </div>
-          <h3>${text(mission.title)}</h3>
-          <p>${text(mission.description)}</p>
-        </div>
-        <div class="mission-icon">${icon(mission.icon || 'spark', 22)}</div>
-      </header>
-      <div class="mission-actions">
-        <button class="secondary-action" type="button" data-action="guide" data-mission-id="${text(mission.id)}">
-          <span data-icon="book"></span>가이드
-        </button>
-        <button class="primary-action" type="button" data-action="capture-camera" data-mission-id="${text(mission.id)}">
-          <span data-icon="camera"></span>촬영
-        </button>
-      </div>
-    </article>`;
-}
-
-function clipCard(clip) {
-  const mission = clipMission(clip);
-  const status = normalizeStatus(clip.status);
-  const title = clip.title || mission?.title || '제목 없는 기록';
-  const submission = state.service?.submissions.find((item) => item.clipId === clip.id);
-  return `
-    <article class="clip-card">
-      <header>
-        <button class="clip-title" type="button" data-action="open-clip" data-clip-id="${text(clip.id)}">
-          <strong>${text(title)}</strong>
-          <span>${text(mission?.title || clip.category || '자유 기록')} · ${text(createdLabel(clip.createdAt))}</span>
-        </button>
-        <button class="icon-button" type="button" data-action="open-clip" data-clip-id="${text(clip.id)}" aria-label="${text(title)} 열기">
-          ${icon('chevron', 20)}
-        </button>
-      </header>
-      <div class="clip-meta">
-        <span class="status-${text(submission?.status || status)}">${text(submission ? reviewStatusLabel(submission.status) : statusLabel(status))}</span>
-        ${clip.example ? '<span class="status-sample">예시 기록</span>' : ''}
-        <span>${text(formatDuration(clip.duration || 0))}</span>
-        <span>${text(formatBytes(clip.size || 0))}</span>
-        ${clip.source ? `<span>${text(sourceLabel(clip.source))}</span>` : ''}
-      </div>
-    </article>`;
-}
-
-function sourceLabel(source) {
-  if (source === 'camera') return '촬영';
-  if (source === 'upload') return '가져오기';
-  if (source === 'sample') return '예시';
-  return source;
-}
-
-function chooseRecommendation() {
-  if (!missions.length) return null;
-  const counts = new Map(missions.map((mission) => [mission.id, 0]));
-  actualClips().forEach((clip) => {
-    if (counts.has(clip.missionId)) counts.set(clip.missionId, counts.get(clip.missionId) + 1);
-  });
-  return [...missions].sort((a, b) => (counts.get(a.id) - counts.get(b.id)) || String(a.title).localeCompare(String(b.title), 'ko'))[0];
-}
-
-function renderHome() {
-  $$('[data-profile-name]').forEach((node) => {
-    node.textContent = state.profile.name || '참여자';
-  });
-
-  const realClips = actualClips();
-  const submissions = state.service?.submissions || [];
-  const pending = submissions.filter((item) => ['submitted', 'reviewing'].includes(item.status)).length;
-  const approved = submissions.filter((item) => item.status === 'approved').length;
-  $('[data-stat="total"]').textContent = realClips.length;
-  $('[data-stat="pending"]').textContent = pending;
-  $('[data-stat="approved"]').textContent = approved;
-  $('[data-wallet-available]').textContent = state.service ? formatMoney(state.service.wallet.available) : '—';
-  $('[data-goal-line]').textContent = `실제 기록 ${realClips.length} / 목표 ${Number(state.profile.goal || 3)}`;
-
-  const recommended = $('#recommended-mission');
-  const mission = chooseRecommendation();
-  if (!mission) {
-    recommended.innerHTML = renderStateCard({ title: '미션을 불러오지 못했습니다', body: '잠시 뒤 다시 열어 주세요.' });
-  } else {
-    const missionClips = realClips.filter((clip) => clip.missionId === mission.id).length;
-    recommended.innerHTML = `
-      <div class="mission-art">${missionIconSvg(mission)}</div>
-      <div class="mission-copy">
-        <div class="mission-meta">
-          <span>${text(mission.category)}</span>
-          <span>${text(mission.duration)}분</span>
-          <span>${text(mission.level)}</span>
-            <span>통과 보상 예시 ${text(formatMoney(mission.reward))}</span>
-          <span>내 기록 ${missionClips}개</span>
-        </div>
-        <h3>${text(mission.title)}</h3>
-        <p>${text(mission.description)}</p>
-      </div>
-      <div class="mission-actions">
-        <button class="secondary-action" type="button" data-action="guide" data-mission-id="${text(mission.id)}"><span data-icon="book"></span>가이드</button>
-        <button class="primary-action" type="button" data-action="capture-camera" data-mission-id="${text(mission.id)}"><span data-icon="camera"></span>촬영</button>
-      </div>`;
-  }
-
-  const recent = $('#recent-clips');
-  if (state.loading) {
-    recent.innerHTML = renderStateCard({ title: '기록을 불러오는 중', body: '이 브라우저의 저장소를 확인하고 있습니다.' });
-  } else if (state.error) {
-    recent.innerHTML = renderStateCard({ title: '기록을 불러오지 못했습니다', body: state.error });
-  } else if (!state.clips.length) {
-    recent.innerHTML = renderStateCard({ title: '아직 기록이 없습니다', body: '첫 미션을 촬영하거나 저장된 영상을 가져와 보세요.', action: 'capture-camera', actionLabel: '첫 기록 만들기' });
-  } else {
-    recent.innerHTML = state.clips.slice(0, 3).map(clipCard).join('');
-  }
-}
-
-function renderMissions() {
-  const categories = ['all', ...new Set(missions.map((mission) => mission.category).filter(Boolean))];
-  $('#mission-filters').innerHTML = categories.map((category) => `
-    <button class="chip-button" type="button" data-action="mission-filter" data-category="${text(category)}" aria-pressed="${state.missionCategory === category}">
-      ${category === 'all' ? '전체' : text(category)}
-    </button>`).join('');
-
-  const filtered = state.missionCategory === 'all'
-    ? missions
-    : missions.filter((mission) => mission.category === state.missionCategory);
-  $('#mission-list').innerHTML = filtered.length
-    ? filtered.map((mission) => missionCard(mission)).join('')
-    : renderStateCard({ title: '표시할 미션이 없습니다', body: '다른 카테고리를 선택해 주세요.' });
-}
-
-function renderCapture() {
-  $('#capture-mission-list').innerHTML = missions.length
-    ? missions.slice(0, 6).map((mission) => missionCard(mission, true)).join('')
-    : renderStateCard({ title: '미션을 불러오지 못했습니다', body: '촬영은 미션 없이도 시작할 수 있습니다.', action: 'capture-camera', actionLabel: '촬영 시작' });
-}
-
-function renderLibrary() {
-  const query = state.libraryQuery.trim().toLowerCase();
-  const filtered = state.clips.filter((clip) => {
-    const status = normalizeStatus(clip.status);
-    const mission = clipMission(clip);
-    const haystack = [clip.title, clip.notes, clip.category, mission?.title, mission?.category].filter(Boolean).join(' ').toLowerCase();
-    return (state.libraryStatus === 'all' || status === state.libraryStatus) && (!query || haystack.includes(query));
-  });
-
-  const list = $('#library-list');
-  if (state.loading) {
-    list.innerHTML = renderStateCard({ title: '라이브러리를 불러오는 중', body: '저장된 영상을 확인하고 있습니다.' });
-  } else if (state.error) {
-    list.innerHTML = renderStateCard({ title: '라이브러리를 열 수 없습니다', body: state.error });
-  } else if (!state.clips.length) {
-    list.innerHTML = renderStateCard({ title: '저장된 기록이 없습니다', body: '촬영하거나 영상을 가져오면 이곳에 나타납니다.', action: 'capture-camera', actionLabel: '기록 만들기' });
-  } else if (!filtered.length) {
-    list.innerHTML = renderStateCard({ title: '검색 결과가 없습니다', body: '검색어 또는 상태 필터를 바꿔 보세요.' });
-  } else {
-    list.innerHTML = filtered.map(clipCard).join('');
-  }
-}
-
-function installHelpText() {
-  const isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  if (state.installed) return '이미 앱처럼 실행 중입니다.';
-  if (state.deferredInstall) return '이 브라우저에서 설치할 수 있습니다.';
-  if (isiOS) return 'Safari 공유 버튼에서 홈 화면에 추가를 선택해 주세요.';
-  return '브라우저 메뉴에서 앱 설치 또는 홈 화면에 추가를 선택해 주세요.';
-}
-
-function renderProfile() {
-  const nameInput = $('#profile-name');
-  const goalInput = $('#profile-goal');
-  if (!state.profileDirty && !$('#profile-form').contains(document.activeElement)) {
-    nameInput.value = state.profile.name || '참여자';
-    goalInput.value = Number(state.profile.goal || 3);
-  }
-  $('[data-profile-wallet]').textContent = state.service ? `출금 가능 ${formatMoney(state.service.wallet.available)}` : '수익을 불러오는 중';
-  const account = state.service?.account;
-  $('[data-profile-account]').textContent = account ? `시연 계좌 · 끝 4자리 ${account.last4}` : '시연 계좌를 등록하세요';
-  $('#install-help').textContent = installHelpText();
-  const installButton = $('#install-button');
-  installButton.disabled = state.installed;
-  installButton.innerHTML = `<span data-icon="phone"></span>${state.installed ? '설치됨' : '설치'}`;
-}
-
-function renderServiceView() {
-  const containers = { reviews: '#app-reviews', wallet: '#app-wallet', shop: '#app-shop' };
-  const selector = containers[state.route];
-  if (!selector) return;
-  const container = $(selector);
-  if (!state.service) {
-    container.innerHTML = renderStateCard({ title: state.error ? '내역을 불러오지 못했습니다' : '내역을 불러오는 중', body: state.error || '저장된 참여 내역을 확인하고 있습니다.' });
-    return;
-  }
-  if (state.route === 'reviews') renderReviews(container, state.service, state.clips);
-  if (state.route === 'wallet') renderWallet(container, state.service);
-  if (state.route === 'shop') renderShop(container, state.service);
-}
-
-function renderRoute() {
-  state.route = currentRoute();
-  $('.service-preview-notice').hidden = Boolean(state.service && ['reviews', 'wallet', 'shop'].includes(state.route));
-  $$('.view').forEach((view) => view.classList.toggle('is-active', view.dataset.view === state.route));
-  $$('.bottom-nav a').forEach((tab) => {
-    if (tab.dataset.tab === state.route) tab.setAttribute('aria-current', 'page');
-    else tab.removeAttribute('aria-current');
-  });
-}
-
-function focusKey() {
-  const active = document.activeElement;
-  if (!active || active === document.body || active.id === 'main') return null;
-  if (active.id) return { id: active.id };
-  if (active.dataset?.action === 'mission-filter') return { action: 'mission-filter', category: active.dataset.category };
-  return null;
-}
-
-function restoreFocus(key) {
-  if (!key) return;
-  const target = key.id
-    ? document.getElementById(key.id)
-    : $(`[data-action="${key.action}"][data-category="${CSS.escape(key.category || '')}"]`);
-  target?.focus({ preventScroll: true });
-}
-
-function focusMissionFilter(category) {
-  $(`[data-action="mission-filter"][data-category="${CSS.escape(category || 'all')}"]`)?.focus({ preventScroll: true });
-}
-
-function render() {
-  const key = focusKey();
-  renderRoute();
-  renderHome();
-  renderMissions();
-  renderCapture();
-  renderLibrary();
-  renderProfile();
-  renderServiceView();
-  renderIcons();
-  restoreFocus(key);
-}
-
-function navigate() {
-  renderRoute();
-  renderServiceView();
-  renderIcons();
-  $('#main').focus({ preventScroll: true });
-}
-
-let refreshVersion = 0;
-async function refresh() {
-  const version = ++refreshVersion;
-  state.error = '';
-  try {
-    const [clips, profile, service] = await Promise.all([getClips(), getProfile(), getServiceState()]);
-    if (version !== refreshVersion) return;
-    state.service = service;
-    state.clips = Array.isArray(clips) ? clips : [];
-    state.profile = profile || { name: '참여자', goal: 3 };
-  } catch (error) {
-    if (version !== refreshVersion) return;
-    state.error = error?.message || '브라우저 저장소 접근 중 문제가 생겼습니다.';
-  } finally {
-    if (version !== refreshVersion) return;
-    state.loading = false;
-    render();
-  }
-}
-
-function bindActions() {
-  document.addEventListener('click', async (event) => {
-    const button = event.target.closest('[data-action]');
-    if (!button) return;
-    const action = button.dataset.action;
-    const missionId = button.dataset.missionId || undefined;
-    const clipId = button.dataset.clipId;
-
-    if (action === 'app-account') openAccount();
-    if (action === 'app-review-demo') openReviewDemo();
-    if (action === 'capture-camera') openCapture({ mode: 'camera', missionId });
-    if (action === 'capture-upload') openCapture({ mode: 'upload', missionId });
-    if (action === 'guide' && missionId) openGuide(missionId);
-    if (action === 'open-clip' && clipId) openClip(clipId);
-    if (action === 'mission-filter') {
-      state.missionCategory = button.dataset.category || 'all';
-      renderMissions();
-      renderIcons();
-      focusMissionFilter(state.missionCategory);
-    }
-  });
-
-  $('#library-search').addEventListener('input', (event) => {
-    state.libraryQuery = event.target.value;
-    renderLibrary();
-    renderIcons();
-  });
-
-  $('#library-status').addEventListener('change', (event) => {
-    state.libraryStatus = event.target.value;
-    renderLibrary();
-    renderIcons();
-  });
-
-  $('#profile-form').addEventListener('submit', async (event) => {
-    event.preventDefault();
-    const form = $('#profile-form');
-    const nameInput = $('#profile-name');
-    const goalInput = $('#profile-goal');
-    const name = nameInput.value.trim();
-    nameInput.setCustomValidity(name ? '' : '이름을 입력해 주세요.');
-    if (!form.reportValidity()) {
-      $('#profile-status').textContent = name ? '목표는 1부터 30 사이의 숫자로 입력해 주세요.' : '이름을 입력해 주세요.';
-      return;
-    }
-    const goal = Number(goalInput.value);
-    $('#profile-status').textContent = '저장 중입니다.';
-    try {
-      await saveProfile({ name, goal });
-      state.profile = { name, goal };
-      state.profileDirty = false;
-      $('#profile-status').textContent = '프로필을 저장했습니다.';
-      render();
-    } catch (error) {
-      $('#profile-status').textContent = error?.message || '프로필을 저장하지 못했습니다.';
-    }
-  });
-
-  $('#profile-form').addEventListener('input', () => {
-    state.profileDirty = true;
-    $('#profile-name').setCustomValidity('');
-  });
-
-  $('#install-button').addEventListener('click', async () => {
-    if (!state.deferredInstall) {
-      $('#install-help').textContent = installHelpText();
-      return;
-    }
-    state.deferredInstall.prompt();
-    await state.deferredInstall.userChoice.catch(() => null);
-    state.deferredInstall = null;
-    renderProfile();
-    renderIcons();
-  });
-}
-
-function bindLifecycle() {
-  window.addEventListener('hashchange', navigate);
-  window.addEventListener('beforeinstallprompt', (event) => {
-    event.preventDefault();
-    state.deferredInstall = event;
-    renderProfile();
-    renderIcons();
-  });
-  window.addEventListener('appinstalled', () => {
-    state.installed = true;
-    state.deferredInstall = null;
-    renderProfile();
-    renderIcons();
-  });
-  window.addEventListener('focus', refresh);
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) refresh();
-  });
-  subscribe(() => refresh());
-}
-
-async function registerServiceWorker() {
-  if (!('serviceWorker' in navigator)) return;
-  try {
-    await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-  } catch {
-    // The root service worker is owned by the shared shell. The app remains usable without it.
-  }
-}
-
-bindActions();
-bindLifecycle();
-render();
-refresh();
-registerServiceWorker();
+function queueRender(){if(renderQueued)return;renderQueued=true;queueMicrotask(()=>{renderQueued=false;render();});}
+function toast(message){clearTimeout(toastTimer);const node=document.querySelector('#app-toast');node.textContent=message;node.hidden=false;toastTimer=setTimeout(()=>{node.hidden=true;},4200);}
+function sample(id){if(!navigator.onLine){toast('예시 영상은 인터넷에 연결한 뒤 재생할 수 있어요.');return;}const example=examples.find(item=>item.id===id);if(!example)return;const d=dialog('촬영 예시',`<video src="${example.src}" poster="${example.poster}" controls playsinline preload="metadata"></video><p class="sample-note">${esc(example.note)}</p>`,{wide:true});d.classList.add('app-sample-dialog');}
+main.addEventListener('compositionstart',()=>{composing=true;});
+main.addEventListener('compositionend',()=>{composing=false;queueRender();});
+main.addEventListener('input',event=>{
+ if(event.target.id==='app-review-search'){ui.reviewQuery=event.target.value;render();return;}
+ if(event.target.id==='app-estimate-count'){const count=event.target.valueAsNumber;if(Number.isInteger(count)&&count>=1&&count<=20){ui.estimateCount=count;updateEstimate();}else document.querySelector('#app-estimate-result').textContent='1~20 사이의 정수를 입력해주세요.';return;}
+ if(event.target.id!=='app-search')return;if(route().name==='library')ui.libraryQuery=event.target.value;else ui.query=event.target.value;render();
+});
+main.addEventListener('change',event=>{
+ if(handlePreparationChange(event.target))return;
+ if(event.target.id==='app-library-status'){ui.libraryStatus=event.target.value;render();}
+ if(event.target.id==='app-library-sort'){ui.librarySort=event.target.value;render();}
+ if(event.target.id==='app-estimate-activity'){ui.estimateActivity=event.target.value;updateEstimate();}
+});
+document.addEventListener('click',async event=>{
+ if(event.target.closest('.skip-link')){event.preventDefault();main.focus();return;}
+ const prep=event.target.closest('[data-prep-action]');if(prep){const result=handlePreparationClick(prep);if(result?.message)toast(result.message);if(result?.handled)return;}
+ const category=event.target.closest('[data-category]');if(category){ui.category=category.dataset.category;if(category.hasAttribute('data-home-category'))location.hash='missions';else render();return;}
+ const filter=event.target.closest('[data-review-filter]');if(filter){ui.reviewFilter=filter.dataset.reviewFilter;render();return;}
+ const target=event.target.closest('[data-app-action]');if(!target)return;
+ const action=target.dataset.appAction;
+ const actionKey=action+':'+(target.dataset.id||'');
+ if(guardedActions.has(action)){if(pendingActions.has(actionKey))return;pendingActions.set(actionKey,{message:actionMessages[action]||'처리하고 있어요.'});target.disabled=true;target.setAttribute('aria-busy','true');target.dataset.appBusy='true';updateProgress();}
+ try{
+  if(action==='login')await login(location.hash||'#profile');
+  if(action==='logout'){target.disabled=true;await logout();location.hash='home';}
+  if(action==='account')await manageAccount();
+  if(action==='delete-account')await openAccountDeletion();
+  if(action==='device-settings')await openDeviceSettings();
+  if(action==='save-activity'){toggleSavedActivity(target.dataset.id);}
+  if(action==='prepare-activity'){selectPreparationActivity(target.dataset.id);location.hash='education';}
+  if(action==='saved-filter'){ui.savedOnly=!ui.savedOnly;render();}
+  if(action==='examples-filter'){ui.examplesOnly=!ui.examplesOnly;render();}
+  if(action==='reset-library'){ui.libraryQuery='';ui.libraryStatus='all';ui.librarySort='newest';render();}
+  if(action==='record')await record(target.dataset.id?selectedTask(target.dataset.id):{id:'camera',title:'촬영 영상',category:'촬영'});
+  if(action==='import')await importVideo();
+  if(action==='open-clip')await openClip(target.dataset.id);
+  if(action==='submit-clip')await submitClip(target.dataset.id);
+  if(action==='submit-video')await submitClip();
+  if(action==='view-submission')await viewSubmission(target.dataset.id);
+  if(action==='resubmit')await resubmitSubmission(target.dataset.id);
+  if(action==='sample')sample(target.dataset.example);
+  if(action==='refresh')await refreshApp({refreshSession:true});
+  if(action==='reset-search'){ui.query='';ui.category='전체';ui.savedOnly=false;ui.examplesOnly=false;render();document.querySelector('#app-search')?.focus();}
+  if(action==='install')await requestInstall();
+  if(action==='update-app')applyAppUpdate();
+  if(action==='feature'){const index=Number(target.dataset.index),rail=main.querySelector('.feature-rail');if(rail){ui.feature=index;rail.scrollTo({left:index*(rail.querySelector('.feature-card').offsetWidth+12),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}}
+ }catch(error){toast(error.message||'완료하지 못했어요. 다시 시도해주세요.');}
+ finally{pendingActions.delete(actionKey);target.disabled=false;target.removeAttribute('aria-busy');delete target.dataset.appBusy;updateProgress();}
+});
+window.addEventListener('hashchange',()=>{if(route().name==='reviews'){ui.reviewFilter='all';ui.reviewQuery='';}render({navigation:true});if(['profile','reviews','wallet'].includes(route().name))void refreshApp({reuse:true});});
+window.addEventListener('online',()=>void refreshApp({refreshSession:true}));window.addEventListener('offline',queueRender);
+subscribeApp(state=>{if(renderedAccount&&renderedAccount!==state.accountKey+'|'+(state.user?.id||'')+'|'+state.access)render();else queueRender();});
+subscribePreparation(queueRender);
+window.addEventListener('app-device-settings-changed',queueRender);
+window.addEventListener('storage',event=>{if(event.key==='momjit-studio-photo-v1'||event.key===null)queueRender();});
+initializeInstall({onChange:queueRender,onMessage:toast});
+render();void appReady.then(queueRender);

@@ -1,0 +1,9 @@
+.opal-text-reveal{color:#fff;font-family:"Inter Tight",sans-serif;overflow:visible}
+.opal-text-reveal__group{display:block}.opal-text-reveal__heading{margin:0;font-family:inherit;font-weight:600;line-height:1.1;letter-spacing:-.04em;font-size:var(--opal-reveal-font-size,150px)}
+.opal-text-reveal__line{display:block}.opal-text-reveal__word{display:inline-block;white-space:pre}.opal-text-reveal__char{display:inline-block;white-space:pre}.opal-text-reveal__label{display:flex;align-items:center;gap:8px;font:500 14px/1.4 "Inter Tight",sans-serif;margin-top:0;letter-spacing:.02em;white-space:nowrap}.opal-text-reveal__label:before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:#ff5d17;flex:none}.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__label{margin-top:12px}
+.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__group{display:flex;align-items:flex-start;gap:216px}
+.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__heading{font-size:var(--opal-reveal-font-size,62px);letter-spacing:-.02em;line-height:1.2}
+@media(min-width:810px) and (max-width:1199px){.opal-text-reveal__heading{font-size:var(--opal-reveal-font-size,106px)}.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__heading{font-size:var(--opal-reveal-font-size,50px)}}
+@media(max-width:809px){.opal-text-reveal__heading{font-size:var(--opal-reveal-font-size,70px)}.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__heading{font-size:var(--opal-reveal-font-size,40px)}.opal-text-reveal[data-reveal-mode="group"] .opal-text-reveal__group{flex-direction:column;gap:16px}}
+@media(prefers-reduced-motion:reduce){.opal-text-reveal *{animation:none!important;transition:none!important}}
+html[data-reduced-motion="true"] .opal-text-reveal *{animation:none!important;transition:none!important}

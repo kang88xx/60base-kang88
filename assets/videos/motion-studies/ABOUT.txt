@@ -1,0 +1,20 @@
+60BASE — Original motion studies
+Created: 2026-09-10
+
+Six original, procedurally authored motion graphics for the 60BASE homepage.
+Each clip is 5.00 seconds, 1280 x 720, 30 fps, silent H.264 MP4.
+
+kitchen: ingredient pinch and release
+retail: reach, grasp and place a package
+fnb: grasp and lift a cup
+logistics: carry a parcel with two hands
+care: pass a small object between hands
+factory: precision rotation of a component
+
+Hands, objects, 21 landmarks per hand and motion paths are authored geometry.
+This is a concept visualization, not recorded egocentric footage, a working
+hand-recognition system, model inference, measured accuracy or collected data.
+No third-party footage or hand-model assets are incorporated in these clips.
+
+Reproducible source: tools/motion-studies/scene.js and render.mjs in the local
+project repository. Source tools and review artifacts are not published.

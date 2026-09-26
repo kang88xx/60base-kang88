@@ -1,0 +1,25 @@
+/* Published geometry; .4s duration/bounce spring approximated with a cubic Bézier. */
+.opal-promo { --promo-scale:1; position:relative; width:calc(140px * var(--promo-scale)); height:calc(101px * var(--promo-scale)); flex:none; }
+.opal-promo[data-part="banner"] {height:calc(60px * var(--promo-scale))}
+.opal-promo[data-part="buy"] {height:calc(36px * var(--promo-scale))}
+.opal-promo-inner {width:140px;display:flex;flex-direction:column;gap:5px;transform:scale(var(--promo-scale));transform-origin:top left}
+.opal-promo *, .opal-promo *::before {box-sizing:border-box}
+.opal-promo-banner {width:140px;height:60px;padding:4px;border-radius:8px;background:#121212;box-shadow:0 4px 6px #0004;position:relative;display:block;overflow:hidden;cursor:pointer}
+.opal-promo-banner::after {content:"";position:absolute;inset:0;border:1.3px solid #2e2e2e;border-radius:inherit;pointer-events:none}
+.opal-promo-viewport {height:100%;width:100%;border-radius:5px;overflow:hidden;position:relative}
+.opal-promo-track {display:flex;flex-direction:column;width:100%;height:100%;will-change:transform}
+.opal-promo-slide {display:block;flex:none;width:100%;height:100%;object-fit:cover}
+.opal-promo-buy {width:140px;height:36px;border-radius:10px;position:relative;overflow:hidden;display:block;background:#0a0a0a;color:#fff;text-decoration:none;box-shadow:0 .602px .602px -1.25px #0004,0 2.289px 2.289px -2.5px #0004,0 10px 10px -3.75px #0002;transition:background .4s cubic-bezier(.2,.85,.25,1.1)}
+.opal-promo-label {position:absolute;left:13px;top:11px;z-index:2;font:600 14px/1 Inter,sans-serif;letter-spacing:-.05em;white-space:nowrap;transition:top .4s cubic-bezier(.2,.85,.25,1.1),color .4s}
+.opal-promo-label-alt {top:-16px;left:12px}
+.opal-promo-disc {position:absolute;right:11px;top:50%;transform:translateY(-50%);height:17px;width:17px;border-radius:50%;background:white;transition:width .4s cubic-bezier(.2,.85,.25,1.1),height .4s cubic-bezier(.2,.85,.25,1.1),right .4s cubic-bezier(.2,.85,.25,1.1),background .4s}
+.opal-promo-bolt {position:absolute;right:14px;top:12.5px;width:11px;height:11px;fill:#222;transition:width .4s,height .4s,right .4s,top .4s,fill .4s;z-index:1}
+.opal-promo-buy:is(:hover,:focus-visible),.opal-promo-buy[data-hover="true"] {background:#dd453d}
+.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-main,.opal-promo-buy[data-hover="true"] .opal-promo-label-main {top:39px;left:12px;color:#222}
+.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-alt,.opal-promo-buy[data-hover="true"] .opal-promo-label-alt {top:11px;left:13px}
+.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-disc,.opal-promo-buy[data-hover="true"] .opal-promo-disc {width:279px;height:279px;right:-113px;background:#dd453d}
+.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-bolt,.opal-promo-buy[data-hover="true"] .opal-promo-bolt {width:16px;height:16px;right:9px;top:9.5px;fill:white}
+.opal-promo a:focus-visible {outline:2px solid #f86330;outline-offset:3px}
+.opal-promo[data-fixed="true"] {position:fixed;right:20px;bottom:63px;z-index:20}
+@media(prefers-reduced-motion:reduce){.opal-promo *{transition:none!important;animation:none!important}}
+html[data-reduced-motion="true"] .opal-promo *{transition:none!important;animation:none!important}

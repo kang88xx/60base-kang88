@@ -1,0 +1,19 @@
+60BASE live-action public egocentric sample derivatives
+Retrieval/rebuild date: 2026-09-10
+
+These files are edited 5.00 second, silent, website-ready derivatives of public egocentric manipulation samples. They are external sample footage used for prototyping visual direction; they are not 60BASE-owned field data and do not verify availability for any commercial domain.
+
+Files and source mapping:
+- kitchen.mp4 / kitchen.jpg — CaptainCook4D public sample, observed task: mixing ingredients in a home kitchen. Source project: https://github.com/CaptainCook4D/CaptainCook4D. License: Apache-2.0.
+- retail.mp4 / retail.jpg — HoloAssist gopro_20 sample, observed task: manipulating GoPro parts. Source project: https://holoassist.github.io/. License: CDLA-Permissive-2.0.
+- fnb.mp4 / fnb.jpg — HoloAssist espresso_20 sample, observed task: operating an espresso machine. Source project: https://holoassist.github.io/. License: CDLA-Permissive-2.0.
+- logistics.mp4 / logistics.jpg — HoloAssist rashult_20 sample, observed task: assembling a cart component. Source project: https://holoassist.github.io/. License: CDLA-Permissive-2.0.
+- care.mp4 / care.jpg — HoloAssist nintendo_all_modal sample, observed task: Nintendo Switch hardware interaction. Source project: https://holoassist.github.io/. License: CDLA-Permissive-2.0.
+- factory.mp4 / factory.jpg — HoloAssist navvis_20 sample, observed task: handling a NavVis item. Source project: https://holoassist.github.io/. License: CDLA-Permissive-2.0.
+
+Edit notes:
+- Trimmed to 5.00 seconds.
+- Audio removed.
+- Encoded as H.264 MP4, yuv420p, fast-start enabled.
+- Aspect ratio preserved; sources are not upscaled.
+- CaptainCook4D: third 640x360 first-person panel from the five-view public sample, matching the previous close hand/action framing.

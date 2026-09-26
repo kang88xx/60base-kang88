@@ -5,4 +5,25 @@
 ._*
 .DS_Store
 *.log
+tests/
+tools/
+dist/
+AGENTS.md
+assets/**/*.md
+assets/**/*.json
 
+server/
+scripts/bootstrap-admin.mjs
+scripts/backup-service.mjs
+scripts/reset-service-password.mjs
+docs/operations/
+.firebase/
+firebase.json
+firebase.test.json
+firestore.rules
+
+mobile/
+
+docs/mobile/
+
+.gstack/

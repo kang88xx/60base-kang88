@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8fc">
+  <title>60BASE 선택한 로딩 미리보기</title>
+  <link rel="stylesheet" href="loading.css">
+  <script type="module" src="loading.js"></script>
+</head>
+<body>
+  <main class="loading-demo">
+    <a class="back-link" href="index.html">인트로 모션 3안으로 돌아가기</a>
+    <section class="loading-panel" aria-label="선택한 로딩 1안 미리보기">
+      <p class="eyebrow">Selected Loading 1</p>
+      <h1>선택한 로딩 · 12시→5시</h1>
+      <div class="app-loading-preview" id="selected-loading" data-loading-motion>
+        <img class="app-loading-symbol" src="assets/brand/icon.svg" alt="60BASE">
+        <p>일상을 불러오고 있어요</p>
+      </div>
+      <div class="loading-controls" aria-label="선택한 로딩 제어">
+        <button type="button" data-action="play" aria-controls="selected-loading">시작</button>
+        <button type="button" data-action="pause" aria-controls="selected-loading">정지</button>
+        <button type="button" data-action="replay" aria-controls="selected-loading">다시보기</button>
+      </div>
+      <label class="reduce-toggle">
+        <input type="checkbox" id="manual-reduce-motion">
+        <span>모션 줄이기</span>
+      </label>
+      <p class="state-text" aria-live="polite" id="loading-state"></p>
+    </section>
+  </main>
+</body>
+</html>

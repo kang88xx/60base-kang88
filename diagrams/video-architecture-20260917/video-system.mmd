@@ -1,0 +1,35 @@
+%%{init: {"theme":"base","themeVariables":{"fontFamily":"Arial, Apple SD Gothic Neo, sans-serif","fontSize":"17px","primaryTextColor":"#0F172A","lineColor":"#64748B","clusterBkg":"#FAFAFA","clusterBorder":"#CBD5E1"},"flowchart":{"htmlLabels":false,"curve":"basis","nodeSpacing":28,"rankSpacing":42}}}%%
+flowchart TD
+  U["사용자 Studio<br/>제출·심사 / 내 영상"]
+  A["관리자<br/>회원 영상 / 검수 / 포인트"]
+  L[("브라우저 보관함<br/>로컬 영상·기록")]
+  F["Firebase<br/>Google 로그인·가입 기록"]
+  G["Vercel API<br/>세션 전달·서버 인증"]
+  S["비공개 HF Space<br/>권한·업로드·검수 처리"]
+  D[("운영 SQLite<br/>소유자·상태<br/>동의·포인트")]
+  T["HF Bucket · 업로드 조각<br/>staging/up_id/offset"]
+  V["HF Bucket · 비공개 원본<br/>videos/vid_id"]
+  C["HF Bucket · 암호화 DB<br/>system/checkpoint.bin"]
+  U <-. "가져오기·로컬 재생" .-> L
+  U -->|Google 로그인| F
+  U <-->|업로드·본인 목록·재생| G
+  A <-->|목록·검수·관리| G
+  G <-->|서버 전용 인증| S
+  S -->|ID 토큰·가입 확인| F
+  S <-->|관리 기록| D
+  S <-->|조각 저장·합치기| T
+  S <-->|원본 저장·부분 재생| V
+  D -->|암호화 저장| C
+  C -.->|재시작 복원| D
+  classDef user fill:#EFF6FF,stroke:#2563EB,color:#0F172A,stroke-width:1.5px;
+  classDef admin fill:#FFF7ED,stroke:#EA580C,color:#0F172A,stroke-width:1.5px;
+  classDef server fill:#F8FAFC,stroke:#475569,color:#0F172A,stroke-width:1.5px;
+  classDef storage fill:#ECFDF5,stroke:#047857,color:#0F172A,stroke-width:1.5px;
+  classDef local fill:#F3F4F6,stroke:#6B7280,color:#374151,stroke-dasharray:5 3;
+  classDef state fill:#F5F3FF,stroke:#7C3AED,color:#0F172A,stroke-width:1.5px;
+  class U user;
+  class A admin;
+  class L local;
+  class F,G,S server;
+  class T,V storage;
+  class D,C state;

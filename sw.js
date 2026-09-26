@@ -1,6 +1,6 @@
-const CACHE = 'momjit-frontend-20260909-service-v3';
+const CACHE = 'momjit-frontend-20260910-buyer-copy-v2';
 const SHELL = [
-  '/', '/index.html', '/styles.css', '/main.js',
+  '/', '/index.html', '/styles.css', '/i18n.js', '/main.js',
   '/studio/', '/studio/index.html', '/studio/studio.css', '/studio/studio.js',
   '/app/', '/app/index.html', '/app/app.css', '/app/app.js', '/app/manifest.webmanifest',
   '/app/icons/icon.svg', '/app/icons/icon-192.png', '/app/icons/icon-512.png',

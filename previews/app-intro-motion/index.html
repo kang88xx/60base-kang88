@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#08183e">
+  <title>60BASE 인트로 2번 모션 시안</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="motion.js"></script>
+</head>
+<body>
+  <header class="review-header">
+    <div>
+      <p class="eyebrow">Selected Intro 2 Motion</p>
+      <h1>인트로 2번 이미지 슬라이드 모션 3안</h1>
+    </div>
+    <p class="review-note">비교용 반복 데모입니다. 마음에 드는 움직임을 하나 골라주세요.</p>
+  </header>
+
+  <main>
+    <p class="loading-link"><a href="loading.html">선택한 로딩 1안 원형 채움 미리보기</a></p>
+
+    <label class="motion-reduce-toggle">
+      <input type="checkbox" id="manual-reduce-motion">
+      <span>모션 줄이기</span>
+    </label>
+
+    <section class="motion-grid" aria-label="인트로 모션 시안 3개">
+      <article class="motion-card">
+        <div class="concept-copy">
+          <span class="option-kicker">1안</span>
+          <h2>부드러운 슬라이드 확대</h2>
+          <p>이미지가 옆에서 작게 다가와 중앙에서 자연스럽게 커집니다.</p>
+        </div>
+        <div class="motion-controls" aria-label="1안 제어">
+          <button type="button" data-action="play" data-target="motion-a" aria-controls="motion-a">시작</button>
+          <button type="button" data-action="pause" data-target="motion-a" aria-controls="motion-a">정지</button>
+          <button type="button" data-action="replay" data-target="motion-a" aria-controls="motion-a">다시보기</button>
+        </div>
+        <div class="phone-frame motion-preview intro-a" id="motion-a" data-motion data-variant="slide">
+          <div class="intro-screen">
+            <img class="brand-logo" src="assets/brand/60base-logo-web.svg" alt="60BASE">
+            <div class="stage">
+              <div class="slide-track">
+                <img src="assets/images/dishwashing.jpg" alt="">
+                <img src="assets/images/folding-clothes.jpg" alt="">
+                <img src="assets/images/cutting-vegetables.jpg" alt="">
+              </div>
+            </div>
+            <div class="intro-copy">
+              <p class="tagline">당신의 일상에서,<br>AI의 내일로.</p>
+              <p class="studio-caption">PHYSICAL AI STUDIO</p>
+            </div>
+          </div>
+        </div>
+        <p class="state-text" aria-live="polite" data-state-for="motion-a"></p>
+      </article>
+
+      <article class="motion-card">
+        <div class="concept-copy">
+          <span class="option-kicker">2안</span>
+          <h2>깊이감 있는 갤러리</h2>
+          <p>양옆 이미지는 뒤로 물러나고 중앙 이미지만 앞으로 떠오릅니다.</p>
+        </div>
+        <div class="motion-controls" aria-label="2안 제어">
+          <button type="button" data-action="play" data-target="motion-b" aria-controls="motion-b">시작</button>
+          <button type="button" data-action="pause" data-target="motion-b" aria-controls="motion-b">정지</button>
+          <button type="button" data-action="replay" data-target="motion-b" aria-controls="motion-b">다시보기</button>
+        </div>
+        <div class="phone-frame motion-preview intro-b" id="motion-b" data-motion data-variant="gallery">
+          <div class="intro-screen">
+            <img class="brand-logo" src="assets/brand/60base-logo-web.svg" alt="60BASE">
+            <div class="stage gallery-stage">
+              <img class="gallery-card one" src="assets/images/dishwashing.jpg" alt="">
+              <img class="gallery-card two" src="assets/images/folding-clothes.jpg" alt="">
+              <img class="gallery-card three" src="assets/images/cutting-vegetables.jpg" alt="">
+            </div>
+            <div class="intro-copy">
+              <p class="tagline">당신의 일상에서,<br>AI의 내일로.</p>
+              <p class="studio-caption">PHYSICAL AI STUDIO</p>
+            </div>
+          </div>
+        </div>
+        <p class="state-text" aria-live="polite" data-state-for="motion-b"></p>
+      </article>
+
+      <article class="motion-card">
+        <div class="concept-copy">
+          <span class="option-kicker">3안</span>
+          <h2>한 장씩 몰입 확대</h2>
+          <p>중앙 이미지를 더 크게 확대하고 다음 장면은 은은하게 겹쳐 넘어갑니다.</p>
+        </div>
+        <div class="motion-controls" aria-label="3안 제어">
+          <button type="button" data-action="play" data-target="motion-c" aria-controls="motion-c">시작</button>
+          <button type="button" data-action="pause" data-target="motion-c" aria-controls="motion-c">정지</button>
+          <button type="button" data-action="replay" data-target="motion-c" aria-controls="motion-c">다시보기</button>
+        </div>
+        <div class="phone-frame motion-preview intro-c" id="motion-c" data-motion data-variant="focus">
+          <div class="intro-screen">
+            <img class="brand-logo" src="assets/brand/60base-logo-web.svg" alt="60BASE">
+            <div class="stage focus-stage">
+              <img class="focus-card one" src="assets/images/dishwashing.jpg" alt="">
+              <img class="focus-card two" src="assets/images/folding-clothes.jpg" alt="">
+              <img class="focus-card three" src="assets/images/cutting-vegetables.jpg" alt="">
+            </div>
+            <div class="intro-copy">
+              <p class="tagline">당신의 일상에서,<br>AI의 내일로.</p>
+              <p class="studio-caption">PHYSICAL AI STUDIO</p>
+            </div>
+          </div>
+        </div>
+        <p class="state-text" aria-live="polite" data-state-for="motion-c"></p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

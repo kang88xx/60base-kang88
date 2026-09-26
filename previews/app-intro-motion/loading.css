@@ -1,0 +1,211 @@
+:root {
+  color-scheme: light;
+  --app-navy: #08183e;
+  --canvas: #f7f8fc;
+  --line: #dfe5f1;
+  --muted: #6c7386;
+  --blue: #0963f6;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("assets/fonts/PretendardVariable.woff2") format("woff2");
+  font-weight: 45 920;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--app-navy);
+  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(9, 99, 246, .42);
+  outline-offset: 3px;
+}
+
+.loading-demo {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.back-link {
+  position: fixed;
+  left: 24px;
+  top: 20px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.loading-panel {
+  width: min(100%, 390px);
+  min-height: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 2px solid rgba(8, 24, 62, .12);
+  background: #fff;
+  padding: 42px 24px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0 0 30px;
+  font-size: 25px;
+  line-height: 1.25;
+}
+
+.app-loading-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+@property --app-fill-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.app-loading-symbol {
+  display: block;
+  flex: none;
+  width: 176px;
+  height: 176px;
+  object-fit: contain;
+  --app-fill-angle: 0deg;
+  animation: app-symbol-fill 1.9s linear infinite;
+  -webkit-mask-image: conic-gradient(from 0deg, transparent 0deg calc(360deg - var(--app-fill-angle)), #000 calc(360deg - var(--app-fill-angle)) 360deg);
+  mask-image: conic-gradient(from 0deg, transparent 0deg calc(360deg - var(--app-fill-angle)), #000 calc(360deg - var(--app-fill-angle)) 360deg);
+}
+
+.app-loading-preview p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.loading-controls {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.loading-controls button {
+  flex: 1;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-navy);
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.reduce-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 6px;
+  color: var(--app-navy);
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.reduce-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+.state-text {
+  min-height: 22px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.app-loading-preview.is-user-paused .app-loading-symbol,
+.app-loading-preview.is-reduced .app-loading-symbol {
+  animation-play-state: paused;
+}
+
+.app-loading-preview.is-reduced .app-loading-symbol {
+  animation: none;
+  --app-fill-angle: 216deg;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+@keyframes app-symbol-fill {
+  0% {
+    --app-fill-angle: 0deg;
+  }
+  82%,
+  94% {
+    --app-fill-angle: 216deg;
+  }
+  94.01%,
+  100% {
+    --app-fill-angle: 0deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-symbol {
+    animation: none;
+    --app-fill-angle: 216deg;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+@media (max-width: 430px) {
+  .loading-demo {
+    padding: 72px 14px 28px;
+  }
+
+  .back-link {
+    left: 14px;
+    top: 12px;
+  }
+
+  .loading-panel {
+    min-height: 560px;
+  }
+}

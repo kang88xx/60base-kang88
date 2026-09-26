@@ -1,0 +1,11 @@
+import path from 'node:path';
+import os from 'node:os';
+import {createService} from './app.mjs';
+import {mobileServicesFromEnv} from './mobile-services.mjs';
+const port=Number(process.env.PORT||4318),host=process.env.HOST||'127.0.0.1';
+const directory=path.resolve(process.env.DONGJAKSO_DATA_DIR||path.join(os.homedir(),'.local/share/dongjakso'));
+const origin=process.env.DONGJAKSO_ORIGIN||`http://localhost:${port}`;
+if(process.env.NODE_ENV==='production'&&!origin.startsWith('https://'))throw Error('Production requires DONGJAKSO_ORIGIN=https://... behind a TLS reverse proxy.');
+const service=createService({directory,origin,allowRegistration:process.env.DONGJAKSO_REGISTRATION!=='closed',trustProxy:process.env.DONGJAKSO_TRUST_PROXY==='1',mobileServicesFactory:store=>mobileServicesFromEnv({store})});
+service.server.listen(port,host,()=>console.log(`동작소: ${origin}/studio/\n관리자: ${origin}/admin/\n데이터: ${directory}`));
+for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>service.close().then(()=>process.exit(0)));

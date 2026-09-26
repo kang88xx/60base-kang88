@@ -1,0 +1,9 @@
+/* Site font inheritance only; source component theme and timing remain intact. */
+#hero-motion-heading .opal-text-reveal,
+#hero-motion-heading .opal-text-reveal__label,
+.hero-index .opal-services,
+#process-motion-host .opal-services,
+#process-motion-host .opal-text-reveal,
+#process-motion-host .opal-text-reveal__label {
+  font-family: var(--fds-font-body, 'Inter Tight', 'Pretendard', sans-serif);
+}

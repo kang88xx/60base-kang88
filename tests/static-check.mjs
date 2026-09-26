@@ -9,6 +9,8 @@ const REPO_ROOT = resolve(ROOT, '..');
 const REVIEW_DIR = resolve(REPO_ROOT, process.env.KOREO_REVIEW_DIR || '.omx/reviews/base60-2026-09-08');
 const results = [];
 const allowedExternalHrefs = new Set([
+  'https://60base.ai/',
+  'https://huggingface.co/60base',
   'https://fonts.googleapis.com',
   'https://fonts.gstatic.com',
   'https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500&display=swap',
@@ -37,13 +39,19 @@ function assertInsideRoot(path, message) {
   assert(path.startsWith(ROOT), message);
 }
 
+function isAllowedHomepageMailto(file, ref) {
+  const normalizedFile = normalize(file);
+  return ['index.html', 'studio/delete-account.html', 'dist/index.html', 'dist/index.ko.html', 'dist/index.en.html'].map(file => normalize(join(ROOT, file))).includes(normalizedFile)
+    && /^mailto:60base\.ai@gmail\.com(?:\?|$)/i.test(ref);
+}
+
 async function collectFiles(dir, extensions, output = []) {
   const entries = await import('node:fs/promises').then((fs) => fs.readdir(dir, { withFileTypes: true }));
   for (const entry of entries) {
     if (entry.name.startsWith('._')) continue; // macOS AppleDouble metadata on external drives
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (!entry.name.startsWith('.')) await collectFiles(path, extensions, output);
+      if (!entry.name.startsWith('.') && !['node_modules', 'mobile', 'dist'].includes(entry.name)) await collectFiles(path, extensions, output);
     } else if (extensions.has(extname(entry.name))) {
       output.push(path);
     }
@@ -94,7 +102,10 @@ check('HTML script, stylesheet, icon, anchor, image, and form references stay lo
           assert(allowedExternalHrefs.has(ref), `${file} has unknown external href: ${ref}`);
           continue;
         }
-        assert(!/^mailto:/i.test(ref), `${file} has mailto link: ${ref}`);
+        if (/^mailto:/i.test(ref)) {
+          assert(isAllowedHomepageMailto(file, ref), `${file} has mailto link: ${ref}`);
+          continue;
+        }
         assert(!/^javascript:/i.test(ref), `${file} has javascript link: ${ref}`);
         assert(ref !== '#', `${file} has placeholder href="#"`);
         const path = localPath(file, ref);

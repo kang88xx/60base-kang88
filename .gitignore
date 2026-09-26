@@ -12,3 +12,8 @@ dist/
 
 .vercel
 .env*
+
+.firebase/
+tests/*.log
+tests/browser-smoke.json
+tests/verification-summary.json

@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, rm, mkdir } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { createService } from '../server/app.mjs';
+import { digest } from '../server/security.mjs';
+const { chromium } = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE || path.join(os.homedir(), '.claude/skills/gstack/node_modules/playwright/index.mjs')));
+const directory = await mkdtemp(path.join(os.tmpdir(), '60base-delete-ui-'));
+const origin = 'http://localhost:4498';
+const service = createService({ directory, origin });
+const at = service.store.now();
+service.store.run('INSERT INTO users(id,email,password,name,createdAt,updatedAt) VALUES(?,?,?,?,?,?)', 'ui-member', 'member@example.test', 'unused', '테스트 회원', at, at);
+service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)', digest('ui-session'), 'ui-member', 'ui-csrf', Date.now() + 3600000, Date.now());
+await new Promise(resolve => service.server.listen(4498, '127.0.0.1', resolve));
+const browser = await chromium.launch({ headless: true });
+const out = path.resolve('../.omx/reviews/mobile-store-readiness-20260918');
+await mkdir(out, { recursive: true });
+try {
+  const guest = await browser.newPage();
+  await guest.goto(origin + '/studio/delete-account.html');
+  await guest.getByRole('button', { name: '로그인하고 삭제 요청' }).waitFor();
+  assert.equal(service.store.one('SELECT count(*) n FROM account_deletions').n, 0);
+  await guest.close();
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await context.addCookies([{ name: 'dongjakso_session', value: 'ui-session', url: origin, httpOnly: true, sameSite: 'Strict' }]);
+  const page = await context.newPage(); const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto(origin + '/studio/delete-account.html');
+  await page.locator('#request-deletion').click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByText('member@example.test', { exact: true }).waitFor();
+  await dialog.getByRole('button', { name: '계정과 데이터 삭제 요청', exact: true }).click();
+  assert.equal(service.store.one('SELECT count(*) n FROM account_deletions').n, 0);
+  await dialog.getByRole('checkbox').check();
+  await dialog.getByRole('button', { name: '계정과 데이터 삭제 요청', exact: true }).click();
+  await dialog.getByRole('heading', { name: '삭제 요청 접수' }).waitFor();
+  assert.equal(service.store.one('SELECT count(*) n FROM account_deletions').n, 1);
+  await page.screenshot({ path: path.join(out, 'deletion-receipt-mobile.png'), fullPage: true });
+  await dialog.getByRole('button', { name: '닫기', exact: true }).click();
+  await page.locator('#request-deletion').click();
+  await page.getByRole('heading', { name: '삭제 요청 접수' }).waitFor();
+  assert.equal(service.store.one("SELECT status FROM users WHERE id='ui-member'").status, 'active');
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  assert.deepEqual(errors, []);
+  // A session change closes private dialogs and never paints the old receipt.
+  await page.evaluate(async () => {
+    const { api, refreshSession } = await import('/studio/online-api.js');
+    await api('/auth/logout', { method: 'POST', body: {} }); await refreshSession();
+  });
+  assert.equal(await page.locator('dialog[open]').count(), 0);
+  await page.getByRole('button', { name: '로그인하고 삭제 요청' }).waitFor();
+  console.log('PASS public deletion guest/member, required confirmation, real request/idempotent receipt, mobile overflow, session-loss privacy; zero browser errors.');
+} finally { await browser.close(); await service.close(); await rm(directory, { recursive: true, force: true }); }

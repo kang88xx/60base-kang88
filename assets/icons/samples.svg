@@ -1,0 +1,23 @@
+<svg class="AnimatedIcon__icon" width="64" height="64" preserveAspectRatio="xMidYMid meet" viewBox="6.573749999999997 25.573749999999997 44.852500000000006 44.852500000000006" xmlns="http://www.w3.org/2000/svg" data-js-controller="DocumentWithArrowsIcon" fill="#000000">
+      <defs>
+      <path id="g101x3" d="M40 28C41.1046 28 42 28.8954 42 30V66C42 67.1046 41.1046 68 40 68H18C16.8954 68 16 67.1046 16 66V30C16 28.8954 16.8954 28 18 28H40ZM36 59H22V61H36V59ZM39 49H30V51H39V49ZM27 49H19V51H27V49ZM29 44H22V46H29V44ZM39 39H27V41H39V39ZM29 34H19V36H29V34Z"></path>
+      <path id="g101x1" d="M44.6641 50.5L49 55.1781L44.9942 59.5L43.5406 58.0995L45.488 55.999L30 56V54L45.156 53.999L43.2105 51.9005L44.6641 50.5Z"></path>
+      <path id="g101x2" d="M14.7895 36.9005L13.3359 35.5L9 40.1781L13.0058 44.5L14.4594 43.0995L12.512 40.999L25 41V39L12.844 38.999L14.7895 36.9005Z"></path>
+
+      <clipPath id="g101x0">
+        <use class="DocumentWithArrowsIcon__document" href="#g101x3" data-js-target="DocumentWithArrowsIcon.document"></use>
+      </clipPath>
+    </defs>
+
+    <use class="DocumentWithArrowsIcon__document" href="#g101x3" fill="#FEBE3D" data-js-target="DocumentWithArrowsIcon.document"></use>
+
+    <use class="DocumentWithArrowsIcon__leftArrow" href="#g101x2" fill="#FF5A0A" data-js-target-list="DocumentWithArrowsIcon.leftArrows"></use>
+
+    <use class="DocumentWithArrowsIcon__rightArrow" href="#g101x1" fill="#FF5A0A" data-js-target-list="DocumentWithArrowsIcon.rightArrows"></use>
+
+    <g clip-path="url(#g101x0)" fill="#000000">
+      <use class="DocumentWithArrowsIcon__leftArrow" href="#g101x2" fill="#B11B07" data-js-target-list="DocumentWithArrowsIcon.leftArrows"></use>
+
+      <use class="DocumentWithArrowsIcon__rightArrow" href="#g101x1" fill="#B11B07" data-js-target-list="DocumentWithArrowsIcon.rightArrows"></use>
+    </g>
+    </svg>

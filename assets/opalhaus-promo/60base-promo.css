@@ -1,0 +1,20 @@
+/* Host and app branding only. The supplied promo-widget.css stays unchanged. */
+@font-face{font-family:Inter;src:url("media/a4c529c3324d-1ZFS7N918ojhhd0nQWdj3jz4w.woff2") format("woff2");font-weight:600;font-style:normal;font-display:swap}
+#fixed-promo-host{position:fixed;right:20px;bottom:63px;z-index:20;width:140px;height:148px}
+#fixed-promo-host .opal-promo{height:148px}
+#fixed-promo-host .opal-promo-buy{min-height:36px}
+#fixed-promo-host .opal-promo-banner{min-height:60px}
+#fixed-promo-host .base60-apple-icon{object-fit:contain;filter:brightness(0);transition:width .4s,height .4s,right .4s,top .4s,filter .4s}
+#fixed-promo-host .opal-promo-buy:is(:hover,:focus-visible) .base60-apple-icon{filter:brightness(0) invert(1)}
+#fixed-promo-host .base60-training-badge{display:flex;align-items:center;gap:4px;width:140px;height:42px;min-height:42px;padding:4px 6px;border:1px solid #e6e6e6;border-radius:8px;background:#fff;color:#0a0a0a;text-decoration:none;box-shadow:0 4px 6px #0002}
+#fixed-promo-host .base60-training-badge>img{width:32px;height:32px;flex:none;object-fit:contain}
+#fixed-promo-host .base60-training-badge>span{display:flex;flex-direction:column;gap:2px;font:600 10px/1.1 Inter,Arial,sans-serif;letter-spacing:-.025em;white-space:nowrap}
+@media(max-width:600px){#fixed-promo-host{right:max(20px,env(safe-area-inset-right));bottom:max(63px,env(safe-area-inset-bottom))}}
+/* Store releases are pending: native disabled controls never navigate. */
+#fixed-promo-host button.opal-promo-banner,#fixed-promo-host button.opal-promo-buy{border:0;font:inherit;text-align:left;cursor:default;opacity:.76}
+#fixed-promo-host button.opal-promo-buy{padding:0}
+#fixed-promo-host button.opal-promo-buy:disabled:hover{background:#0a0a0a}
+#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-label-main{top:11px;left:13px;color:#fff}
+#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-label-alt{top:-16px;left:12px}
+#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-disc{width:17px;height:17px;right:11px;background:#fff}
+#fixed-promo-host button.opal-promo-buy:disabled:hover .base60-apple-icon{width:11px;height:11px;right:14px;top:12.5px;filter:brightness(0)}

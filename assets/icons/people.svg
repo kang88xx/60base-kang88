@@ -1,0 +1,77 @@
+<svg class="AnimatedIcon__icon" width="64" height="64" preserveAspectRatio="xMidYMid meet" viewBox="0.3999999999999986 14.399999999999999 67.2 67.2" xmlns="http://www.w3.org/2000/svg" data-js-controller="NodesIcon" fill="#000000">
+      <defs>
+      <path id="g122x1" d="M20 41.15l9.7 5.55a1.5 1.5 0 0 1 0 2.6L20 54.85v-13.7z"></path>
+      <circle id="g122x2" cx="34" cy="48" r="6"></circle>
+      <clipPath id="g122x0">
+        <use class="NodesIcon__dot" href="#g122x2" x="0" y="-24" data-js-target-list="NodesIcon.clipPathDots"></use>
+        <use class="NodesIcon__dot" href="#g122x2" x="21" y="-12" data-js-target-list="NodesIcon.clipPathDots"></use>
+        <use class="NodesIcon__dot" href="#g122x2" x="21" y="12" data-js-target-list="NodesIcon.clipPathDots"></use>
+        <use class="NodesIcon__dot" href="#g122x2" x="0" y="24" data-js-target-list="NodesIcon.clipPathDots"></use>
+        <use class="NodesIcon__dot" href="#g122x2" x="-21" y="12" data-js-target-list="NodesIcon.clipPathDots"></use>
+        <use class="NodesIcon__dot" href="#g122x2" x="-21" y="-12" data-js-target-list="NodesIcon.clipPathDots"></use>
+      </clipPath>
+    </defs>
+
+    <g class="NodesIcon__segments" fill="#000000">
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(0deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(60deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(120deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(180deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(240deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(300deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#FEBE3D" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+    </g>
+    <g class="NodesIcon__dots" fill="#000000">
+      <use class="NodesIcon__dot" href="#g122x2" x="0" y="-24" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+      <use class="NodesIcon__dot" href="#g122x2" x="21" y="-12" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+      <use class="NodesIcon__dot" href="#g122x2" x="21" y="12" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+      <use class="NodesIcon__dot" href="#g122x2" x="0" y="24" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+      <use class="NodesIcon__dot" href="#g122x2" x="-21" y="12" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+      <use class="NodesIcon__dot" href="#g122x2" x="-21" y="-12" fill="#FF5A0A" data-js-target-list="NodesIcon.dots"></use>
+    </g>
+    <g clip-path="url(#g122x0)" fill="#000000">
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(0deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(60deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(120deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(180deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(240deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+        <g class="NodesIcon__segmentRotator" style="transform-origin:34px 48px;transform: rotate(300deg)" data-js-target-list="NodesIcon.segmentRotators" fill="#000000">
+          <use class="NodesIcon__segment" href="#g122x1" fill="#B11B07" data-js-target-list="NodesIcon.segments"></use>
+        </g>
+      
+    </g>
+    </svg>

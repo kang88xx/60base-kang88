@@ -1,0 +1,13 @@
+/* Approved geometric process option. Keep all overrides inside the process section. */
+#process-motion-host .opal-service-media{display:block;height:auto;min-height:0;overflow:visible;max-width:471px;position:static}
+#process-motion-host .process-diagrams{width:100%;color:#dedede}
+#process-motion-host .process-diagrams-stage{display:block;width:100%;height:auto;overflow:visible;margin-top:-30px}
+#process-motion-host .process-diagrams-minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;width:min(100%,390px);margin:12px auto 0;--mini-height:76px;--mini-gap:20px}
+#process-motion-host .process-diagrams-mini{position:relative;min-width:0;min-height:44px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:center;cursor:pointer}
+#process-motion-host .process-diagrams-mini:not(:last-child)::after{content:'→';position:absolute;left:100%;top:calc(var(--mini-height)/2);width:var(--mini-gap);transform:translateY(-50%);color:#aaa;font-size:16px;line-height:1;text-align:center;pointer-events:none}
+#process-motion-host .process-diagrams-mini>svg{display:block;width:100%;height:var(--mini-height)}
+#process-motion-host .process-diagrams-mini>span{display:block;padding-top:10px;font-size:13px;line-height:1.5;font-weight:550}
+#process-motion-host .process-diagrams-mini[aria-pressed=true]>span{color:#ff5d17}
+#process-motion-host .process-diagrams :is(button:focus-visible){outline:2px solid #ff5d17;outline-offset:4px}
+@media(max-width:1199px){#process-motion-host .opal-service-media{height:auto;overflow:visible;max-width:500px;align-self:center}#process-motion-host .process-diagrams-stage{margin-top:0}}
+@media(max-width:480px){#process-motion-host .process-diagrams-minis{gap:15px;margin-top:0;--mini-gap:15px;--mini-height:60px}#process-motion-host .process-diagrams-mini>span{font-size:11px}#process-motion-host .process-diagrams-mini:not(:last-child)::after{font-size:12px}}
