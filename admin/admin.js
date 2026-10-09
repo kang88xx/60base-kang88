@@ -3,6 +3,78 @@ import {api as requestApi,session,sessionReady,refreshSession,showAccount,dialog
 const pages=[['overview','대시보드','grid'],['members','회원 관리','user'],['videos','영상·심사','video'],['tasks','촬영 활동','book'],['data','데이터 현황','folder'],['finance','매출·비용','wallet'],['payouts','출금 관리','bank'],['commerce','상품·주문','package'],['tickets','문의 관리','help'],['notices','공지 관리','bell'],['audit','변경 기록','clock'],['settings','운영 설정','settings']];
 const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:{query:'',status:'all'},sort:{scope:null,index:null,direction:'asc'}},main=document.querySelector('#admin-main');
 let sessionRecovery=null;
+let cloudAccount=null,cloudInitialization=null,googlePending=false,googlePopup=false,googleBridge=false,adminSigningOut=false,googleMessage='';
+function syncAdminGoogle(){
+ const cloud=cloudAccount?.getCloudAccount(),waiting=googlePending||googlePopup||googleBridge||cloud?.busy;
+ const ready=cloud?.availability==='ready'&&!waiting;
+ document.querySelectorAll('[data-google-signin]').forEach(button=>{button.disabled=!session.online||!ready;button.setAttribute('aria-busy',String(!!waiting));button.querySelector('span').textContent=waiting?'Google 로그인 중…':'Google로 로그인';});
+ if(!session.user&&session.authProvider==='google')document.querySelector('#admin-account').disabled=!session.online||!ready;
+ const status=document.querySelector('[data-admin-auth-status]');
+ if(status)status.textContent=googleMessage||(waiting?'Google 계정을 확인하고 있습니다.':!cloud||cloud.availability==='loading'?'Google 로그인을 준비하고 있습니다.':cloud.availability!=='ready'?'Google 로그인에 연결하지 못했습니다. 다시 연결해주세요.':'');
+ const retry=document.querySelector('[data-google-retry]');if(retry)retry.hidden=!!waiting||(!cloudInitialization&&cloud?.availability==='ready');
+ const registration=document.querySelector('[data-admin-registration]');if(registration)registration.hidden=cloud?.phase!=='registrationRequired';
+}
+function googleLoginError(error){
+ return {'auth/popup-closed-by-user':'로그인 창이 닫혔습니다. 다시 시도해주세요.','auth/cancelled-popup-request':'이미 열린 Google 로그인 창에서 계속해주세요.','auth/popup-blocked':'브라우저에서 팝업을 허용한 뒤 다시 시도해주세요.','auth/network-request-failed':'인터넷 연결을 확인한 뒤 다시 시도해주세요.'}[error?.code]||error?.message||'Google 로그인을 완료하지 못했습니다. 다시 시도해주세요.';
+}
+async function initializeAdminGoogle(){
+ if(cloudInitialization)return cloudInitialization;
+ cloudInitialization=(async()=>{
+  try{
+   if(!cloudAccount){
+    cloudAccount=await import('../studio/cloud-account.js');
+    cloudAccount.subscribeCloudAccount(()=>{syncAdminGoogle();void finishAdminGoogle();});
+   }else await cloudAccount.retryCloudAccount();
+  }catch{googleMessage='Google 로그인에 연결하지 못했습니다. 다시 연결해주세요.';}
+  finally{cloudInitialization=null;syncAdminGoogle();}
+ })();
+ return cloudInitialization;
+}
+function signInAdminGoogle(){
+ const cloud=cloudAccount?.getCloudAccount();
+ if(!session.online||session.user||cloud?.availability!=='ready'||cloud.busy||googlePending||googlePopup||googleBridge)return;
+ googlePending=true;googlePopup=true;googleMessage='';
+ // Invoke the provider directly in the click handler to preserve popup activation.
+ let popup;try{popup=cloudAccount.continueWithGoogle();}catch(error){popup=Promise.reject(error);}
+ syncAdminGoogle();
+ Promise.resolve(popup).catch(error=>{googlePending=false;googleMessage=googleLoginError(error);}).finally(()=>{googlePopup=false;void finishAdminGoogle();syncAdminGoogle();});
+}
+async function finishAdminGoogle(){
+ const cloud=cloudAccount?.getCloudAccount();
+ if(!googlePending||googlePopup||googleBridge||adminSigningOut||cloud?.busy)return;
+ if(cloud?.availability!=='ready'||cloud.error){googlePending=false;googleMessage=googleLoginError(cloud?.error);syncAdminGoogle();return;}
+ if(cloud.phase==='signedOut'){googlePending=false;googleMessage='Google 로그인이 취소되었습니다. 다시 시도해주세요.';syncAdminGoogle();return;}
+ if(cloud.phase==='registrationRequired'){googlePending=false;googleMessage='이 계정은 Studio 가입 확인이 필요합니다. 관리자에게 연결된 Google 계정을 선택해주세요.';syncAdminGoogle();return;}
+ if(cloud.phase!=='registered'||!cloud.user)return;
+ googlePending=false;googleBridge=true;syncAdminGoogle();
+ const uid=cloud.user.uid,version=state.accessVersion;
+ const current=()=>cloudAccount.getCloudAccount().user?.uid===uid&&cloudAccount.getCloudAccount().phase==='registered'&&state.accessVersion===version&&!session.user;
+ try{
+  const idToken=await cloudAccount.getCloudIdToken();
+  if(!current())throw Error('로그인 계정이 변경되었습니다. 다시 시도해주세요.');
+  const result=await requestApi('/auth/firebase',{method:'POST',body:{idToken}});
+  if(!current()){
+   // The exchange already issued a cookie. Revoke it without publishing the stale user.
+   const response=await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':result.csrf}});
+   if(!response.ok)throw Error('변경된 계정의 로그인을 취소하지 못했습니다. 연결을 확인한 뒤 다시 로그인해주세요.');
+   await refreshSession();
+   throw Error('로그인 계정이 변경되었습니다. 다시 시도해주세요.');
+  }
+  await refreshSession();
+  if(!session.online)throw Error('로그인 상태를 확인하지 못했습니다. 연결을 확인하고 다시 시도해주세요.');
+  if(!session.user)throw Error('로그인 세션을 확인하지 못했습니다. 다시 시도해주세요.');
+  googleMessage='';
+ }catch(error){googleMessage=googleLoginError(error);}
+ finally{googleBridge=false;syncAdminGoogle();}
+}
+async function signOutAdmin(){
+ if(adminSigningOut)return;
+ adminSigningOut=true;googlePending=false;googleMessage='';
+ try{
+  await requestApi('/auth/logout',{method:'POST'});await refreshSession();
+  if(cloudAccount?.getCloudAccount().user)await cloudAccount.signOutCloudAccount();
+ }finally{adminSigningOut=false;syncAdminGoogle();}
+}
 const route=()=>pages.some(p=>p[0]===location.hash.slice(1))?location.hash.slice(1):'overview';
 const canManage=()=>session.online&&session.user?.role==='admin'&&!session.user.forcePassword;
 function closeAdminDialogs(){
@@ -38,14 +110,16 @@ async function api(path,options){
   throw error;
  }
 }
-document.querySelector('#admin-nav').innerHTML=pages.map(([id,title,glyph])=>`<a href="#${id}" data-admin-nav="${id}">${icon(glyph,18)}<span>${title}</span></a>`).join('');
+const navigationGroups=[['운영',['overview','videos','tasks','data']],['참여자',['members','tickets','notices']],['관리',['finance','payouts','commerce']],['설정',['audit','settings']]];
+document.querySelector('#admin-nav').innerHTML=navigationGroups.map(([group,ids])=>`<div class="admin-nav-group"><span class="admin-nav-label">${group}</span>${ids.map(id=>{const [,title,glyph]=pages.find(page=>page[0]===id);return `<a href="#${id}" data-admin-nav="${id}" title="${title}">${icon(glyph,18)}<span>${title}</span></a>`;}).join('')}</div>`).join('');
 const menuToggle=document.querySelector('#admin-menu-toggle');
 function setMenuOpen(open){menuToggle.setAttribute('aria-expanded',String(open));menuToggle.textContent=open?'메뉴 닫기':'메뉴';document.querySelector('.admin-sidebar').classList.toggle('is-menu-open',open);}
 menuToggle.onclick=()=>setMenuOpen(menuToggle.getAttribute('aria-expanded')!=='true');
 document.querySelector('#admin-nav').addEventListener('click',event=>{if(event.target.closest('a')){setMenuOpen(false);main.focus({preventScroll:true});}});
 function openAdminAccount(){
  if(!session.online)return;
- if(session.user){showAccount();return;}
+ if(session.user){showAccount({onSignOut:signOutAdmin});return;}
+ if(session.authProvider==='google'){signInAdminGoogle();return;}
  const d=dialog('관리자 로그인',`<form class="online-form"><label>이메일<input name="email" type="email" autocomplete="email" required maxlength="254"></label><label>비밀번호<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label><p class="online-help">서비스의 Google 계정과 별도로 발급된 운영 계정으로 로그인하세요.</p>${statusLine}<button type="submit" class="button primary">로그인</button></form>`);
  const form=d.querySelector('form');
  form.onsubmit=async event=>{
@@ -59,9 +133,12 @@ document.querySelector('#admin-account').onclick=openAdminAccount;
 function navigation(){const key=route(),title=pages.find(p=>p[0]===key)[1];document.title=`${title} · 60BASE 관리자`;document.querySelector('#admin-breadcrumb').textContent=title;document.querySelectorAll('[data-admin-nav]').forEach(a=>{if(a.dataset.adminNav===key)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});}
 function gate(){navigation();document.querySelector('#admin-account').textContent=session.user?session.user.name:'관리자 로그인';document.querySelector('#admin-account').disabled=!session.online;document.querySelector('#admin-connection').textContent=session.online?'서버 연결됨':'서버 미연결';if(session.online&&session.user?.role==='admin'&&!session.user.forcePassword)return false;
  const title=!session.online?'관리자 서버 연결이 필요합니다.':!session.user?'60BASE 운영 관리':session.user.forcePassword?'비밀번호를 먼저 변경해주세요.':'관리자 계정으로 로그인해주세요.';
- const copy=!session.online?'운영 서버 연결을 준비하고 있습니다. 연결 후 관리자 계정으로 로그인할 수 있습니다.':!session.user?'운영 계정으로 로그인해주세요.':session.user.forcePassword?'안전한 운영을 위해 임시 비밀번호를 본인만 아는 비밀번호로 바꿔주세요.':'현재 계정에는 운영 데이터를 볼 수 있는 권한이 없습니다.';
- main.innerHTML=`<section class="online-panel admin-login"><h1>${title}</h1><p>${copy}</p>${session.online?`<button type="button" class="button primary" data-access>${session.user?'계정 관리':'관리자 로그인'}</button>`:'<button type="button" class="button" data-retry>연결 다시 확인</button>'}</section>`;
- main.querySelector('[data-access]')?.addEventListener('click',openAdminAccount);main.querySelector('[data-retry]')?.addEventListener('click',()=>location.reload());return true;
+ const google=session.online&&!session.user&&session.authProvider==='google';
+ const copy=!session.online?'운영 서버 연결을 준비하고 있습니다. 연결 후 관리자 계정으로 로그인할 수 있습니다.':!session.user?(google?'관리자 권한이 연결된 Google 계정으로 로그인하세요.':'운영 계정으로 로그인해주세요.'):session.user.forcePassword?'안전한 운영을 위해 임시 비밀번호를 본인만 아는 비밀번호로 바꿔주세요.':'현재 계정에는 운영 데이터를 볼 수 있는 권한이 없습니다. 계정 관리에서 로그아웃한 뒤 관리자 계정을 선택해주세요.';
+ main.innerHTML=`<section class="online-panel admin-login"><h1>${title}</h1><p>${copy}</p>${google?'<button type="button" class="cloud-google-button" data-google-signin disabled><img src="../assets/brand/google-signin-g.png" alt="" width="20" height="20"><span>Google로 로그인</span></button><p class="online-status" data-admin-auth-status role="status" aria-live="polite"></p><button type="button" class="button" data-google-retry hidden>Google 다시 연결</button><a class="button" href="/studio/" data-admin-registration hidden>Studio에서 가입 확인</a>':session.online?`<button type="button" class="button primary" data-access>${session.user?'계정 관리':'관리자 로그인'}</button>`:'<button type="button" class="button" data-retry>연결 다시 확인</button>'}</section>`;
+ main.querySelector('[data-google-signin]')?.addEventListener('click',signInAdminGoogle);
+ main.querySelector('[data-google-retry]')?.addEventListener('click',()=>{googleMessage='';void initializeAdminGoogle();});
+ main.querySelector('[data-access]')?.addEventListener('click',openAdminAccount);main.querySelector('[data-retry]')?.addEventListener('click',()=>location.reload());syncAdminGoogle();return true;
 }
 async function load(){
  const epoch=++state.epoch;if(gate())return;
@@ -82,23 +159,47 @@ window.addEventListener('hashchange',()=>{state.filters={query:'',status:'all'};
 window.addEventListener('service-session',()=>{state.filters={query:'',status:'all'};state.sort={scope:null,index:null,direction:'asc'};state.accessVersion++;clearAdminData();closeAdminDialogs();main.removeAttribute('aria-busy');if(sessionRecovery){gate();return;}void load();});
 function heading(title,copy='',actions=''){return `<div class="online-toolbar"><div class="admin-page-title"><h1>${title}</h1>${copy?`<p>${copy}</p>`:''}</div><div class="online-toolbar-actions">${actions}<button type="button" class="button" data-refresh>새로고침</button></div></div>`;}
 const kpi=(label,value,sub='')=>`<article class="online-kpi"><span>${label}</span><strong>${value}</strong>${sub?`<small>${sub}</small>`:''}</article>`;
-const exportButton=type=>`<a class="button" href="/api/admin/export?type=${type}">CSV 내보내기</a>`;
+const exportButton=type=>`<a class="button admin-export" href="/api/admin/export?type=${type}">CSV 내보내기</a>`;
 const empty=message=>`<div class="online-empty"><h3>${message}</h3></div>`;
 const button=(text,action,id)=>`<button type="button" class="button" data-admin-action="${action}" data-id="${esc(id)}">${text}</button>`;
 function render(){navigation();const key=route();({overview:overviewPage,members:membersPage,videos:videosPage,tasks:tasksPage,data:dataPage,finance:financePage,payouts:payoutsPage,commerce:commercePage,tickets:ticketsPage,notices:noticesPage,audit:auditPage,settings:settingsPage}[key])();main.querySelector('[data-refresh]')?.addEventListener('click',load);main.querySelectorAll('[data-admin-action]').forEach(b=>b.onclick=()=>perform(b.dataset.adminAction,b.dataset.id));}
-function trendChart(rows){if(!rows.length)return '<div class="admin-chart-empty">선택한 기간에 접수된 영상이 없습니다.</div>';const max=Math.max(1,...rows.map(r=>r.count));return `<div class="admin-chart" role="img" aria-label="${esc(rows.map(r=>r.day+' '+r.count+'건').join(', '))}">${rows.slice(-14).map(r=>`<div class="admin-chart-col"><strong>${r.count}</strong><i style="--bar-height:${Math.max(2,r.count/max*140)}px"></i><span>${r.day.slice(5)}</span></div>`).join('')}</div>`;}
+function trendChart(rows){
+ if(!rows.length)return '<div class="admin-chart-empty">선택한 기간에 업로드된 영상이 없습니다.</div>';
+ const visible=rows.slice(-14),max=Math.max(4,Math.ceil(Math.max(...visible.map(row=>row.count))/4)*4);
+ return `<div class="admin-chart-frame"><div class="admin-chart-axis" aria-hidden="true">${[4,3,2,1,0].map(step=>`<span style="--tick:${(4-step)*25}">${(max*step/4).toLocaleString('ko-KR')}</span>`).join('')}</div><div class="admin-chart" role="list" aria-label="날짜별 영상 업로드 건수">${visible.map(row=>`<div class="admin-chart-col" style="--bar-height:${row.count/max*230}px" role="listitem" tabindex="0" title="${esc(row.day)} · ${row.count}건" aria-label="${esc(row.day)} 업로드 ${row.count}건"><strong>${row.count}</strong><i aria-hidden="true"></i><span>${esc(row.day.slice(5).replace('-','/'))}</span></div>`).join('')}</div></div>`;
+}
+function statusChart(rows){
+ if(!rows.length)return '<div class="admin-chart-empty">아직 집계할 영상이 없습니다.</div>';
+ const max=Math.max(1,...rows.map(row=>row.count));
+ return `<div class="admin-status-chart" role="list" aria-label="누적 영상 상태별 건수">${rows.map(row=>`<div class="admin-status-column" role="listitem" aria-label="${esc(labels[row.status]||row.status)} ${row.count}건"><strong>${row.count}</strong><div class="admin-status-track"><i aria-hidden="true" style="--status-height:${row.count/max*100}%"></i></div><span>${esc(labels[row.status]||row.status)}</span></div>`).join('')}</div>`;
+}
 function breakdown(rows,total){return rows.length?`<div class="admin-breakdown">${rows.map(r=>`<div class="admin-breakdown-row"><div><span>${esc(r.label)}</span><strong>${r.count}건</strong></div><i><b style="--share:${Math.max(0,Math.min(100,r.count/Math.max(1,total)*100))}%"></b></i></div>`).join('')}</div>`:'<p class="admin-info-line">아직 집계할 데이터가 없습니다.</p>';}
 const daysSelect=()=>`<label class="sr-only" for="admin-days">집계 기간</label><select id="admin-days" class="online-filter">${[7,30,90].map(d=>`<option value="${d}" ${d===state.days?'selected':''}>최근 ${d}일</option>`).join('')}</select>`;
 function bindDays(){main.querySelector('#admin-days').onchange=e=>{state.days=Number(e.target.value);void load();};}
 function overviewPage(){
- const o=state.overview;
- main.innerHTML=heading('운영 현황','',daysSelect())+`
-  <section class="admin-work-queue" aria-labelledby="admin-work-title"><h2 id="admin-work-title">처리할 일</h2><div class="admin-quick-links"><a href="#videos"><span>심사 대기</span><strong>${o.pendingReviews}건 ${icon('arrow',18)}</strong></a><a href="#payouts"><span>출금</span><strong>국내 은행 연동 예정</strong></a><a href="#tickets"><span>답변 대기</span><strong>${o.openTickets}건 ${icon('arrow',18)}</strong></a></div></section>
-  <div class="online-kpis admin-summary-kpis">${kpi('전체 회원',o.members+'명',`선택 기간 신규 ${o.newMembers}명`)}${kpi('누적 영상',o.videos+'건',(o.seconds/60).toFixed(1)+'분 · '+size(o.bytes))}${kpi('승인 영상',o.approved+'건','누적 승인 상태')}</div>
-  <div class="admin-chart-grid"><section class="online-panel"><h2>영상 접수 추이</h2><p class="admin-data-legend">선택 기간의 날짜별 업로드 건수</p>${trendChart(o.trend)}</section><section class="online-panel"><h2>영상 상태</h2>${breakdown(o.statuses.map(r=>({label:labels[r.status]||r.status,count:r.count})),o.videos)}</section></div>
-  <section class="admin-finance-summary" aria-labelledby="admin-finance-title"><h2 id="admin-finance-title">선택 기간의 매출·비용</h2><div class="online-kpis admin-summary-kpis">${kpi('확인된 매출',money(o.income),'수기 매출 + 입금 확인 − 환불')}${kpi('확인된 비용',money(o.expenses),'수기 비용 + 지급 확인 출금')}${kpi('매출 − 비용',money(o.net),'기록된 현금 흐름 기준')}</div></section>`;
- bindDays();
+ const o=state.overview,recent=[...state.data.videos].sort((a,b)=>new Date(b.submittedAt||b.createdAt)-new Date(a.submittedAt||a.createdAt)).slice(0,5);
+ const recentHeaders=['영상','참여자','상태','접수일','검수'];
+ const recentRow=v=>rowData([`<strong>${esc(v.title)}</strong><small>${esc(v.taskTitle)}</small>`,esc(v.memberName),badge(v.status),date(v.submittedAt||v.createdAt),['deleting','deleted'].includes(v.status)?esc(labels[v.status]||v.status):button('검수 열기','video',v.id)],[v.title,v.memberName,v.status,v.submittedAt||v.createdAt,'']);
+ const recentTable=()=>{
+  const query=state.filters.query.trim().toLocaleLowerCase('ko-KR');
+  const selected=recent.filter(video=>[video.title,video.taskTitle,video.memberName,labels[video.status]||video.status].join(' ').toLocaleLowerCase('ko-KR').includes(query));
+  return `${selected.length?tableMarkup('최근 영상',recentHeaders,selected.map(recentRow),{scope:'overview-recent',panel:false}):empty(query?'검색 조건에 맞는 영상이 없습니다.':'아직 접수된 영상이 없습니다.')}<span class="sr-only" role="status">최근 영상 ${recent.length}건 중 ${selected.length}건 표시</span>`;
+ };
+ const uploaded=o.trend.reduce((sum,row)=>sum+row.count,0);
+ main.innerHTML=heading('운영 현황','',daysSelect()+exportButton('videos'))+`
+  <div class="online-kpis admin-overview-kpis">${kpi('전체 회원',o.members+'명',`선택 기간 신규 ${o.newMembers}명`)}${kpi('누적 영상',o.videos+'건',(o.seconds/60).toFixed(1)+'분 · '+size(o.bytes))}${kpi('최종 승인',o.approved+'건','누적 승인 상태')}${kpi('심사 대기',o.pendingReviews+'건','다음 심사가 필요한 영상')}</div>
+  <div class="admin-chart-grid admin-overview-charts"><section class="online-panel admin-trend-panel"><header class="admin-panel-heading"><h2>영상 업로드 추이</h2><span>최근 ${state.days}일</span></header><div class="admin-panel-body"><div class="admin-chart-summary"><span>선택 기간 업로드 <strong>${uploaded.toLocaleString('ko-KR')}<small>건</small></strong></span><span class="admin-chart-key">업로드 건수</span></div>${trendChart(o.trend)}<p class="admin-chart-footnote">업로드가 있는 최근 ${Math.min(14,o.trend.length)}개 날짜 · 업로드일 기준 · 단위: 건</p></div></section><section class="admin-priority online-panel" aria-labelledby="admin-status-title"><header class="admin-panel-heading"><h2 id="admin-status-title">영상 상태별 현황</h2><span>전체 기간</span></header><div class="admin-panel-body"><div class="admin-status-summary"><span>누적 영상</span><strong>${o.videos.toLocaleString('ko-KR')}<small>건</small></strong></div>${statusChart(o.statuses)}<div class="admin-priority-actions"><h3 id="admin-work-title">다음 검수를 이어가세요</h3><a class="button primary" href="#videos">영상·심사 열기 <span>${o.pendingReviews}건</span> ${icon('arrow',16)}</a><a class="admin-priority-inbox" href="#tickets">답변 대기 ${o.openTickets}건 ${icon('arrow',14)}</a></div></div></section></div>
+  <section class="online-panel admin-recent"><header class="admin-panel-heading"><h2>최근 영상</h2><div class="admin-recent-tools"><label class="admin-recent-search">${icon('search',15)}<span class="sr-only">최근 영상 ${recent.length}건에서 검색</span><input id="admin-recent-search" type="search" placeholder="최근 ${recent.length}건에서 검색" value="${esc(state.filters.query)}" autocomplete="off"></label><a class="button" href="#videos">전체 영상 보기 ${icon('arrow',14)}</a></div></header><div class="admin-recent-results">${recentTable()}</div><p class="admin-data-legend">최근 업로드 최대 1,000건 중 접수일 기준 ${recent.length}건 · 미제출은 업로드일 기준</p></section>
+  <div class="admin-chart-grid"><section class="online-panel"><h2>촬영 활동별 영상</h2><p class="admin-data-legend">누적 영상 ${o.videos}건 기준</p>${breakdown(o.categories.map(row=>({label:row.category,count:row.count})),o.videos)}</section><section class="online-panel"><h2>선택 기간의 매출·비용</h2><div class="admin-finance-values">${kpi('확인된 매출',money(o.income),'수기 매출 + 입금 확인 − 환불')}${kpi('확인된 비용',money(o.expenses),'수기 비용 + 지급 확인 출금')}${kpi('매출 − 비용',money(o.net),'기록된 현금 흐름 기준')}</div><a class="button" href="#finance">거래 기록 보기</a></section></div>`;
+ main.querySelector('#admin-recent-search').addEventListener('input',event=>{
+  state.filters.query=event.target.value;
+  main.querySelector('.admin-recent-results').innerHTML=recentTable();
+  bindTableSort();
+  main.querySelectorAll('.admin-recent-results [data-admin-action]').forEach(button=>button.onclick=()=>perform(button.dataset.adminAction,button.dataset.id));
+ });
+ bindDays();bindTableSort();
 }
+
 const actionHeaders=new Set(['관리','처리','검수','답변','기존 처리 기록']);
 const rowData=(cells,sort=cells)=>({cells,sort});
 const cellsOf=row=>Array.isArray(row)?row:row.cells;
@@ -191,7 +292,11 @@ function commercePage(){
  else tableView('상품·주문',copy,['상품','기존 가격','남은 재고','기존 공개 상태','관리'],state.data.products.map(p=>rowData(['<strong>'+esc(p.title)+'</strong><small>'+esc(p.description)+'</small>',money(p.price),p.stock,p.published?'공개':'비공개','<span>조회 전용</span>'],[p.title,p.price,p.stock,p.published,''])),{filters:tabs,scope:'commerce-products'});
  main.querySelectorAll('[data-commerce]').forEach(b=>b.onclick=()=>{state.commerce=b.dataset.commerce;state.sort={scope:null,index:null,direction:'asc'};render();});
 }
-function ticketsPage(){tableView('문의 관리','참여자의 문의와 개인정보 관련 요청을 확인합니다.',['문의','참여자','상태','접수일','답변'],state.data.tickets.map(t=>rowData([`<strong>${esc(t.subject)}</strong><small>${esc(t.message.slice(0,100))}</small>`,esc(t.memberName),badge(t.status),date(t.createdAt),button('답변','ticket',t.id)],[t.subject,t.memberName,t.status,t.createdAt,''])));}
+function ticketsPage(){
+ const items=state.data.tickets,rows=items=>items.map(t=>rowData([`<strong>${esc(t.subject)}</strong><small>${esc(t.message.slice(0,100))}</small>`,esc(t.memberName),badge(t.status),date(t.createdAt),button('답변','ticket',t.id)],[t.subject,t.memberName,t.status,t.createdAt,'']));
+ const search=searchable(items,rows,{placeholder:'제목, 내용 또는 참여자 검색',statuses:['open','replied','closed']});
+ tableView('문의함','참여자의 문의를 검색하고 답변과 처리 상태를 함께 관리하세요.',['문의','참여자','상태','접수일','답변'],rows(items),{filters:search.filters});search.bind();
+}
 function noticesPage(){tableView('공지 관리','촬영·심사·정산 관련 안내를 작성하고 공개합니다.',['공지','공개 상태','수정일','관리'],state.data.announcements.map(n=>rowData([`<strong>${esc(n.title)}</strong><small>${esc(n.body.slice(0,100))}</small>`,n.published?'공개':'비공개',date(n.updatedAt),button('수정','notice',n.id)],[n.title,n.published,n.updatedAt,''])),{actions:button('공지 작성','notice','')});}
 function auditPage(){tableView('변경 기록','운영 데이터 조회·변경과 내보내기 이력을 확인합니다.',['시각','작업자','작업','대상'],state.data.audit.map(a=>rowData([date(a.createdAt),esc(a.actorName||'시스템'),esc(a.action),`<span class="online-monospace">${esc(a.target)}</span>`],[a.createdAt,a.actorName||'시스템',a.action,a.target])),{actions:exportButton('audit'),limit:200});}
 function settingsPage(){
@@ -225,7 +330,7 @@ async function perform(action,id){if(['product','payout','order'].includes(actio
  if(action==='video')await reviewDialog(id);
  if(action==='task'){const t=state.data.tasks.find(t=>t.id===id)||{};formDialog(id?'촬영 활동 수정':'촬영 활동 추가',field('활동명','title',t.title,'text','required maxlength="150"')+field('분류','category',t.category||'주방','text','required maxlength="60"')+field('촬영 안내','instructions',t.instructions,'textarea','required maxlength="6000"')+field('승인 포인트 (P)','reward',t.reward??3000,'number','required min="0" max="1000000"')+field('참여자에게 공개','published',t.published,'checkbox'),(b,form)=>api('/admin/tasks',{method:'POST',body:{...b,id:id||undefined,reward:Number(b.reward),published:form.elements.published.checked}}));}
  if(action==='notice'){const n=state.data.announcements.find(n=>n.id===id)||{};formDialog(id?'공지 수정':'공지 작성',field('제목','title',n.title,'text','required maxlength="150"')+field('공지 내용','body',n.body,'textarea','required maxlength="6000" rows="7"')+field('공지 공개','published',n.published,'checkbox'),(b,form)=>api('/admin/announcements',{method:'POST',body:{...b,id:id||undefined,published:form.elements.published.checked}}));}
- if(action==='ticket'){const t=state.data.tickets.find(t=>t.id===id);formDialog('문의 답변',`<h3>${esc(t.subject)}</h3><p>${esc(t.memberName)} · ${date(t.createdAt)}</p><div class="online-notice">${esc(t.message)}</div>${field('답변','response',t.response,'textarea','required maxlength="6000" rows="6"')}<label>처리 상태<select name="status"><option value="replied">답변 완료</option><option value="closed">처리 완료</option></select></label>`,b=>api('/admin/tickets/'+id,{method:'PATCH',body:b}));}
+ if(action==='ticket'){const t=state.data.tickets.find(t=>t.id===id);formDialog('문의 답변',`<div class="admin-ticket-layout"><section class="admin-ticket-context"><span class="admin-eyebrow">참여자 문의</span><h3>${esc(t.subject)}</h3><p class="admin-info-line">${esc(t.memberName)} · ${date(t.createdAt)}</p>${badge(t.status)}<div class="admin-ticket-message">${esc(t.message)}</div>${t.response?`<h3>기존 답변</h3><div class="admin-ticket-message is-response">${esc(t.response)}</div>`:'<p class="admin-info-line">아직 등록된 답변이 없습니다.</p>'}</section><section class="admin-ticket-compose"><h3>답변 작성</h3><p class="admin-info-line">저장한 답변은 참여자의 문의 내역에 표시됩니다.</p>${field('답변','response',t.response,'textarea','required maxlength="6000" rows="9"')}<label>처리 상태<select name="status"><option value="replied" ${t.status==='closed'?'':'selected'}>답변 완료</option><option value="closed" ${t.status==='closed'?'selected':''}>처리 완료</option></select></label></section></div>`,b=>api('/admin/tickets/'+id,{method:'PATCH',body:b}),{wide:true,submit:'답변 저장'});} 
  if(action==='entry')formDialog('확인된 거래 기록',`<p class="online-help">주문 결제와 출금 지급은 자동 집계됩니다. 그 외 실제 거래만 기록해주세요.</p><label>구분<select name="kind"><option value="income">매출</option><option value="expense">비용</option></select></label>${field('항목','category','데이터 판매','text','required maxlength="60"')}${field('금액 (원)','amount','','number','required min="1" max="1000000000"')}${field('거래일','date',new Date(Date.now()+9*3600000).toISOString().slice(0,10),'date','required')}${field('거래처','party','','text','maxlength="120"')}${field('증빙 번호','reference','','text','required minlength="3" maxlength="120"')}${field('메모','note','','textarea','maxlength="2000"')}`,b=>api('/admin/entries',{method:'POST',body:{...b,amount:Number(b.amount)}}));
  }catch(e){if(version!==state.accessVersion||e.name==='AbortError'||!canManage())return;dialog('확인하지 못했습니다.',`<p>${esc(e.message)}</p>`);}}
 const reviewStageCopy={
@@ -276,4 +381,4 @@ async function reviewDialog(id){
   const annotation=d.querySelector('[data-annotation]');d.querySelector('[data-use-time]').onclick=()=>{annotation.elements.start.value=d.querySelector('video').currentTime.toFixed(1);};annotation.onsubmit=async e=>{e.preventDefault();busy(annotation,true);try{await api('/admin/videos/'+id+'/annotation',{method:'POST',body:{start:Number(annotation.elements.start.value),end:Number(annotation.elements.end.value),label:annotation.elements.label.value,note:''}});const data=await api('/videos/'+id);d.querySelector('[data-annotations]').innerHTML=data.annotations.map(a=>`<p class="admin-info-line">${a.start.toFixed(1)}–${a.end.toFixed(1)}초 · ${esc(a.label)}</p>`).join('');annotation.querySelector('[role="status"]').textContent='구간 라벨을 저장했습니다.';}catch(e){annotation.querySelector('[role="status"]').textContent=e.message;}finally{busy(annotation,false);}};
  }catch(e){d.querySelector('.online-dialog-body').textContent=e.message;}
 }
-await sessionReady;await load();
+await sessionReady;if(session.authProvider==='google')void initializeAdminGoogle();await load();

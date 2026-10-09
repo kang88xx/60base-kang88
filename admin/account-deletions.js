@@ -1,7 +1,7 @@
 const labels={pending:'접수됨',processing:'처리 중',blocked:'확인 필요',completed:'삭제 완료'};
 export async function mountAccountDeletions(host,{api}){
  const heading=document.createElement('h2');heading.textContent='계정 삭제 요청';
- const description=document.createElement('p');description.textContent='접수와 삭제 완료는 다릅니다. 계정·영상·포인트 삭제는 되돌릴 수 없습니다. 요청자를 확인하고 처리하세요. 설정이 부족하면 확인 필요 상태로 남습니다.';
+ const description=document.createElement('p');description.textContent='접수와 삭제 완료는 다릅니다. 계정·영상·포인트 삭제는 되돌릴 수 없습니다. 요청자를 확인하고 접수 후 7일 이내에 처리하세요. 설정이 부족하면 확인 필요 상태로 남습니다.';
  const status=document.createElement('p');status.setAttribute('role','status');
  const list=document.createElement('div');host.replaceChildren(heading,description,status,list);
  async function refresh(){
@@ -12,7 +12,8 @@ export async function mountAccountDeletions(host,{api}){
    for(const item of data.deletions){
     const section=document.createElement('section');section.className='online-panel';
     const title=document.createElement('h3');title.textContent=`${labels[item.status]||item.status} · ${item.id}`;
-    const detail=document.createElement('p');detail.textContent=`회원 ${item.userId} · 접수 ${item.requestedAt} · 단계 ${item.stage}${item.lastError?' · '+item.lastError:''}`;
+    const overdue=item.status!=='completed'&&item.dueAt&&Date.now()>Date.parse(item.dueAt);
+    const detail=document.createElement('p');detail.textContent=`회원 ${item.userId} · 접수 ${item.requestedAt} · 처리 기한 ${item.dueAt||'확인 필요'}${overdue?' · 기한 초과':''} · 단계 ${item.stage}${item.lastError?' · '+item.lastError:''}`;
     section.append(title,detail);
     if(item.status!=='completed'){
      const form=document.createElement('form');form.className='online-form';

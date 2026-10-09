@@ -24,8 +24,8 @@ export async function refreshSession({expectedUserId=session.user?.id,expectedEp
  window.dispatchEvent(new CustomEvent('service-session'));return session;
 }
 export const sessionReady=refreshSession();
-export function dialog(title,content,{wide=false}={}){
- const ownerId=session.user?.id,trigger=document.activeElement,element=document.createElement('dialog');element.className=`online-dialog ${wide?'is-wide':''}`;const titleId='online-dialog-title-'+crypto.randomUUID();element.setAttribute('aria-labelledby',titleId);
+export function dialog(title,content,{wide=false,accountBound=true}={}){
+ const ownerId=accountBound?session.user?.id:null,trigger=document.activeElement,element=document.createElement('dialog');element.className=`online-dialog ${wide?'is-wide':''}`;const titleId='online-dialog-title-'+crypto.randomUUID();element.setAttribute('aria-labelledby',titleId);
  element.innerHTML=`<div class="online-dialog-head"><h2 id="${titleId}">${esc(title)}</h2><button type="button" class="button" data-close aria-label="닫기">닫기</button></div><div class="online-dialog-body">${content}</div>`;
  const closeOnSessionChange=()=>{if(ownerId&&(!session.online||session.user?.id!==ownerId))element.close();};
  if(ownerId)window.addEventListener('service-session',closeOnSessionChange);

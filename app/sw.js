@@ -1,4 +1,4 @@
-const CACHE='60base-app-20260918-v5';
+const CACHE='60base-app-20260928-deletion-v1';
 const SHELL=[
   "/app/",
   "/app/index.html",

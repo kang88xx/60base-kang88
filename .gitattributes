@@ -1,0 +1,9 @@
+# Preserve the exact bytes captured from the current public deployment.
+studio/delete-account.html -text
+studio/online-api.js -text
+studio/privacy.html -text
+admin/account-deletions.js -text
+admin/admin.css -text
+admin/admin.js -text
+app/account-deletion.js -text
+app/sw.js -text

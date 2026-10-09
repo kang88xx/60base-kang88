@@ -1,0 +1,101 @@
+{
+  "capturedAt": "2026-10-09T14:47:32.165Z",
+  "baseCommit": "00d64ac0d7025046167f48fe934effca02fc9da4",
+  "reason": "Preserve the currently deployed account-deletion and administrator updates while replacing the homepage. Public files only; no runtime data or credentials.",
+  "files": [
+    {
+      "file": "studio/delete-account.html",
+      "sourceUrl": "https://60base.ai/studio/delete-account.html",
+      "status": 200,
+      "bytes": 2245,
+      "productionSha256": "aeb2d50159ccc8739990c614945c31101ccd659936fb96af84228ce33f0ff2f0",
+      "previousGitSha256": "b17d41fa8e693b1121a38b8bc5b24ffc1f5b897a2eb075451684368002431123",
+      "etag": "W/\"24ea0fb432938d1514e518124ca36bc2\""
+    },
+    {
+      "file": "studio/online-api.js",
+      "sourceUrl": "https://60base.ai/studio/online-api.js",
+      "status": 200,
+      "bytes": 9341,
+      "productionSha256": "090b8ccefde281d2e604012688bf5079c9d031a960c7b476b15ed7d571654748",
+      "previousGitSha256": "846b3825ffa3e2191c3733cc956ca3ad03c5bbab34000a06096edc59a8f88e25",
+      "etag": "W/\"7b479127cecc29ef46e0b23c7a80a7c9\""
+    },
+    {
+      "file": "studio/privacy.html",
+      "sourceUrl": "https://60base.ai/studio/privacy.html",
+      "status": 200,
+      "bytes": 6270,
+      "productionSha256": "9126b7234c32f7ed0babfb05f26b3111dbe65b9ae6cf78f4f07294d73898872d",
+      "previousGitSha256": "62fb56e9b2fd965003c7974f28929be157ed22ae969650ab196cf1ea694953ab",
+      "etag": "W/\"55481901bc2ea62b7d648a70ab497b43\""
+    },
+    {
+      "file": "admin/account-deletions.js",
+      "sourceUrl": "https://60base.ai/admin/account-deletions.js",
+      "status": 200,
+      "bytes": 3345,
+      "productionSha256": "a60d0b353d27ec40f6cf6c3301f702b0910b965e7f23ebc59b483c4a1aad1346",
+      "previousGitSha256": "bd3b25765313eb73cf48b7ff21d250387ce161f53c6a23d67e9c9d7522c6cb7a",
+      "etag": "W/\"ffff2572453358e0264b604b083d9d54\""
+    },
+    {
+      "file": "admin/admin.css",
+      "sourceUrl": "https://60base.ai/admin/admin.css",
+      "status": 200,
+      "bytes": 28831,
+      "productionSha256": "c2c787c0912982fa03b2c82d9771423dfe59de363d26a07df3cc91766c426c87",
+      "previousGitSha256": "3ea7362d60efed4a2706f177e74cb473cda45f088c43b4141101aff8d520a441",
+      "etag": "W/\"e6990083db66e333f944a321a231dc7c\""
+    },
+    {
+      "file": "admin/admin.js",
+      "sourceUrl": "https://60base.ai/admin/admin.js",
+      "status": 200,
+      "bytes": 59236,
+      "productionSha256": "7fdad728c26f534305053608cb83e8440bb6eea47ff141283e9da5c823d38e3c",
+      "previousGitSha256": "8c11d89cb464d4401249843f222e5a5007bfef5c186140ff2fc1e7ccb92ef550",
+      "etag": "W/\"6fcb48d00e06c09f46063fda21f46f6c\""
+    },
+    {
+      "file": "app/account-deletion.js",
+      "sourceUrl": "https://60base.ai/app/account-deletion.js",
+      "status": 200,
+      "bytes": 10909,
+      "productionSha256": "fb90266fee40097adf6f5e1935cbdf406bff9fe1b031df8f70e15ae86b00e892",
+      "previousGitSha256": "5827c5a36ebc354410f39f9ebffa9ef2adf76061a96270778056bb0a5bd3c664",
+      "etag": "W/\"cea7fcebf0f662f50aa29b962f704e82\""
+    },
+    {
+      "file": "app/sw.js",
+      "sourceUrl": "https://60base.ai/app/sw.js",
+      "status": 200,
+      "bytes": 3985,
+      "productionSha256": "2784704fa68267d1016cb206335223307d133ee317d30f4dae0a9f03330b44b6",
+      "previousGitSha256": "96f063d653279c0d8c542a0eacd8df8d75abedecf2fda25d2e38e3b6a3cd80ad",
+      "etag": "W/\"9cc53f021c7cf45bf67fb98db9c2b4e6\""
+    }
+  ],
+  "protectedSourceFiles": [
+    {
+      "file": "api/contact.js",
+      "sha256": "ab6a3f24c69625b992ecac831c188c7e8bdaab974e362106ee33436c5e08b986",
+      "normalization": "LF"
+    },
+    {
+      "file": "api/operations.js",
+      "sha256": "ea9b890076349fb71e4410ae94570a08c362a52580114d857dc0f4d4ebddec48",
+      "normalization": "LF"
+    },
+    {
+      "file": "vercel.json",
+      "sha256": "b5c32c6f3c619fb69b10e005dcc9570de959f27c376298658db217a892c32071",
+      "normalization": "LF"
+    },
+    {
+      "file": "sw.js",
+      "sha256": "e3014daf7847e97971b379ae405de0256854e634122cfbbdfa87c4ea7bc1959b",
+      "normalization": "LF"
+    }
+  ]
+}
