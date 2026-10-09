@@ -2,7 +2,9 @@
 .original-process-motion{width:100%;max-width:500px;color:#dedede;min-width:0}
 .original-process-stage{display:block;width:100%;height:auto;overflow:visible}
 .original-quality-motion{position:relative;display:block;width:100%;aspect-ratio:1;min-width:0;isolation:isolate}
-.original-quality-motion>img{display:block;width:100%;height:auto;aspect-ratio:1;max-width:100%;object-fit:contain;border-radius:10px}
+.original-quality-motion>img{display:block;width:100%;height:auto;aspect-ratio:1;max-width:100%;object-fit:contain;clip-path:inset(12%)}
+/* Hide the raster frame/corner points; paint one crisp, unscaled frame for all four. */
+.original-quality-motion::after{content:'';position:absolute;inset:4.6875%;border:1px solid #777;border-radius:4%;pointer-events:none;z-index:1}
 .original-quality-motion>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .original-quality-motion>.original-quality-filter-definitions{width:0;height:0;overflow:hidden}
 .original-quality-trail{fill:none;stroke:#ff5d17;stroke-width:8;stroke-linecap:round;opacity:.74}

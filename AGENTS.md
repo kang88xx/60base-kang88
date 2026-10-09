@@ -2,7 +2,9 @@
 
 ## Brand refinements · 2026-10-10
 
-The latest owner request makes the homepage CONTACT panel orange (#ff5d17), with matching orange hover/focus states for DATA, SERVICES and ABOUT. Browser-tab titles use `60base`. The administrator page now uses the same owner-supplied logo_new2 artwork and its own orange favicon/social thumbnail; keep these assets scoped to admin. These presentation changes are authorized for the existing GitHub/Vercel release workflow. Preserve authentication and administrator behavior.
+The four QUALITY & RIGHTS motion frames must have equally clear borders and no corner-square decorations. Preserve their diagram geometry, timing and responsive arrangement.
+
+The latest owner clarification keeps the homepage CONTACT panel black with white text by default and orange (#ff5d17) with dark text on hover, focus and click/active. DATA, SERVICES and ABOUT retain orange hover/focus states. Browser-tab titles use `60base`. The administrator page now uses the same owner-supplied logo_new2 artwork and its own orange favicon/social thumbnail; keep these assets scoped to admin. These presentation changes are authorized for the existing GitHub/Vercel release workflow. Preserve authentication and administrator behavior.
 
 ## Authorized homepage replacement · 2026-10-09
 
