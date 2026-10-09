@@ -1,0 +1,61 @@
+/* Reference navigation: 600×120,480:120 panel split,20px padding. */
+.site-nav { background: #f4f2ed; color: #000; border-radius: 6px; }
+.site-nav .nav-logo img { filter: brightness(0) invert(20%); }
+.site-nav .nav-menu a,
+.site-nav .nav-contact,
+.site-nav .nav-mobile-menu a {
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.site-nav .nav-contact {
+  color: #fff; background: #000; font-size: 14px; line-height: 1.2;
+}
+.site-nav .nav-contact:hover { background: #2c2c2c; }
+.site-footer .footer-language {
+  min-height: 44px; padding: 8px 0; background: transparent;
+  color: inherit; font: 10px/1.2 var(--mono);
+}
+@media (min-width: 981px) {
+  /* Paint each panel once: cream under the black rounded edge produced a halo. */
+  .site-nav { width: 600px; height: 120px; --nav-panel-padding: 20px; background: transparent; }
+  .site-nav .nav-main-panel,
+  .site-nav.is-compact .nav-main-panel { padding: 20px; background: #f4f2ed; }
+  .site-nav .nav-topline { height: 22px; }
+  .site-nav .nav-logo,
+  .site-nav.is-compact .nav-logo { height: 22px; }
+  .site-nav .nav-logo img,
+  .site-nav.is-compact .nav-logo img,
+  .site-nav.is-compact:is(:hover, :focus-within) .nav-logo img {
+    width: auto; height: 22px; aspect-ratio: 274.6 / 41.5;
+  }
+  .site-nav .nav-menu,
+  .site-nav.is-compact .nav-menu {
+    height: 14px; justify-content: flex-start; gap: 80px;
+  }
+  .site-nav .nav-menu a,
+  .site-nav.is-compact .nav-menu a {
+    min-height: 14px; gap: 10px; flex-shrink: 0;
+    color: #000; font-size: 14px; line-height: 1;
+  }
+  /* DATA retains the reference WORKS slot so following items align. */
+  .site-nav .nav-menu a:first-child { min-width: 64.84px; }
+  .site-nav .nav-dot,
+  .site-nav.is-compact .nav-dot {
+    width: 12px; height: 12px; background: #2c2c2c;
+  }
+  .site-nav .nav-contact { width: 120px; }
+  .site-nav.is-compact { height: 60px; }
+  .site-nav.is-compact:not(:hover):not(:focus-within) .nav-main-panel {
+    padding: 19px 20px;
+  }
+  .site-nav.is-compact:is(:hover, :focus-within) { height: 120px; }
+}
+@media (min-width: 981px) and (max-width: 1350px) {
+  .site-nav { width: 44vw; }
+  .site-nav .nav-menu,
+  .site-nav.is-compact .nav-menu { gap: 16px; }
+  .site-nav .nav-menu a,
+  .site-nav.is-compact .nav-menu a { font-size: 12px; }
+  .site-nav .nav-menu a:first-child { min-width: 58px; }
+}

@@ -1,0 +1,8 @@
+/* Keep only the rules separating the original six FAQ items. */
+#main .section-faq .faq-list > details:first-child {
+  border-top: 0;
+}
+
+#main .section-faq .faq-list > details:last-child {
+  border-bottom: 0;
+}

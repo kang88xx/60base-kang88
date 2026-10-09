@@ -51,7 +51,9 @@ async function collectFiles(dir, extensions, output = []) {
     if (entry.name.startsWith('._')) continue; // macOS AppleDouble metadata on external drives
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (!entry.name.startsWith('.') && !['node_modules', 'mobile', 'dist'].includes(entry.name)) await collectFiles(path, extensions, output);
+      // React source is checked by Vite and the separate compiled-homepage test.
+      // Preserve every existing static service/admin/app assertion below.
+      if (!entry.name.startsWith('.') && !['node_modules', 'mobile', 'dist', 'homepage'].includes(entry.name)) await collectFiles(path, extensions, output);
     } else if (extensions.has(extname(entry.name))) {
       output.push(path);
     }

@@ -41,6 +41,19 @@
     "mobile:prepare": "npm run build && npm --prefix mobile run sync",
     "mobile:check": "npm --prefix mobile run check",
     "mobile:release-check": "npm --prefix mobile run release:check",
-    "test:mobile": "node tests/native-adapter.mjs && node tests/mobile-readiness-backend.mjs && node tests/mobile-auth-integration.mjs && node tests/account-deletion.mjs && node tests/firebase-erasure.mjs && node tests/hf-erasure.mjs && node tests/apple-tokens.mjs && node tests/firebase-identity.mjs && node tests/cloud-account-apple.mjs && node tests/account-deletion-browser.mjs"
+    "test:mobile": "node tests/native-adapter.mjs && node tests/mobile-readiness-backend.mjs && node tests/mobile-auth-integration.mjs && node tests/account-deletion.mjs && node tests/firebase-erasure.mjs && node tests/hf-erasure.mjs && node tests/apple-tokens.mjs && node tests/firebase-identity.mjs && node tests/cloud-account-apple.mjs && node tests/account-deletion-browser.mjs",
+    "dev:homepage": "vite --config homepage/vite.config.mjs",
+    "check:homepage": "node --test tests/homepage-release.test.mjs tests/homepage-contact.test.mjs",
+    "homepage:sync": "node scripts/sync-homepage-prototype.mjs",
+    "preview:production": "node scripts/preview-production.mjs",
+    "monitor:deployment": "node scripts/monitor-deployment.mjs"
+  },
+  "dependencies": {
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "5.0.4",
+    "vite": "6.4.2"
   }
 }

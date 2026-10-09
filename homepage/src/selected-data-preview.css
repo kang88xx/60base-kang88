@@ -1,0 +1,24 @@
+/* Inline playback overlays the unchanged poster without shifting the card. */
+#main .section-data.data-catalog .catalog-thumbnail {
+  position: relative;
+  overflow: hidden;
+}
+
+#main .section-data.data-catalog .catalog-thumbnail .catalog-preview-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#main .section-data.data-catalog .catalog-thumbnail.is-previewing .catalog-preview-video {
+  opacity: 1;
+}
+
+#main .section-data.data-catalog .catalog-thumbnail.is-previewing > img {
+  visibility: hidden;
+}

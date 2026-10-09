@@ -1,0 +1,13 @@
+60BASE 집안일 촬영 예시 / Household filming examples
+
+60BASE가 제공한 원본 영상에서 홈페이지와 촬영 교육용으로 발췌했습니다.
+각 MP4는 20초 무음 미리보기이며, 원본의 화면 비율을 유지합니다.
+
+- 설거지: DishWash.mp4, 원본 8–28초 구간
+- 빨래 개기: Folding clothes.MOV, 원본 8–28초 구간
+- 채소 손질: Cutting Vegi.MOV, 원본 150–170초 구간
+
+원본 파일과 상세 출처 기록은 별도 수집 보관함에서 관리합니다.
+이 안내는 제3자의 재사용·재배포나 데이터셋 학습 이용을 허가하는 라이선스가 아닙니다. 프로젝트별 제공 범위와 사용 조건은 별도로 확인합니다.
+
+These are owner-provided, muted 20-second excerpts for the 60BASE website and filming guidance. Original files and provenance records are archived separately. No public dataset license or third-party reuse rights are granted by this notice.

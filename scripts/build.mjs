@@ -2,6 +2,7 @@ import { copyFile, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promi
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { renderEnglishHomepage } from './localize-homepage.mjs';
+import { buildHomepage } from './build-homepage.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'dist');
@@ -54,3 +55,4 @@ await copyAsset('studio/service-status.json');
 // Publish only this reviewed document; other local documents stay private.
 await copyAsset('docs/60BASE-Company-Profile-KO.pdf');
 console.log(`Built ${count} public frontend assets in dist/`);
+await buildHomepage(output);

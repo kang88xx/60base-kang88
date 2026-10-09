@@ -1,0 +1,345 @@
+/* Motion follows the supplied Loco reference: restrained scale, opacity and
+   movement. Scroll-driven reveals are owned by the GSAP motion module. */
+html.motion-ready [data-reveal] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+@media (min-width: 981px) {
+  .site-nav {
+    --nav-panel-padding: 20px;
+    transition: height .45s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .site-nav .nav-main-panel,
+  .site-nav.is-compact .nav-main-panel {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--nav-panel-padding);
+    transition: padding .45s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .nav-logo img {
+    transition: width .35s cubic-bezier(.2, .7, .2, 1), height .35s ease;
+  }
+
+  .site-nav .language-button {
+    transition: opacity .25s ease, visibility .25s;
+  }
+
+  .site-nav .nav-menu,
+  .site-nav.is-compact .nav-menu {
+    height: 24px;
+    gap: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: height .35s cubic-bezier(.2, .7, .2, 1),
+      opacity .3s ease, visibility .3s;
+  }
+
+  .site-nav .nav-menu a,
+  .site-nav.is-compact .nav-menu a {
+    gap: 10px;
+    font-size: 14px;
+    transition: opacity .3s ease;
+  }
+
+  .site-nav .nav-dot,
+  .site-nav.is-compact .nav-dot {
+    width: 12px;
+    height: 12px;
+    transition: transform .3s cubic-bezier(.2, .7, .2, 1);
+  }
+
+  .site-nav .nav-menu a:is(:hover, :focus-visible) {
+    opacity: .6;
+  }
+
+  .site-nav .nav-menu a:is(:hover, :focus-visible) .nav-dot {
+    transform: scale(1.2);
+  }
+
+  .site-nav.is-compact:not(:hover):not(:focus-within) .nav-main-panel {
+    padding: 18px var(--nav-panel-padding);
+  }
+
+  .site-nav.is-compact:not(:hover):not(:focus-within) .nav-menu {
+    height: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .site-nav.is-compact .language-button {
+    display: block;
+  }
+
+  .site-nav.is-compact:not(:hover):not(:focus-within) .language-button {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .site-nav.is-compact:is(:hover, :focus-within) {
+    height: 120px;
+  }
+
+  .site-nav.is-compact:is(:hover, :focus-within) .nav-logo img {
+    width: 136px;
+    height: 29px;
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1350px) {
+  .site-nav {
+    --nav-panel-padding: 18px;
+  }
+
+  .site-nav .nav-menu,
+  .site-nav.is-compact .nav-menu {
+    gap: 16px;
+  }
+
+  .site-nav .nav-menu a,
+  .site-nav.is-compact .nav-menu a {
+    font-size: 12px;
+  }
+}
+
+.button,
+.text-link,
+.nav-contact,
+.language-button,
+.work-title button,
+.service-row > button,
+.data-toolbar button,
+.site-footer a {
+  transition: background-color .3s ease, color .3s ease, opacity .3s ease;
+}
+
+.button-dark:focus-visible {
+  background: #383838;
+}
+
+.nav-contact:is(:hover, :focus-visible) {
+  background: var(--charcoal);
+}
+
+.button:not(:disabled):is(:hover, :focus-visible) .arrow,
+.text-link:not(:disabled):is(:hover, :focus-visible) .arrow,
+.nav-contact:is(:hover, :focus-visible) .arrow,
+.site-footer a:is(:hover, :focus-visible) .arrow {
+  transform: translate(3px, -2px);
+}
+
+.language-button:is(:hover, :focus-visible),
+.work-title button:focus-visible,
+.site-footer a:is(:hover, :focus-visible) {
+  opacity: .6;
+}
+
+.sample-image:focus-visible img {
+  transform: scale(1.04);
+}
+
+.view-film {
+  opacity: 0;
+  transform: translateY(68px);
+  transition: transform .4s cubic-bezier(.2, .7, .2, 1), opacity .3s ease;
+}
+
+.view-film .arrow {
+  transform: translate(-4px, 4px);
+  transition: transform .4s cubic-bezier(.2, .7, .2, 1);
+}
+
+.sample-image:is(:hover, :focus-visible) .view-film {
+  opacity: 1;
+  transform: none;
+}
+
+.sample-image:is(:hover, :focus-visible) .view-film .arrow {
+  transform: none;
+  transition-delay: .08s;
+}
+
+.service-row > button:focus-visible {
+  opacity: 1;
+}
+
+.service-row .service-symbol {
+  transition: transform .3s ease;
+}
+
+.service-row > button:is(:hover, :focus-visible) .service-symbol {
+  transform: rotate(90deg);
+}
+
+.service-row.is-active > button:is(:hover, :focus-visible) .service-symbol {
+  transform: none;
+}
+
+.contact-form input,
+.contact-form textarea {
+  transition: border-color .3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-bottom-color: #000;
+}
+
+.faq-content .faq-symbol {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.faq-content .faq-symbol::before,
+.faq-content .faq-symbol::after,
+.faq-content details[open] .faq-symbol::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+}
+
+.faq-content .faq-symbol::before {
+  width: 14px;
+  height: 1.5px;
+}
+
+.faq-content .faq-symbol::after {
+  width: 1.5px;
+  height: 14px;
+}
+
+.faq-content details[open] .faq-symbol::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+@supports (interpolate-size: allow-keywords) and selector(details::details-content) {
+  .faq-content details {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-content details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size .4s cubic-bezier(.2, .7, .2, 1),
+      content-visibility .4s allow-discrete;
+  }
+
+  .faq-content details[open]::details-content {
+    block-size: auto;
+  }
+}
+
+.film-dialog[open] {
+  animation: film-enter .4s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+.film-dialog[open]::backdrop {
+  animation: film-backdrop-enter .35s ease both;
+}
+
+@keyframes film-enter {
+  from { opacity: 0; transform: translateY(24px) scale(.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes film-backdrop-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 980px) {
+  .view-film {
+    opacity: 1;
+    transform: none;
+  }
+
+  .view-film .arrow {
+    transform: none;
+  }
+
+  .nav-mobile-menu:not([hidden]) a {
+    animation: mobile-menu-enter .4s cubic-bezier(.2, .7, .2, 1) both;
+  }
+
+  .nav-mobile-menu:not([hidden]) a:nth-child(2) { animation-delay: .05s; }
+  .nav-mobile-menu:not([hidden]) a:nth-child(3) { animation-delay: .1s; }
+  .nav-mobile-menu:not([hidden]) a:nth-child(4) { animation-delay: .15s; }
+
+  .nav-mobile-menu a:focus-visible {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mobile-menu-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (hover: none) {
+  .view-film {
+    opacity: 1;
+    transform: none;
+  }
+
+  .view-film .arrow {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-nav,
+  .site-nav *,
+  .button,
+  .text-link,
+  .arrow,
+  .sample-image img,
+  .view-film,
+  .view-film .arrow,
+  .work-title button,
+  .service-row > button,
+  .service-symbol,
+  .data-toolbar button,
+  .contact-form input,
+  .contact-form textarea,
+  .faq-content .faq-symbol::before,
+  .faq-content .faq-symbol::after,
+  .faq-content details::details-content,
+  .site-footer a {
+    transition: none !important;
+  }
+
+  .film-dialog[open],
+  .film-dialog[open]::backdrop,
+  .nav-mobile-menu:not([hidden]) a {
+    animation: none;
+  }
+
+  .sample-image:is(:hover, :focus-visible) img,
+  .button:not(:disabled):is(:hover, :focus-visible) .arrow,
+  .text-link:not(:disabled):is(:hover, :focus-visible) .arrow,
+  .nav-contact:is(:hover, :focus-visible) .arrow,
+  .site-footer a:is(:hover, :focus-visible) .arrow,
+  .site-nav .nav-menu a:is(:hover, :focus-visible) .nav-dot,
+  .service-row > button:is(:hover, :focus-visible) .service-symbol {
+    transform: none;
+  }
+}
+html.smooth-motion { scroll-behavior: auto !important; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }

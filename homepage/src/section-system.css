@@ -1,0 +1,270 @@
+/* One content rail and spacing scale across the renewal's content sections. */
+#main {
+  --section-space: 96px;
+  --section-heading-gap: 56px;
+  --section-content-gap: 48px;
+  --section-column-gap: 64px;
+  --section-rule: #0003;
+  --section-title-size: 44px;
+}
+#main .section-pad {
+  padding: var(--section-space) 40px;
+}
+#main .section-pad:not(.section-contact) {
+  background: #fff;
+  color: #111;
+}
+#main .section-contact { --section-rule: #ffffff55; padding-bottom: 32px; }
+#main .section-pad > .section-label,
+#main .section-pad > .section-label + div,
+#main .section-pad > .site-footer {
+  width: 100%;
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+#main .section-pad > .section-label {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--section-rule);
+  font: 400 13px/1.4 var(--mono);
+  letter-spacing: 0;
+}
+/* Keep section names/rules wide; center the complete content composition. */
+#main .section-pad > .section-label + div {
+  max-width: 1200px;
+  margin-top: var(--section-heading-gap);
+}
+#main .section-pad h2[id] {
+  margin: 0;
+  max-width: 720px;
+  font-family: var(--body);
+  font-size: var(--section-title-size);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+
+/* Introductory copy and actions always share the title's left edge. */
+#main .section-about .about-bottom {
+  margin-top: var(--section-content-gap);
+  gap: 28px;
+}
+#main .section-about .about-bottom > p { font-size: 16px; line-height: 1.7; }
+
+/* Samples and the inquiry form share the same aside/body grid. */
+#main .section-data .catalog-layout,
+#main .section-contact .contact-layout {
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: var(--section-column-gap);
+}
+#main .section-data .catalog-layout { margin-top: var(--section-content-gap); }
+#main .section-data .catalog-intro { display: block; margin: 0; }
+#main .section-data .catalog-intro p {
+  margin: 0;
+  width: auto;
+  max-width: 360px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+#main .section-data .catalog-grid { gap: 32px 24px; }
+#main .section-data .catalog-main {
+  width: 100%;
+  max-width: 776px;
+  justify-self: end;
+}
+#main .section-data .catalog-card-title { font-size: 22px; font-weight: 500; }
+#main .section-contact .contact-heading p { font-size: 16px; }
+
+/* Alternating service rows use equal columns and matching content bounds. */
+#main .section-services .service-features { margin-top: var(--section-content-gap); gap: 64px; }
+#main .section-services .service-feature { gap: var(--section-column-gap); }
+#main .section-services .service-feature-copy {
+  width: 100%;
+  max-width: 520px;
+  justify-self: start;
+}
+#main .section-services .service-feature:nth-child(even) .service-feature-copy { justify-self: end; }
+#main .section-services .service-feature-art {
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
+}
+#main .section-services .service-feature:nth-child(even) .service-feature-art { justify-self: start; }
+#main .section-services .service-feature-copy h3 { font-size: 28px; font-weight: 500; }
+
+/* Compact process rows keep all four stages in view, with artwork on the right. */
+#main .section-process .process-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 32px;
+}
+#main .section-process #process-title { max-width: none; }
+#main .section-process .process-motion-layout { grid-column: 1 / -1; }
+#main .section-process .process-step {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  align-items: center;
+  gap: 32px;
+  padding: 12px 0;
+  border-top: 0;
+  border-bottom: 1px solid var(--section-rule);
+  cursor: pointer;
+}
+#main .section-process .process-step-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+}
+#main .section-process .process-step-rule::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #ff5d17;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s ease;
+}
+#main .section-process .process-step:is(:hover, :focus-within, .is-active) .process-step-rule::after {
+  transform: scaleX(1);
+  animation: process-rule-draw .45s cubic-bezier(.2, .7, .2, 1) both;
+}
+@keyframes process-rule-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+#main .section-process .process-step .reference-process-motion {
+  width: 96px;
+  max-width: 96px;
+  background: transparent;
+}
+#main .section-process .process-step-copy h3 { font-size: 22px; font-weight: 500; }
+#main .section-process .process-step-copy h3 > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  background: transparent;
+}
+#main .section-process .process-step .process-step-copy p { max-width: 720px; padding-left: 0; font-size: 16px; line-height: 1.7; }
+#main .section-process .process-list { border: 0; }
+@media (prefers-reduced-motion: reduce) {
+  #main .section-process .process-step-rule::after {
+    transition: none;
+    animation: none !important;
+  }
+}
+
+/* Four compact entries: artwork on the left, title/copy together on the right. */
+#main .section-quality { --quality-art-size: 104px; }
+#main .section-quality .quality-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--section-content-gap);
+  gap: 32px 64px;
+}
+#main .section-quality .quality-item {
+  display: grid;
+  grid-template-columns: var(--quality-art-size) minmax(0, 1fr);
+  grid-template-rows: min-content 1fr;
+  gap: 10px 24px;
+  align-items: start;
+  padding-top: 24px;
+  border: 0;
+  min-width: 0;
+}
+#main .section-quality .quality-item .original-quality-motion {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+  width: var(--quality-art-size);
+  max-width: var(--quality-art-size);
+  margin: 0;
+}
+#main .section-quality .quality-item h3 {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+#main .section-quality .quality-item p {
+  grid-column: 2;
+  grid-row: 2;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+#main .section-faq .faq-list { margin-top: var(--section-content-gap); }
+#main .section-faq .faq-content details { border-color: var(--section-rule); }
+#main .section-faq .faq-content summary { padding: 24px 0; font-size: 22px; }
+#main .section-faq .faq-content details p { max-width: 760px; font-size: 16px; line-height: 1.7; }
+#main .section-contact .site-footer { margin-top: 64px; border-color: var(--section-rule); }
+
+@media (max-width: 980px) {
+  #main {
+    --section-space: 72px;
+    --section-heading-gap: 40px;
+    --section-content-gap: 36px;
+    --section-column-gap: 32px;
+    --section-title-size: 36px;
+  }
+  #main .section-pad { padding-left: 24px; padding-right: 24px; }
+  #main .section-data .catalog-layout,
+  #main .section-contact .contact-layout { grid-template-columns: minmax(0, 1fr); }
+  #main .section-data .catalog-intro p { max-width: 640px; }
+  #main .section-services .service-feature-copy h3 { font-size: 24px; }
+  #main .section-quality { --quality-art-size: 96px; }
+  #main .section-quality .quality-grid { column-gap: 32px; }
+  #main .section-quality .quality-item { column-gap: 20px; }
+}
+@media (max-width: 768px) {
+  #main .section-quality .quality-grid { grid-template-columns: minmax(0, 1fr); }
+  #main .section-services .service-feature { grid-template-columns: minmax(0, 1fr); }
+  #main .section-services .service-feature .service-feature-copy,
+  #main .section-services .service-feature:nth-child(even) .service-feature-copy {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  #main .section-services .service-feature .service-feature-art {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+}
+@media (max-width: 600px) {
+  #main {
+    --section-space: 56px;
+    --section-heading-gap: 32px;
+    --section-content-gap: 32px;
+    --section-column-gap: 24px;
+    --section-title-size: 32px;
+  }
+  #main .section-pad { padding-left: 20px; padding-right: 20px; }
+  #main .section-pad > .section-label { padding-bottom: 16px; font-size: 11px; }
+  #main .section-services .service-features { gap: 48px; }
+  #main .section-services .service-feature { gap: 24px; }
+  #main .section-process .process-content { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  #main .section-process .process-step { grid-template-columns: minmax(0, 1fr) 64px; gap: 16px; }
+  #main .section-process .process-step .reference-process-motion { width: 64px; max-width: 64px; }
+  #main .section-process .process-step-copy h3 { font-size: 19px; }
+  #main .section-process .process-step .process-step-copy p { font-size: 14px; }
+  #main .section-quality { --quality-art-size: 84px; }
+  #main .section-quality .quality-item { column-gap: 16px; }
+  #main .section-faq .faq-content summary { font-size: 19px; }
+  #main .section-contact .contact-heading p { font-size: 15px; }
+}
+
+@media (max-width: 360px) {
+  #main .section-quality { --quality-art-size: 72px; }
+  #main .section-quality .quality-item { column-gap: 12px; }
+}

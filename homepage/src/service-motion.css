@@ -1,0 +1,69 @@
+@font-face {
+  font-family: '60BASE Service Reference Mono';
+  src: url('/assets/media/service-reference/mono.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+
+.service-motion {
+  --ink: #0d0d0d;
+  --body: #333;
+  --ground: #fff;
+  --panel: #f5f5f5;
+  --chip: #e6e6e6;
+  --line: #ccc;
+  --font-abc-mono: '60BASE Service Reference Mono', monospace;
+  width: 100%;
+  max-width: 520px;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.service-motion-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+.service-motion .scene-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 640px;
+  height: 360px;
+  transform-origin: top left;
+  color: var(--ink);
+  font-family: var(--font-abc-mono);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Original source scene styles, scoped to this component. */
+.service-motion .scene-canvas .variation-art { position: absolute; overflow: hidden; border: 1px solid var(--ink); background: var(--ground); box-sizing: border-box; }
+.service-motion .scene-canvas .variation-art img { position: absolute; max-width: none; display: block; object-fit: fill; filter: grayscale(1); user-select: none; pointer-events: none; }
+.service-motion .scene-canvas .variation-art[data-ink='ready'] img { opacity: 0; }
+.service-motion .scene-canvas .variation-art[data-ink='ready']::after { content: ''; position: absolute; inset: 0; background: var(--ink); mask: var(--art-mask) center / 100% 100% no-repeat; }
+.service-motion .scene-canvas .variation-source-handle-mask { position: absolute; z-index: 1; background: var(--ground); pointer-events: none; }
+.service-motion .scene-canvas .variation-art-unframed { border: 0; }
+.service-motion .scene-canvas .variation-label { position: absolute; white-space: nowrap; font: 10px/1.3 var(--font-abc-mono, 'Courier New', monospace); letter-spacing: .035em; }
+.service-motion .scene-canvas .variation-eyebrow { color: var(--body); font-size: 9px; letter-spacing: .08em; }
+.service-motion .scene-canvas .variation-muted { color: var(--body); font-size: 9px; }
+.service-motion .scene-canvas .variation-rule { position: absolute; height: 0; border-top: 1px solid var(--line); }
+.service-motion .scene-canvas .variation-dotted { border-top-style: dotted; }
+.service-motion .scene-canvas .variation-cursor { position: absolute; width: 9px; height: 9px; background: var(--ink); z-index: 3; }
+.service-motion .scene-canvas .variation-acquisition { position: absolute; box-sizing: border-box; border: 1px solid var(--line); background: var(--ground); }
+.service-motion .scene-canvas .variation-rec { font-size: 8px; padding: 2px 3px; background: var(--chip); z-index: 1; }
+.service-motion .scene-canvas .variation-scan { position: absolute; border-top: 1px solid var(--ink); height: 6px; background: var(--chip); z-index: 3; opacity: .8; }
+.service-motion .scene-canvas .variation-validation { position: absolute; box-sizing: border-box; padding: 10px 0; border-bottom: 1px solid var(--line); background: var(--panel); font: 10px/1.3 var(--font-abc-mono, 'Courier New', monospace); letter-spacing: .025em; }
+.service-motion .scene-canvas .variation-track-group { position: absolute; inset: 0; }
+.service-motion .scene-canvas .variation-track { position: absolute; box-sizing: border-box; border: 1px solid var(--line); background: var(--ground); }
+.service-motion .scene-canvas .variation-sync-scan { position: absolute; border-left: 1px solid var(--ink); width: 5px; background: var(--chip); z-index: 2; }
+.service-motion .scene-canvas .variation-sync-scan::before { content: ''; position: absolute; top: -4px; left: -4px; width: 7px; height: 7px; background: var(--ink); }
+.service-motion .scene-canvas .variation-packet { position: absolute; box-sizing: border-box; border: 1px solid var(--ink); background: var(--ground); }
+.service-motion .scene-canvas .variation-packet-title { font-size: 17px; letter-spacing: -.04em; }
+
+/* Keep the selected motion artwork without another brand's study headings. */
+.service-motion .scene-canvas .variation-eyebrow { visibility: hidden; }
+

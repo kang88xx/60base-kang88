@@ -1,0 +1,136 @@
+/* Shared page typography. Reference artwork, navigation, hero and footer
+   retain their established type treatments. */
+#main {
+  --type-ink: #111;
+  --type-muted: #555;
+  --type-item-size: 22px;
+  --type-copy-size: 16px;
+  --type-action-size: 12px;
+}
+
+#main .section-contact {
+  --type-ink: var(--cream);
+  --type-muted: #bababa;
+}
+
+#main .section-pad h2[id] {
+  font-family: var(--body);
+  font-size: var(--section-title-size);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -.035em;
+  color: var(--type-ink);
+}
+
+/* Cards, services, process steps and FAQ questions share one title role. */
+#main .section-data .catalog-card-title,
+#main .section-services .service-feature-copy h3,
+#main .section-process .process-step-copy h3,
+#main .section-quality .quality-item h3,
+#main .section-faq .faq-content summary,
+#main .section-contact .draft-result h3 {
+  font-family: var(--body);
+  font-size: var(--type-item-size);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -.025em;
+  color: var(--type-ink);
+}
+
+#main .section-about .about-bottom > p,
+#main .section-data .catalog-intro p,
+#main .section-data.data-catalog .works-item > .catalog-card-description,
+#main .section-services .service-feature-copy p,
+#main .section-process .process-step .process-step-copy p,
+#main .section-quality .quality-item p,
+#main .section-faq .faq-content details p,
+#main .section-contact .contact-heading p,
+#main .section-contact .draft-result pre {
+  font-family: var(--body);
+  font-size: var(--type-copy-size);
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0;
+  color: var(--type-muted);
+}
+
+/* Action labels keep their existing button dimensions and state colors. */
+#main .section-about .about-links .text-link,
+#main .section-data.data-catalog .catalog-action,
+#main .section-contact .contact-submit,
+#main .section-contact .draft-result .text-link,
+.film-dialog .film-heading .button {
+  font-family: var(--mono);
+  font-size: var(--type-action-size, 12px);
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+#main .section-data.data-catalog .catalog-tags,
+#main .section-services .service-feature-copy .tags {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--type-muted);
+}
+
+#main .section-data.data-catalog .catalog-tags span,
+#main .section-services .service-feature-copy .tags span {
+  line-height: inherit;
+}
+
+/* Form text stays at a readable 16px; label/helper roles stay distinct. */
+#main .section-contact .contact-form label {
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--type-ink);
+}
+
+#main .section-contact .field-optional,
+#main .section-contact .contact-direct-email > span:first-child,
+#main .section-contact .draft-result > p {
+  font-family: var(--body);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--type-muted);
+}
+
+#main .section-contact .contact-form input,
+#main .section-contact .contact-form textarea,
+#main .section-contact .contact-direct-email > span:last-child {
+  font-family: var(--body);
+  font-size: var(--type-copy-size);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--type-ink);
+}
+
+#main .section-contact .contact-form textarea {
+  line-height: 1.7;
+}
+
+#main .section-contact .field-error {
+  font: 400 12px/1.5 var(--body);
+  color: #ffac8f;
+}
+#main .section-contact .contact-form :is(input, textarea)[aria-invalid="true"] {
+  border-bottom-color: #ff5d17;
+}
+#main .section-contact .contact-form-status {
+  margin: 0;
+  font: 400 14px/1.5 var(--body);
+  color: var(--type-muted);
+}
+
+@media (max-width: 600px) {
+  #main { --type-item-size: 19px; }
+}

@@ -1,0 +1,68 @@
+.section-services .services-expanded { margin-top: 60px; }
+.section-services .services-heading {
+  max-width: 680px;
+  font-size: clamp(30px, 2.8vw, 44px);
+}
+.section-services .service-features {
+  display: grid;
+  gap: 72px;
+  margin-top: 64px;
+}
+.section-services .service-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 112px);
+}
+.section-services .service-feature-copy { min-width: 0; max-width: 500px; }
+.section-services .service-feature-copy h3 {
+  font-size: clamp(23px, 2.2vw, 30px);
+  line-height: 1.3;
+  letter-spacing: -.025em;
+}
+.section-services .service-feature-copy p {
+  margin-top: 20px;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.section-services .service-feature-copy .tags {
+  margin-top: 24px;
+  color: #555;
+  font-size: 10px;
+}
+.section-services .service-feature-art {
+  min-width: 0;
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
+}
+.section-services .service-feature-art .service-motion { max-width: none; }
+.section-services .service-feature:nth-child(even) .service-feature-copy {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+}
+.section-services .service-feature:nth-child(even) .service-feature-art {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+@media (max-width: 980px) {
+  .section-services .services-expanded { margin-top: 40px; }
+  .section-services .service-features { gap: 60px; margin-top: 44px; }
+  .section-services .service-feature { gap: 32px; }
+}
+@media (max-width: 600px) {
+  .section-services .service-feature { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .section-services .service-feature .service-feature-copy,
+  .section-services .service-feature:nth-child(even) .service-feature-copy {
+    grid-column: 1; grid-row: 1; justify-self: stretch;
+  }
+  .section-services .service-feature .service-feature-art,
+  .section-services .service-feature:nth-child(even) .service-feature-art {
+    grid-column: 1; grid-row: 2; justify-self: stretch;
+  }
+  .section-services .service-feature-copy p { margin-top: 16px; font-size: 15px; }
+  .section-services .service-feature-copy .tags { margin-top: 20px; }
+}

@@ -1,0 +1,83 @@
+{
+  "purpose": "Native-resolution copies of the same source pose; original JPEG posters and MP4s are unchanged. No sharpening, morphological or line-width changes are baked into these decoded frames.",
+  "sourceMapping": [
+    2,
+    1,
+    4
+  ],
+  "logicalCropSpace": [
+    1120,
+    630
+  ],
+  "nativeFrameScale": 1.1428571428571428,
+  "frames": [
+    {
+      "study": 1,
+      "sourceUrl": "https://assets.piplabs.xyz/psdn-landing/videos/thesis/thesis-1-light.mp4",
+      "sourceVideoSha256": "d46d3ff1ace8b42dc1072537e13a26f8000e85fa83b4f45fe0c5cf37aea73c19",
+      "frameIndex": 210,
+      "frameTimeSeconds": 7.0,
+      "nativeSize": [
+        1280,
+        720
+      ],
+      "output": "thesis-1-light-source.png",
+      "outputSha256": "bcaa90d2ec865282e8012574a4bff26598bb531e1551e1a6c0117f938411fb43",
+      "originalPoster": "thesis-1-light-poster.jpg",
+      "originalPosterSha256": "47d90926d0cb2c3a8749fef5a417502de49653583b6702e6bba8033123244d70",
+      "posterPreserved": true,
+      "matchedPosterMeanLuminanceErrorAt560x315": 0.352
+    },
+    {
+      "study": 2,
+      "sourceUrl": "https://assets.piplabs.xyz/psdn-landing/videos/thesis/thesis-2-light.mp4",
+      "sourceVideoSha256": "cb7393004cabd35a4d0a369e2de494947249b6209ae640d74a917c3509d40039",
+      "frameIndex": 120,
+      "frameTimeSeconds": 4.0,
+      "nativeSize": [
+        1280,
+        720
+      ],
+      "output": "thesis-2-light-source.png",
+      "outputSha256": "03ca55ca58ce5b728987fde27102bded55b10b3d321264ba24454b6b5c802771",
+      "originalPoster": "thesis-2-light-poster.jpg",
+      "originalPosterSha256": "aff1b6824a4d25d5b886b92f5e648fe9b0880dcdba87c417861d389824b9410a",
+      "posterPreserved": true,
+      "matchedPosterMeanLuminanceErrorAt560x315": 0.599
+    },
+    {
+      "study": 3,
+      "sourceUrl": "https://assets.piplabs.xyz/psdn-landing/videos/thesis/thesis-3-light.mp4",
+      "sourceVideoSha256": "08e6bfeea587dae1a47f6efb6e052ecc4b5ac9f8a8d74d7b4c10595cb3f27322",
+      "frameIndex": 227,
+      "frameTimeSeconds": 7.566666666666666,
+      "nativeSize": [
+        1280,
+        720
+      ],
+      "output": "thesis-3-light-source.png",
+      "outputSha256": "127b7b6dfee522af685a36b097a9b8f8eabeef16e524f0a2709cc278c8f5f01a",
+      "originalPoster": "thesis-3-light-poster.jpg",
+      "originalPosterSha256": "70577ad70379d0ee1082cd56429503b6229f3783b4547e63437f71daaf4559db",
+      "posterPreserved": true,
+      "matchedPosterMeanLuminanceErrorAt560x315": 0.677
+    },
+    {
+      "study": 4,
+      "sourceUrl": "https://assets.piplabs.xyz/psdn-landing/videos/thesis/thesis-4-light.mp4",
+      "sourceVideoSha256": "13052f96a8252c4bf993b27a0ebec2f8beeed43426d284bb376f6cef4a9f074d",
+      "frameIndex": 231,
+      "frameTimeSeconds": 7.7,
+      "nativeSize": [
+        1280,
+        720
+      ],
+      "output": "thesis-4-light-source.png",
+      "outputSha256": "57b742399f101df1685301977bafa6da0b370e68d545e2870e8705eef809ad70",
+      "originalPoster": "thesis-4-light-poster.jpg",
+      "originalPosterSha256": "bcc42ecd098b0be6bb5cd73dac2969ce72f95f81b09750021db5fbf6ebd6f8fe",
+      "posterPreserved": true,
+      "matchedPosterMeanLuminanceErrorAt560x315": 0.483
+    }
+  ]
+}

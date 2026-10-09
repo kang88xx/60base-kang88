@@ -1,0 +1,48 @@
+/* Owner-supplied logo_new2: preserve the SVG's 274.6 / 41.5 proportions. */
+.site-nav .nav-logo img {
+  display: block;
+  width: 173px;
+  height: auto;
+  aspect-ratio: 274.6 / 41.5;
+}
+
+.site-nav.is-compact .nav-logo img {
+  width: 134px;
+  height: auto;
+}
+
+.section-contact .site-footer img {
+  display: block;
+  width: 191px;
+  height: auto;
+  aspect-ratio: 274.6 / 41.5;
+  filter: brightness(0) invert(1);
+}
+
+@media (min-width: 981px) {
+  .site-nav.is-compact:is(:hover, :focus-within) .nav-logo img {
+    width: 173px;
+    height: auto;
+  }
+}
+
+@media (max-width: 980px) {
+  .site-nav .nav-logo img,
+  .site-nav.is-compact .nav-logo img,
+  .section-contact .site-footer img {
+    width: 151px;
+    height: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .site-nav .nav-logo img,
+  .site-nav.is-compact .nav-logo img {
+    width: 140px;
+  }
+
+  .site-nav .nav-topline {
+    gap: 14px;
+  }
+}
+

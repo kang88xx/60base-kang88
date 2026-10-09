@@ -1,0 +1,152 @@
+/* Original 500:440 SVG artwork fits the existing stage without distortion. */
+.original-process-motion.reference-process-motion {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 500 / 440;
+  overflow: hidden;
+  border-radius: 6px;
+  isolation: isolate;
+}
+
+.original-process-motion.reference-process-motion[data-process-theme='dark'] {
+  background: #111111;
+}
+
+.original-process-motion.reference-process-motion[data-process-theme='light'] {
+  background: #f5f5f5;
+}
+
+.reference-process-motion .reference-process-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+}
+
+.reference-process-motion[data-motion='static'] .reference-process-control {
+  visibility: hidden;
+}
+
+.reference-process-control {
+  position: absolute;
+  z-index: 1;
+  right: 8px;
+  bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #f4f2ed;
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.reference-process-motion[data-process-theme='light'] .reference-process-control {
+  color: #111;
+}
+
+.reference-process-control:is(:hover, :focus-visible) span:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reference-process-motion .reference-process-control {
+    visibility: hidden;
+  }
+}
+
+/* Each explanation owns its corresponding original reference motion. */
+.section-process .process-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 20px 0 12px;
+}
+
+.section-process .process-motion-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.section-process .process-motion-layout .process-step {
+  display: grid;
+  grid-template-columns: 144px minmax(0, 1fr);
+  align-items: center;
+  gap: 32px;
+  padding: 20px 0;
+}
+
+.section-process .process-step .reference-process-motion {
+  width: 144px;
+  max-width: 144px;
+  margin: 0;
+  aspect-ratio: 1;
+  border-radius: 2px;
+}
+
+.section-process .process-step-copy {
+  min-width: 0;
+}
+
+.section-process .process-step-copy > button {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 24px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+}
+
+.section-process .process-step-copy > button .arrow {
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.section-process .process-step.is-active .process-step-copy .arrow,
+.section-process .process-step-copy > button:is(:hover, :focus-visible) .arrow {
+  opacity: 1;
+}
+
+.section-process .process-step .process-step-copy p {
+  margin-top: 8px;
+  padding-left: 48px;
+}
+
+@media (max-width: 600px) {
+  .section-process .process-motion-layout .process-step {
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: start;
+    gap: 20px;
+    padding: 24px 0;
+  }
+
+  .section-process .process-step .reference-process-motion {
+    width: 88px;
+    max-width: 88px;
+    margin: 0;
+  }
+
+  .section-process .process-step-copy > button {
+    grid-template-columns: 24px minmax(0, 1fr) 16px;
+    gap: 8px;
+    align-items: baseline;
+  }
+
+  .section-process .process-step-copy h3 {
+    font-size: 19px;
+  }
+
+  .section-process .process-step .process-step-copy p {
+    padding-left: 32px;
+    font-size: 14px;
+  }
+}
