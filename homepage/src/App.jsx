@@ -133,7 +133,7 @@ export function App() {
 
   useEffect(() => {
     document.documentElement.lang = language;
-    const title = language === 'en' ? '60BASE | Action data sourcing & custom collection' : '60BASE | 행동 데이터 구매·맞춤 수집';
+    const title = language === 'en' ? '60base | Action data sourcing & custom collection' : '60base | 행동 데이터 구매·맞춤 수집';
     const description = language === 'en'
       ? '60BASE sources, collects, annotates and reviews first-person action data from Korea for physical AI training.'
       : '60BASE는 피지컬 AI 학습을 위한 한국의 1인칭 영상 데이터를 수집·가공·검수합니다.';

@@ -59,3 +59,23 @@
   .site-nav.is-compact .nav-menu a { font-size: 12px; }
   .site-nav .nav-menu a:first-child { min-width: 58px; }
 }
+
+/* Owner-selected navigation colors; override the earlier charcoal/opacity states. */
+.site-nav .nav-contact,
+.site-nav .nav-contact:is(:hover, :focus) {
+  background: #ff5d17;
+  color: #111;
+  opacity: 1;
+}
+.site-nav .nav-contact .arrow { color: inherit; }
+.site-nav .nav-menu a:is(:hover, :focus),
+.site-nav.is-compact .nav-menu a:is(:hover, :focus),
+.site-nav .nav-mobile-menu a:not([href="#contact"]):is(:hover, :focus) {
+  color: #ff5d17;
+  opacity: 1;
+}
+.site-nav .nav-menu a:is(:hover, :focus) .nav-dot,
+.site-nav.is-compact .nav-menu a:is(:hover, :focus) .nav-dot {
+  background: #ff5d17;
+  opacity: 1;
+}

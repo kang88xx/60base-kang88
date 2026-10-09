@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Brand refinements · 2026-10-10
+
+The latest owner request makes the homepage CONTACT panel orange (#ff5d17), with matching orange hover/focus states for DATA, SERVICES and ABOUT. Browser-tab titles use `60base`. The administrator page now uses the same owner-supplied logo_new2 artwork and its own orange favicon/social thumbnail; keep these assets scoped to admin. These presentation changes are authorized for the existing GitHub/Vercel release workflow. Preserve authentication and administrator behavior.
+
 ## Authorized homepage replacement · 2026-10-09
 
 The user explicitly authorized replacing the production company homepage with the completed LOCO prototype, pushing GitHub and deploying. Complete functional and visual checks before publishing. The current button/tag styles are authorized for release; the requested alternatives can be applied later if the user selects one and do not require another release approval. Preserve Studio/admin/app/shared/API behavior and current production account-deletion fixes. The isolated checkout starts from00d64ac; the damaged older workspace must not be reset, staged, pushed or deployed.
