@@ -37,7 +37,7 @@
  #fixed-promo-host button.opal-promo-buy:disabled .base60-apple-icon{right:11px;top:12.5px}
  #fixed-promo-host .base60-training-badge>img{width:24px;height:24px}
  #fixed-promo-host .base60-training-badge>span{font-size:9px}
- #contact :is(input,textarea,button,a){scroll-margin-bottom:calc(var(--promo-dock-height) + 16px)}
+ #main :is(input,textarea,button,a,summary){scroll-margin-bottom:calc(var(--promo-dock-height) + 16px)}
 }
 @media(max-width:359px){
  #fixed-promo-host .opal-promo-inner{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 116px;gap:6px}

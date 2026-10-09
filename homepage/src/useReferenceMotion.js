@@ -8,6 +8,47 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
   const refresh = useRef(() => {});
   const menuHeight = useRef(60);
 
+  // Keep the looping hero's decoder idle when its footage cannot be seen.
+  // Playback owns its lifecycle independently of GSAP's responsive timelines.
+  useEffect(() => {
+    const video = document.querySelector('.showreel-card video');
+    if (!video) return;
+    const autoplay = video.autoplay;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const listeners = new AbortController();
+    const { signal } = listeners;
+    let visible = !('IntersectionObserver' in window);
+    let suspended = false;
+    const sync = () => {
+      const blocked = !visible || suspended || document.hidden || filmOpen || reduced.matches
+        || document.documentElement.dataset.reducedMotion === 'true' || Boolean(window.__FIGMA_CAPTURE__);
+      video.autoplay = autoplay && !blocked;
+      if (blocked) video.pause();
+      else if (autoplay && video.paused) {
+        try { Promise.resolve(video.play()).catch(() => {}); } catch { /* Keep the poster when autoplay is unavailable. */ }
+      }
+    };
+    const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      sync();
+    }) : null;
+    observer?.observe(video);
+    const mutation = new MutationObserver(sync);
+    mutation.observe(document.documentElement, { attributes: true, attributeFilter: ['data-reduced-motion'] });
+    reduced.addEventListener('change', sync, { signal });
+    document.addEventListener('visibilitychange', sync, { signal });
+    window.addEventListener('pagehide', () => { suspended = true; sync(); }, { signal });
+    window.addEventListener('pageshow', () => { suspended = false; sync(); }, { signal });
+    sync();
+    return () => {
+      observer?.disconnect();
+      mutation.disconnect();
+      listeners.abort();
+      video.pause();
+      video.autoplay = autoplay;
+    };
+  }, [filmOpen]);
+
   useEffect(() => {
     const gsap = window.gsap;
     const ScrollTrigger = window.ScrollTrigger;
@@ -25,6 +66,34 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
     let media;
     let resizeObserver;
     let refreshFrame;
+    let hashFrame;
+    let initialized = false;
+    const hashTarget = hash => {
+      if (!hash || hash === '#') return null;
+      try { return document.getElementById(decodeURIComponent(hash.slice(1))); }
+      catch { return null; }
+    };
+    const scrollToHash = (hash, immediate = false) => {
+      const target = hashTarget(hash);
+      if (!target) return;
+      const top = target.id === 'hero' || target.id === 'main';
+      const offset = window.innerWidth <= 980 ? 90 : 130;
+      const instant = immediate || matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (smoother.current) smoother.current.scrollTo(top ? 0 : target, { offset: top ? 0 : -offset, duration: 1, immediate: instant, force: true });
+      else window.scrollTo({ top: top ? 0 : target.getBoundingClientRect().top + window.scrollY - offset, behavior: instant ? 'instant' : 'smooth' });
+    };
+    const navigateCurrentHash = () => {
+      // Leave ordinary no-hash history restoration to the browser. Language
+      // updates only refresh geometry; they must not jump back to this anchor.
+      if (!initialized || !window.location.hash) return;
+      cancelAnimationFrame(hashFrame);
+      hashFrame = requestAnimationFrame(() => {
+        if (cancelled) return;
+        ScrollTrigger.refresh();
+        smoother.current?.resize();
+        scrollToHash(window.location.hash, true);
+      });
+    };
     const scheduleRefresh = () => {
       cancelAnimationFrame(refreshFrame);
       refreshFrame = requestAnimationFrame(() => {
@@ -46,10 +115,8 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
         const body = root.querySelector('.hero-body');
         const video = card?.querySelector('video');
         if (reduced) {
-          const autoplay = video?.autoplay;
-          if (video) { video.autoplay = false; video.pause(); }
           root.querySelectorAll('[data-reveal]').forEach(node => node.classList.add('is-visible'));
-          return () => { if (video) video.autoplay = autoplay; };
+          return;
         }
 
         let lenis;
@@ -134,6 +201,8 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
         root.querySelectorAll('.section-pad').forEach(node => resizeObserver.observe(node));
       }
       scheduleRefresh();
+      initialized = true;
+      navigateCurrentHash();
     };
     document.fonts.ready.then(initialize);
 
@@ -141,14 +210,12 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
       const anchor = event.target.closest('a[href^="#"]');
       if (!anchor || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const hash = anchor.getAttribute('href');
-      const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+      const target = hashTarget(hash);
       if (!target) return;
       event.preventDefault();
+      cancelAnimationFrame(hashFrame);
       history.pushState(null, '', hash);
-      const top = hash === '#hero' || hash === '#main';
-      const offset = window.innerWidth <= 980 ? 90 : 130;
-      if (smoother.current) smoother.current.scrollTo(top ? 0 : target, { offset: top ? 0 : -offset, duration: 1, force: true });
-      else window.scrollTo({ top: top ? 0 : target.getBoundingClientRect().top + window.scrollY - offset, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      scrollToHash(hash);
       if (anchor.classList.contains('skip-link')) { target.tabIndex = -1; target.focus({ preventScroll: true }); }
     };
     root.addEventListener('click', anchorClick);
@@ -157,14 +224,19 @@ export function useReferenceMotion({ language, menuOpen, filmOpen, hasDraft }) {
     // invalidating a running scrub; real section resizing is observed above.
     window.addEventListener('load', scheduleRefresh);
     window.addEventListener('resize', scheduleRefresh);
+    window.addEventListener('hashchange', navigateCurrentHash);
+    window.addEventListener('popstate', navigateCurrentHash);
     return () => {
       cancelled = true;
       cancelAnimationFrame(refreshFrame);
+      cancelAnimationFrame(hashFrame);
       resizeObserver?.disconnect();
       root.removeEventListener('click', anchorClick);
       root.removeEventListener('toggle', scheduleRefresh, true);
       window.removeEventListener('load', scheduleRefresh);
       window.removeEventListener('resize', scheduleRefresh);
+      window.removeEventListener('hashchange', navigateCurrentHash);
+      window.removeEventListener('popstate', navigateCurrentHash);
       media?.revert();
       document.documentElement.classList.remove('motion-ready', 'smooth-motion');
       refresh.current = () => {};

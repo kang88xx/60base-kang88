@@ -106,8 +106,14 @@ function Arrow({ diagonal = false }) { return <span className="arrow" aria-hidde
 function Multiline({ text }) { return text.split('\n').map((line, i) => <span key={line}>{i > 0 && <br />}{line}</span>); }
 function SectionLabel({ children }) { return <div className="section-label"><span>{children}</span></div>; }
 
+function getInitialLanguage() {
+  const requested = new URLSearchParams(location.search).get('lang');
+  if (requested === 'en' || requested === 'ko') return requested;
+  return document.documentElement.lang === 'ko' ? 'ko' : 'en';
+}
+
 export function App() {
-  const [language, setLanguage] = useState(new URLSearchParams(location.search).get('lang') === 'ko' ? 'ko' : 'en');
+  const [language, setLanguage] = useState(getInitialLanguage);
   const [compact, setCompact] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredStep, setHoveredStep] = useState(null);
@@ -200,7 +206,7 @@ export function App() {
       <header className={`site-nav${compact ? ' is-compact' : ''}${menuOpen ? ' is-open' : ''}`}>
         <div className="nav-main-panel">
           <div className="nav-topline">
-            <a className="nav-logo" href="#hero" aria-label="60BASE home" onClick={closeMenu}><img src="/assets/brand/logo-new2.svg" alt="60BASE" /></a>
+            <a className="nav-logo" href="#hero" aria-label={language === 'en' ? '60BASE home' : '60BASE 홈'} onClick={closeMenu}><img src="/assets/brand/logo-new2.svg" alt="60BASE" /></a>
             <button ref={menuButton} className="nav-hamburger" type="button" aria-expanded={menuOpen} aria-controls="mobile-navigation" aria-label={menuOpen ? t.closeMenu : t.menu} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
           </div>
           <nav className="nav-menu" aria-label={language === 'en' ? 'Main navigation' : '주요 메뉴'}>{['data', 'services', 'about'].map((id, i) => <a key={id} href={`#${id}`} onClick={closeMenu}><span className="nav-dot" aria-hidden="true" />{t.nav[i]}</a>)}</nav>
@@ -216,16 +222,16 @@ export function App() {
             <div className="hero-headline"><h1 id="hero-title">{t.hero.map((line) => <span className="headline-line" key={line}><span className="headline-inner">{line}</span></span>)}</h1></div>
           </div>
             <div className="showreel-card">
-              <video src="/assets/media/hero-graded.mp4" poster="/assets/media/hero-graded.jpg" autoPlay muted loop playsInline preload="metadata" aria-label={language === 'en' ? 'First-person vegetable preparation footage' : '1인칭 채소 손질 영상'} />
+              <video poster="/assets/media/hero-graded.jpg" autoPlay muted loop playsInline preload="metadata" aria-label={language === 'en' ? 'First-person vegetable preparation footage' : '1인칭 채소 손질 영상'}><source src="/assets/media/hero-mobile.mp4" media="(max-width:600px)" type="video/mp4" /><source src="/assets/media/hero-graded.mp4" type="video/mp4" /></video>
             </div>
         </section>
 
         <section className="section-about section-pad" id="about" aria-labelledby="about-title">
           <SectionLabel>{t.aboutLabel}</SectionLabel>
-          <div className="about-content" data-reveal><h2 id="about-title"><Multiline text={t.aboutTitle} /></h2><div className="about-bottom"><p>{t.aboutCopy}</p><div className="about-links"><a className="text-link" href="https://huggingface.co/60base" target="_blank" rel="noreferrer"><span className="about-huggingface-label"><img className="about-huggingface-logo" src="/assets/brand/huggingface-logo.svg" alt="" aria-hidden="true" width="20" height="20" />HUGGING FACE</span><Arrow diagonal /></a><button type="button" className="text-link" disabled>{t.profile}<Arrow diagonal /></button></div></div></div>
+          <div className="about-content" data-reveal><h2 id="about-title"><Multiline text={t.aboutTitle} /></h2><div className="about-bottom"><p>{t.aboutCopy}</p><div className="about-links"><a className="text-link" href="https://huggingface.co/60base" target="_blank" rel="noreferrer"><span className="about-huggingface-label"><img className="about-huggingface-logo" src="/assets/brand/huggingface-logo.svg" alt="" aria-hidden="true" width="20" height="20" />HUGGING FACE</span><Arrow diagonal /></a><a className="text-link" href="https://60base.ai/docs/60BASE-Company-Profile-KO.pdf" target="_blank" rel="noopener noreferrer" aria-label={language === 'en' ? 'Company profile (Korean PDF, opens in a new tab)' : '회사소개서 (PDF, 새 창)'}>{t.profile}<Arrow diagonal /></a></div></div></div>
         </section>
 
-        <SelectedData t={t} samples={samples.slice(0, 4)} localeIndex={localeIndex} onOpenFilm={openFilm} />
+        <SelectedData t={t} samples={samples.slice(0, 4)} localeIndex={localeIndex} onOpenFilm={openFilm} filmOpen={Boolean(film)} />
 
         <section className="section-services section-pad" id="services" aria-labelledby="services-title">
           <SectionLabel>{t.servicesLabel}</SectionLabel>
@@ -271,20 +277,20 @@ export function App() {
           <div className="contact-heading" data-reveal><h2 id="contact-title">{t.contactTitle[0]}<br />{t.contactTitle[1]}</h2><p>{t.contactCopy}</p></div>
           <form id="contact-form" className="contact-form" onSubmit={contactForm.submit} aria-labelledby="contact-title" aria-busy={contactForm.sending} noValidate>
             <div aria-hidden="true" style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)' }}><label htmlFor="contact-website">Website</label><input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" /></div>
-            <label><span>{t.name}</span><input id="contact-name" name="name" value={contactForm.values.name} onChange={contactForm.change} readOnly={contactForm.sending} autoComplete="organization" placeholder={t.namePlaceholder} maxLength="100" aria-invalid={contactForm.errors.name || undefined} aria-describedby={contactForm.errors.name ? 'contact-name-error' : undefined} required /><span id="contact-name-error" className="field-error" hidden={!contactForm.errors.name}>{contactForm.errorText.name}</span></label>
-            <label><span>{t.email}</span><input id="contact-email" name="email" value={contactForm.values.email} onChange={contactForm.change} readOnly={contactForm.sending} type="email" autoComplete="email" placeholder="you@company.com" maxLength="254" aria-invalid={contactForm.errors.email || undefined} aria-describedby={contactForm.errors.email ? 'contact-email-error' : undefined} required /><span id="contact-email-error" className="field-error" hidden={!contactForm.errors.email}>{contactForm.errorText.email}</span></label>
-            <label className="full-width"><span className="field-label"><span>{t.type}</span><span className="field-optional">{t.optional}</span></span><input id="contact-type" name="dataType" value={contactForm.values.dataType} onChange={contactForm.change} readOnly={contactForm.sending} placeholder={t.typePlaceholder} maxLength="180" aria-invalid={contactForm.errors.dataType || undefined} aria-describedby={contactForm.errors.dataType ? 'contact-type-error' : undefined} /><span id="contact-type-error" className="field-error" hidden={!contactForm.errors.dataType}>{contactForm.errorText.dataType}</span></label>
-            <label className="full-width"><span>{t.brief}</span><textarea id="contact-message" name="message" value={contactForm.values.message} onChange={contactForm.change} readOnly={contactForm.sending} rows="4" placeholder={t.briefPlaceholder} maxLength="5000" aria-invalid={contactForm.errors.message || undefined} aria-describedby={contactForm.errors.message ? 'contact-message-error' : undefined} required /><span id="contact-message-error" className="field-error" hidden={!contactForm.errors.message}>{contactForm.errorText.message}</span></label>
+            <label><span id="contact-name-label">{t.name}</span><input id="contact-name" name="name" value={contactForm.values.name} onChange={contactForm.change} readOnly={contactForm.sending} autoComplete="organization" placeholder={t.namePlaceholder} maxLength="100" aria-labelledby="contact-name-label" aria-invalid={contactForm.errors.name || undefined} aria-describedby={contactForm.errors.name ? 'contact-name-error' : undefined} required /><span id="contact-name-error" className="field-error" hidden={!contactForm.errors.name}>{contactForm.errorText.name}</span></label>
+            <label><span id="contact-email-label">{t.email}</span><input id="contact-email" name="email" value={contactForm.values.email} onChange={contactForm.change} readOnly={contactForm.sending} type="email" autoComplete="email" placeholder="you@company.com" maxLength="254" aria-labelledby="contact-email-label" aria-invalid={contactForm.errors.email || undefined} aria-describedby={contactForm.errors.email ? 'contact-email-error' : undefined} required /><span id="contact-email-error" className="field-error" hidden={!contactForm.errors.email}>{contactForm.errorText.email}</span></label>
+            <label className="full-width"><span className="field-label"><span id="contact-type-label">{t.type}</span><span id="contact-type-optional" className="field-optional">{t.optional}</span></span><input id="contact-type" name="dataType" value={contactForm.values.dataType} onChange={contactForm.change} readOnly={contactForm.sending} placeholder={t.typePlaceholder} maxLength="180" aria-labelledby="contact-type-label contact-type-optional" aria-invalid={contactForm.errors.dataType || undefined} aria-describedby={contactForm.errors.dataType ? 'contact-type-error' : undefined} /><span id="contact-type-error" className="field-error" hidden={!contactForm.errors.dataType}>{contactForm.errorText.dataType}</span></label>
+            <label className="full-width"><span id="contact-message-label">{t.brief}</span><textarea id="contact-message" name="message" value={contactForm.values.message} onChange={contactForm.change} readOnly={contactForm.sending} rows="4" placeholder={t.briefPlaceholder} maxLength="5000" aria-labelledby="contact-message-label" aria-invalid={contactForm.errors.message || undefined} aria-describedby={contactForm.errors.message ? 'contact-message-error' : undefined} required /><span id="contact-message-error" className="field-error" hidden={!contactForm.errors.message}>{contactForm.errorText.message}</span></label>
             <div className="form-actions full-width"><button className="button contact-submit" type="submit" disabled={contactForm.sending || contactForm.sent} data-state={['validation', 'rateLimited', 'unavailable', 'invalid', 'unconfirmed'].includes(contactForm.status) ? 'Error' : 'Default'}>{contactForm.buttonLabel}<Arrow diagonal /></button><a className="contact-direct-email" href="mailto:60base.ai@gmail.com"><span>{t.directEmail}</span><span>60base.ai@gmail.com<Arrow diagonal /></span></a></div>
             <p id="form-status" className="contact-form-status full-width" role="status" aria-live="polite" hidden={!contactForm.statusText}>{contactForm.statusText}</p>
           </form>
         </div>
-        <footer className="site-footer"><a href="#hero" aria-label="60BASE home"><img src="/assets/brand/logo-new2.svg" alt="60BASE" /></a><span>© 2026 60BASE. All Rights Reserved.</span><div><button className="footer-language" type="button" aria-label={language === 'en' ? '한국어로 보기' : 'View in English'} onClick={() => changeLanguage(language === 'en' ? 'ko' : 'en')}>{language === 'en' ? '한국어' : 'ENGLISH'}</button></div></footer>
+        <footer className="site-footer"><a href="#hero" aria-label={language === 'en' ? '60BASE home' : '60BASE 홈'}><img src="/assets/brand/logo-new2.svg" alt="60BASE" /></a><span>© 2026 60BASE. All Rights Reserved.</span><div><button className="footer-language" type="button" aria-label={language === 'en' ? '한국어로 보기' : 'View in English'} onClick={() => changeLanguage(language === 'en' ? 'ko' : 'en')}>{language === 'en' ? '한국어' : 'ENGLISH'}</button></div></footer>
         </section>
       </main>
       <FixedPromo language={language} />
 
-      <dialog className="film-dialog" ref={dialog} aria-labelledby="film-title" onClose={onDialogClosed} onCancel={() => dialogVideo.current?.pause()} onClick={(event) => { if (event.target === event.currentTarget) closeFilm(); }}><div className="film-heading"><div><span className="mono">60BASE / {t.excerpt}</span><h2 id="film-title">{film?.title}</h2></div><button className="button button-dark" type="button" onClick={closeFilm} autoFocus>{t.close}<span aria-hidden="true">×</span></button></div>{film && <video ref={dialogVideo} src={`/assets/media/${film.id}.mp4`} poster={`/assets/media/${film.id}.jpg`} controls playsInline muted preload="metadata" />}</dialog>
+      <dialog className="film-dialog" ref={dialog} aria-labelledby="film-title" aria-describedby={film ? 'film-description' : undefined} onClose={onDialogClosed} onCancel={() => dialogVideo.current?.pause()} onClick={(event) => { if (event.target === event.currentTarget) closeFilm(); }}><div className="film-heading"><div><span className="mono">60BASE / {t.excerpt}</span><h2 id="film-title">{film?.title}</h2></div><button className="button button-dark" type="button" onClick={closeFilm} autoFocus>{t.close}<span aria-hidden="true">×</span></button></div>{film && <><video ref={dialogVideo} src={`/assets/media/${film.id}.mp4`} poster={`/assets/media/${film.id}.jpg`} controls playsInline muted preload="metadata" /><p id="film-description">{samples.find(sample => sample.id === film.id)?.desc[localeIndex]}</p></>}</dialog>
     </>
   );
 }

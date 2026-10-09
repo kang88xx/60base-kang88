@@ -26,6 +26,14 @@
   max-width: 100%;
 }
 
+/* Keep fine diagram lines readable at the compact 96px/64px stage size.
+   Filled markers keep their source geometry; only outlined artwork changes. */
+.reference-process-motion .reference-process-svg line[stroke],
+.reference-process-motion .reference-process-svg [fill='none'][stroke] {
+  stroke-width: var(--motion-line-width, 1px);
+  vector-effect: non-scaling-stroke;
+}
+
 .reference-process-motion[data-motion='static'] .reference-process-control {
   visibility: hidden;
 }

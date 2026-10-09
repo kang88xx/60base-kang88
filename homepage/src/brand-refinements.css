@@ -27,6 +27,13 @@
 }
 
 @media (max-width: 980px) {
+  .site-nav .nav-logo,
+  .section-contact .site-footer > a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
   .site-nav .nav-logo img,
   .site-nav.is-compact .nav-logo img,
   .section-contact .site-footer img {

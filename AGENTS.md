@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Full homepage QA · 2026-10-10
+
+The owner requested full homepage code/text/behavior QA and mobile optimization and selected mobile Selected Data option2: a compact2×2 grid below601px, with a shared Hugging Face link and full descriptions in the film dialog. Desktop stays unchanged. Keep HOW IT WORKS fine outlines and QUALITY animated trails/rings at a consistent1 CSSpx using non-scaling SVG strokes, preserving original geometry/timing and Services linework. The main mobile hero uses the960×540 mobile encoding up to600px; desktop keeps the original graded video. Restore the published Korean company-profile PDF link. Preserve sample once-through playback while suspending background previews during the film dialog. `check:homepage` includes the media playback regression tests; the comparison hub and QA screenshot report remain excluded from production.
+
 ## Brand refinements · 2026-10-10
 
 The four QUALITY & RIGHTS motion frames must have equally clear borders and no corner-square decorations. Preserve their diagram geometry, timing and responsive arrangement.

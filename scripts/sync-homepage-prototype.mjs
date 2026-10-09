@@ -53,5 +53,13 @@ if (contactTests) {
   await writeFile(path.join(root, 'tests/homepage-contact.test.mjs'), contactTests.replace('../src/useContactForm.js', '../homepage/src/useContactForm.js'));
   count++;
 }
+const mediaTests = await readFile(path.join(prototype, 'tests/sample-preview.test.mjs'), 'utf8').catch(error => {
+  if (error.code !== 'ENOENT') throw error;
+  return null;
+});
+if (mediaTests) {
+  await writeFile(path.join(root, 'tests/homepage-media.test.mjs'), mediaTests.replace('../src/sample-preview.js', '../homepage/src/sample-preview.js'));
+  count++;
+}
 console.log(`Synchronized ${count + 1} homepage source/asset files from ${prototype}`);
 console.log('Excluded design-options, screenshots, evidence, Figma handoff, build output and local dependencies.');
