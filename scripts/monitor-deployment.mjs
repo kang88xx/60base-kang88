@@ -32,7 +32,7 @@ function existingGitHubCredential() {
   return token;
 }
 
-const normalizeHtml = value => value.replaceAll('\r\n', '\n').trim();
+const normalizeHtml = value => value.replaceAll('\r', '').trim();
 const digest = value => createHash('sha256').update(normalizeHtml(value)).digest('hex');
 
 async function run() {
