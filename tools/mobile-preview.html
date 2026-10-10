@@ -64,6 +64,17 @@
       const url=previewAddress();
       $('screen').src=url; $('direct').href=url;
     }
+    function reloadLocal(){
+      // Keep recovery outside the iframe: a rebuild can temporarily replace its
+      // document with a browser error page, which cannot retain its own listener.
+      let url=previewAddress();
+      try {
+        const current=new URL($('screen').contentWindow.location.href);
+        const prefix=$('target').value==='ios'?'/__ios/app/':'/app/';
+        if(current.origin===location.origin && current.pathname.startsWith(prefix)) url=current.href;
+      } catch {}
+      $('screen').src=url; $('direct').href=url;
+    }
     function changeTarget(){
       const isHomepage=$('target').value==='homepage', isLive=$('target').value==='live';
       $('language-control').hidden=!isHomepage;
@@ -84,6 +95,11 @@
       $('direct').href=previewAddress();
     });
     $('refresh').addEventListener('click',()=>{try{$('screen').contentWindow.location.reload();}catch{load();}});
+    const changes=new EventSource('/__mobile/events');
+    changes.addEventListener('reload',event=>{
+      if(event.data===$('target').value && ['app','ios'].includes(event.data)) reloadLocal();
+    });
+    window.addEventListener('pagehide',()=>changes.close());
     $('screen').addEventListener('load',()=>{
       if($('target').value==='live') return;
       // Desktop scrollbars consume width; mobile browsers use overlay scrollbars.

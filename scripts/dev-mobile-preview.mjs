@@ -20,9 +20,12 @@ const iosPublicRoots = iosDirectories.map(directory => path.join(iosRoot, direct
 const watchedRoots = [...publicRoots, ...iosPublicRoots];
 const iosAssetPaths = text => text.replace(/(["'`(])\/(app|studio|shared|assets|fonts|vendor)(?=[/"'`)]|$)/g, '$1/__ios/$2');
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.webm': 'video/webm', '.webmanifest': 'application/manifest+json', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8' };
-const reloadScript = `const changes = new EventSource('/__mobile/events');
-changes.addEventListener('reload', () => location.reload());
-addEventListener('pagehide', () => changes.close());`;
+const reloadScript = `if (parent === window) {
+  const changes = new EventSource('/__mobile/events');
+  const target = location.pathname.startsWith('/__ios/') ? 'ios' : 'app';
+  changes.addEventListener('reload', event => { if (event.data === target) location.reload(); });
+  addEventListener('pagehide', () => changes.close());
+}`;
 // Development only: never install the app's cache-first production worker here.
 const developmentWorker = `self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', event => event.waitUntil(self.registration.unregister()));`;
@@ -38,7 +41,30 @@ if (existing?.ok && existing.headers.get('X-60base-preview') === 'mobile-dev') {
   }
 } else {
   const clients = new Set();
-  let reloadTimer;
+  const reloadTimers = new Map();
+  const generations = { app: 0, ios: 0 };
+  async function iosBundleReady() {
+    // The iOS builder replaces www, then writes the branded index as its last step.
+    // Wait for that completed entry and essential assets before reloading a view.
+    const required = ['app/app.js', 'app/native.js', 'app/ego-brand.css', 'app/icons/ego-icon-512.png', 'studio/online-api.js', 'studio/cloud-account.js', 'shared/base.css', 'vendor/firebase-app.js'];
+    try {
+      const entry = await readFile(path.join(iosRoot, 'app/index.html'), 'utf8');
+      if (!entry.includes('href="ego-brand.css"') || !entry.includes('</html>')) return false;
+      return (await Promise.all(required.map(file => stat(path.join(iosRoot, file))))).every(info => info.isFile() && info.size > 0);
+    } catch { return false; }
+  }
+  function scheduleReload(target, generation, delay) {
+    clearTimeout(reloadTimers.get(target));
+    reloadTimers.set(target, setTimeout(async () => {
+      if (generations[target] !== generation) return;
+      if (target === 'ios' && !await iosBundleReady()) {
+        if (generations[target] === generation) scheduleReload(target, generation, 500);
+        return;
+      }
+      if (generations[target] !== generation) return;
+      for (const client of clients) client.write(`event: reload\ndata: ${target}\n\n`);
+    }, delay));
+  }
   const server = await createServer({
     configFile: fileURLToPath(new URL('../homepage/vite.config.mjs', import.meta.url)),
     server: {
@@ -53,10 +79,8 @@ if (existing?.ok && existing.headers.get('X-60base-preview') === 'mobile-dev') {
         vite.watcher.add(watchedRoots);
         vite.watcher.on('all', (event, filename) => {
           if (!['add', 'change', 'unlink'].includes(event) || !watchedRoots.some(directory => path.resolve(filename).startsWith(directory))) return;
-          clearTimeout(reloadTimer);
-          reloadTimer = setTimeout(() => {
-            for (const client of clients) client.write('event: reload\ndata: changed\n\n');
-          }, 120);
+          const target = iosPublicRoots.some(directory => path.resolve(filename).startsWith(directory)) ? 'ios' : 'app';
+          scheduleReload(target, ++generations[target], target === 'ios' ? 700 : 200);
         });
         vite.middlewares.use(async (request, response, next) => {
           const send = (status, type, data, extra = {}) => {
@@ -144,7 +168,7 @@ if (existing?.ok && existing.headers.get('X-60base-preview') === 'mobile-dev') {
   console.log('Local API and Firebase accounts are disconnected. Production app is a separate preview option. Ctrl+C to stop.');
   for (const signal of ['SIGINT', 'SIGTERM']) {
     process.once(signal, async () => {
-      clearTimeout(reloadTimer);
+      for (const timer of reloadTimers.values()) clearTimeout(timer);
       for (const client of clients) client.end();
       await server.close();
       process.exit(0);
