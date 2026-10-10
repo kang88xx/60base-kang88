@@ -1,6 +1,6 @@
 .app-launch{position:absolute;inset:0;z-index:60;overflow:hidden;background:#08183e;color:#fff}
 .app-launch[hidden]{display:none}
-.app-launch-brand{position:absolute;top:calc(56px + env(safe-area-inset-top));left:32px;display:flex;align-items:center;gap:10px;height:42px}.app-launch-brand img{width:40px;height:42px;object-fit:contain}.app-launch-brand span{font-size:30px;font-weight:800;line-height:1;letter-spacing:-.04em}
+.app-launch-brand{position:absolute;top:calc(56px + env(safe-area-inset-top));left:32px;display:flex;align-items:center;gap:8px;height:42px}.app-launch-brand img{width:34px;height:36px;object-fit:contain;transform:translateY(-4.7px);flex:none}.app-launch-brand span{font-family:"Ego Satoshi",Pretendard,sans-serif;font-size:30px;font-weight:600;line-height:1;letter-spacing:-.015em;transform:translateY(-5px)}
 .app-launch-stage{position:absolute;top:18.25%;left:32px;right:32px;height:42%;max-height:352px}
 .app-launch-slide{position:absolute;inset:0;width:100%;height:100%;border-radius:22px;object-fit:cover;transform-origin:center;animation:app-intro-slide 9s cubic-bezier(.2,.82,.16,1) infinite}
 .app-launch-slide:nth-child(2){animation-delay:-6s}

@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Selected lowercase ego wordmark · 2026-10-11
+
+The owner selected header concept 2: lowercase `ego`. Home header and launch lockups use local Satoshi Variable 600, 30px, line-height 1, tracking -.015em and an 8px gap. Preserve the byte-exact transparent symbol; its 34×36px image box translates up 4.7px to compensate for the source SVG's top whitespace, and the lowercase wordmark translates up 5px for optical alignment. This presentation choice does not rename the service metadata, change company branding or replace install/store artwork. Keep Satoshi in the app's offline cache. The private iOS overlay mirrors the lockup; store submission remains deferred.
+
 ## Final EGO artwork selection · 2026-10-11
 
 The owner's latest instruction uses C:/Users/kslee/Desktop/app_simbol.svg for BOTH the installed app icon and all in-app symbols. This supersedes the earlier clay-only install-icon choice and the temporary split between icon and symbol. Byte-exact source copies are app/icons/icon.svg, app/icons/symbol.svg and assets/brand/ego-clay-20261010/ego-symbol-original.svg. PWA 192/512 and favicon PNGs derive from this source; iOS/store 1024 artwork is prepared outside this public checkout. Preserve original geometry and transparent in-app background, with no added white card, clay effects, monochrome filter or crop. Historical clay masters remain archived but are not the current artwork. Store upload remains deferred.

@@ -112,3 +112,30 @@ Reference/render comparison: ../.omx/reviews/app-launch-selected-20260917/tests/
 User source: ../.omx/reviews/admin-review-20260917/member-list-source.png. Existing neutral administrator style is preserved. Member desktop table adds authoritative held points and ascending/descending header controls; mobile uses the existing labelled card rows plus visible44px sort buttons. Images: ../.omx/reviews/admin-review-ui-20260917/tests/admin-members-points-desc-{390,1440}.png. Manual-review desktop and each stage at390/1440 show original video, current stage, ordered approvals, checklist, action and history without horizontal overflow.
 
 Direct screenshot review found completed-state pending-points copy and hidden mobile sort headers. Both were fixed and tested through the actual buttons. Review also found legacy approval could imply three historical gates; current-revision approval records now govern those ticks, and legacy records get their own summary. The final focused UI suite passes4groups including legacy and mobile controls; independent source review APPROVE with zero open findings. No runtime visual-verdict skill is installed; direct review evidence is recorded in ../.omx/state/admin-review-20260917/ralph-progress.json. Final result: passed.
+
+---
+
+# Selected lowercase ego lockup — 2026-10-11
+
+- Scope: selected concept 2 applied to the existing app home header and launch lockup. The owner-provided transparent symbol remains authoritative; generated character variations and the mock presentation canvas are not replacement assets.
+- Source visual truth: `C:/Users/kslee/.codex/generated_images/01a12563-7332-7a70-b866-82b144340a5a/exec-4073af94-6a2b-4be9-8c85-e5216ecb4636.png` (2172×724 presentation image).
+- Rendered implementation: `.artifacts/ego-lowercase/web-mobile-390.jpg`, `ios-mobile-390.jpg` (390×844), and focused `web-header-390.jpg`, `ios-header-390.jpg` (390×68). Browser viewport is 390×844 CSS px in the existing preview iframe, scale 1. Additional 375×812 check has no horizontal overflow or overlapping header controls. These are Windows Chrome browser renders, not physical iOS captures.
+- State: navy home header, signed-out local app with expected disconnected catalog notice. The mock's P/0 belongs to a signed-in state; the existing right-side login/points behavior was preserved. Component typography was compared without treating the wide presentation strip as a literal 390px app viewport.
+- Combined evidence: source image, final focused web header and full iOS app screenshot were opened together in one comparison tool input. A second read-only reviewer compared the same source/header pair and found no remaining actionable visual mismatch.
+
+## Required surfaces
+
+- Typography: local Satoshi Variable 600 at30px, line-height1 and tracking-.015em reproduces the lowercase, rounded geometric direction. Browser confirms the actual font loaded; the body font and service-name metadata remain unchanged.
+- Spacing: 8px flex gap and a34×36px full-contain symbol box. Symbol translates up4.7px to account for its SVG top whitespace. Wordmark translates up5px to balance the actual lowercase ink. Left inset, header touch target, right-side controls and page layout remain intact.
+- Colors: original orange#ff5d17, existing navy#08183e, white wordmark. No recoloring, image background card, shadows or filters were introduced.
+- Assets: source SVG remains byte-exact and transparent; no image crop. The Satoshi font is preloaded on web and included in its offline cache and native bundle. Existing install/store icons are unchanged.
+- Copy: visual lockups read`ego`; accessible home label stays`에고 홈`. App name 에고/EGO, company60BASE and launch tagline remain unchanged. Native logo micro-subtitle was removed to match the selected simple lockup.
+
+## Comparison history and validation
+
+- First focused check found a P2 optical alignment issue: lowercase ink sat below the visible character. Corrected by translating the wordmark up5px in both implementations, refreshed the browser, and recaptured the files above. Final comparison shows balanced alignment and no clipping or wrapping.
+- Home brand link was exercised at375px; native and web fonts were verified loaded. Browser error log was empty for the final local preview.
+- Public build,5 static checks and18 release/contact/media checks passed. Native iOS/default/Android boundary checks and mobile check passed; final iOS bundle rebuilt after optical adjustment. No auth, recording, account or store submission changes.
+- Remaining limit: iOS runtime/native behavior was not exercised; this change affects the prepared web-view artwork only. Launch shares the same font/size/alignment; transient startup timing remains unchanged.
+
+final result: passed

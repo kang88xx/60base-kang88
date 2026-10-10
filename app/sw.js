@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-symbol-v3';
+const CACHE='60base-app-20261011-ego-lowercase-v4';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -40,6 +40,7 @@ const SHELL=[
   "/studio/camera.css",
   "/studio/firebase-config.js",
   "/fonts/PretendardVariable.woff2",
+  "/fonts/Satoshi-Variable.woff2",
   "/fonts/inter-tight/inter-tight-latin-variable.woff2",
   "/assets/brand/ego-clay-20261010/ego-symbol-original.svg",
   "/assets/brand/google-signin-g.png",

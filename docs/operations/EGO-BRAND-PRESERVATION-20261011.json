@@ -45,7 +45,7 @@
       "replacements": [
         {
           "before": "const CACHE='60base-app-20260928-deletion-v1';",
-          "after": "const CACHE='60base-app-20261011-ego-symbol-v3';"
+          "after": "const CACHE='60base-app-20261011-ego-lowercase-v4';"
         },
         {
           "before": "\"/app/icons/icon.svg\",",
@@ -54,6 +54,10 @@
         {
           "before": "\"/assets/brand/60base-logo3-20260914/60base-logo-dark.svg\",",
           "after": "\"/assets/brand/ego-clay-20261010/ego-symbol-original.svg\","
+        },
+        {
+          "before": "\"/fonts/PretendardVariable.woff2\",",
+          "after": "\"/fonts/PretendardVariable.woff2\",\n  \"/fonts/Satoshi-Variable.woff2\","
         }
       ]
     }
