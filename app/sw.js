@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-v1';
+const CACHE='60base-app-20261011-ego-symbol-v2';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -17,6 +17,7 @@ const SHELL=[
   "/app/device-settings.css",
   "/app/manifest.webmanifest",
   "/app/icons/icon.svg",
+  "/app/icons/symbol.svg",
   "/app/icons/favicon-32.png",
   "/app/icons/icon-192.png",
   "/app/icons/icon-512.png",

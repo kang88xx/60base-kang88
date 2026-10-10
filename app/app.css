@@ -51,7 +51,7 @@ html{scroll-padding-bottom:120px;scroll-behavior:auto}body{background:#e9edf4;co
 [data-screen=home] .app-bottom-nav>a{min-height:58px;border-radius:12px}
 [data-screen=home] .app-bottom-nav>a:active{background:#ffffff12}
 
-/* Keep the complete clay character visible throughout loading. */
+/* Keep the complete transparent app symbol visible throughout loading. */
 
 .app-loading{min-height:52dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:36px 20px;text-align:center;background:#f7f8fc;color:var(--app-navy)}
 .app-loading h1,.app-loading h2{font-size:21px;line-height:1.4;margin:0;font-weight:750}

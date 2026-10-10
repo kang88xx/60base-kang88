@@ -48,7 +48,7 @@ export function FixedPromo({ language = 'en' }) {
     badge.href = '/app/#home';
     badge.setAttribute('aria-label', language === 'en' ? 'EGO · Open the contributor app' : '에고 EGO · 촬영 참여 앱 열기');
     const symbol = document.createElement('img');
-    symbol.src = '/app/icons/icon.svg';
+    symbol.src = '/app/icons/symbol.svg';
     symbol.alt = '';
     symbol.width = 32;
     symbol.height = 32;

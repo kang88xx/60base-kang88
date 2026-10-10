@@ -46,7 +46,7 @@ if (existing?.ok && existing.headers.get('X-60base-preview') === 'mobile-dev') {
   async function iosBundleReady() {
     // The iOS builder replaces www, then writes the branded index as its last step.
     // Wait for that completed entry and essential assets before reloading a view.
-    const required = ['app/app.js', 'app/native.js', 'app/ego-brand.css', 'app/icons/ego-icon-512.png', 'studio/online-api.js', 'studio/cloud-account.js', 'shared/base.css', 'vendor/firebase-app.js'];
+    const required = ['app/app.js', 'app/native.js', 'app/ego-brand.css', 'app/icons/symbol.svg', 'studio/online-api.js', 'studio/cloud-account.js', 'shared/base.css', 'vendor/firebase-app.js'];
     try {
       const entry = await readFile(path.join(iosRoot, 'app/index.html'), 'utf8');
       if (!entry.includes('href="ego-brand.css"') || !entry.includes('</html>')) return false;

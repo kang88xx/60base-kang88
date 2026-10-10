@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## App icon and in-app symbol separation · 2026-10-11
+
+The owner clarified: 04_clay.svg is only the installed/store app icon. Keep its icon.svg, 192/512 PNG, Apple touch icon and App Store artwork unchanged. Inside the app, use the byte-exact transparent C:/Users/kslee/Desktop/app_simbol.svg saved as app/icons/symbol.svg and assets/brand/ego-clay-20261010/ego-symbol-original.svg. Header, launch, loading, web favicon and website app symbol use this transparent symbol, without an added white card, monochrome filter or crop. This clarification supersedes earlier instructions to use the clay app icon throughout the UI. Store upload remains deferred.
+
 ## EGO participant app · 2026-10-11
 
 The owner renamed the participant app to 에고 / EGO per workspace-root NAMING-EGO-2026-10-10.md. Company 60BASE, domains, account/backend identifiers and native bundle ID kr.base60.app remain unchanged. Use the byte-exact selected 04_clay.svg master in assets/brand/ego-clay-20261010 and app/icons; do not recolor, flatten to a monochrome mark, crop it with the previous radial loading mask or claim it is maskable. App name, launch, installation, settings, favicon and homepage contributor entry now use EGO. Protected production behavior still compares against the original hashes after reversing only the explicit brand text changes recorded in docs/operations/EGO-BRAND-PRESERVATION-20261011.json.
