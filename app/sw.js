@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-experience-v5';
+const CACHE='60base-app-20261011-ego-reference-blue-v7';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -7,6 +7,7 @@ const SHELL=[
   "/app/community.js",
   "/app/experience-ui.js",
   "/app/ego-experience.css",
+  "/app/ego-reference-theme.css",
   "/app/ego-forms.css",
   "/app/welcome-popup.js",
   "/app/welcome-popup.css",

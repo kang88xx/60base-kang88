@@ -85,6 +85,15 @@ try {
     res.setHeader = (name, value) => setHeader(name, name.toLowerCase() === 'x-frame-options' ? 'SAMEORIGIN' : value);
     try {
       const url = new URL(req.url, origin);
+      if (['/__qa/intro-final', '/__qa/intro-final/'].includes(url.pathname)) {
+        const source = await readFile(path.join(root, 'app/index.html'), 'utf8');
+        const intro = source.match(/<section class="app-launch" id="app-launch"[\s\S]*?<\/section>/)?.[0];
+        if (!intro) throw Error('Intro markup not found.');
+        // Static QA only: reuse the actual production markup/styles, import no
+        // runtime modules, and never add a production query/replay mechanism.
+        const html = source.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '').replace(/<body>[\s\S]*<\/body>/, `<body>${intro.replace(' hidden ', ' ')}<style>.app-launch-flood{display:none}.app-launch{pointer-events:none}.intro-qa-label{position:fixed;z-index:61;left:12px;bottom:8px;margin:0;color:#6a6865;font:9px/1.2 sans-serif;pointer-events:none}</style><p class="intro-qa-label">LOCAL QA · D 최종 정적 프레임</p></body>`);
+        return send(200, 'text/html; charset=utf-8', html.replace('<head>', '<head><base href="/app/">'));
+      }
       if (['/__qa/verification', '/__qa/verification/'].includes(url.pathname)) return send(200, 'text/html; charset=utf-8', await readFile(path.join(root, 'tools/verification-code-preview.html'), 'utf8'));
       if (['/', '/__qa', '/__qa/'].includes(url.pathname)) return send(200, 'text/html; charset=utf-8', wrapper);
       if (['/studio/firebase-config.js', '/app/firebase-config.js'].includes(url.pathname)) return send(200, 'text/javascript', 'export const firebaseConfig = null;');

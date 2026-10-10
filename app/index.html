@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="referrer" content="no-referrer">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="theme-color" content="#f3f6fd">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="에고">
@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="../studio/online.css">
   <link rel="stylesheet" href="../studio/camera.css">
   <link rel="preload" href="../fonts/Satoshi-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/inter-tight/inter-tight-latin-variable.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="launch.css">
   <link rel="stylesheet" href="preparation.css">
@@ -25,6 +26,7 @@
   <link rel="stylesheet" href="ego-experience.css">
   <link rel="stylesheet" href="ego-forms.css">
   <link rel="stylesheet" href="welcome-popup.css">
+  <link rel="stylesheet" href="ego-reference-theme.css">
   <script type="module" src="launch.js"></script>
   <script type="module" src="app.js"></script>
 </head>
@@ -32,17 +34,21 @@
   <a class="skip-link" href="#app-main">본문으로 이동</a>
   <div class="app-shell" id="app-shell">
     <section class="app-launch" id="app-launch" hidden aria-label="에고 시작 화면">
-      <div class="app-launch-brand" aria-label="에고 EGO"><img src="icons/symbol.svg" width="34" height="36" alt=""><span>ego</span></div>
-      <div class="app-launch-stage" aria-hidden="true">
-        <img class="app-launch-slide" src="../assets/videos/collection/dishwashing.jpg" width="640" height="360" alt="">
-        <img class="app-launch-slide" src="../assets/videos/collection/folding-clothes.jpg" width="640" height="360" alt="">
-        <img class="app-launch-slide" src="../assets/videos/collection/cutting-vegetables.jpg" width="640" height="360" alt="">
+      <div class="app-launch-stage">
+        <svg class="app-launch-symbol" viewBox="0 87.52 287.1 249.18" aria-hidden="true">
+          <path class="app-launch-blob" fill="#2f86f4" d="M287,335.6l-13-133.9c-9.1-64.3-54.9-91.3-54.9-91.3-78.7-47.7-151.8-6-151.8-6L0,147v189.7h277.4c3.3,0,6.6-.4,9.7-1.1h-.1Z"/>
+          <g class="app-launch-eyes">
+            <circle fill="#fff" cx="180" cy="160.3" r="21"/>
+            <circle fill="#fff" cx="216.9" cy="160.3" r="21"/>
+            <path d="M186.8,167.7h0c2.7,0,4.8,2.1,4.8,4.8v5c0,2.7-2.1,4.8-4.8,4.8h0c-2.7,0-4.8-2.1-4.8-4.8v-5c0-2.7,2.1-4.8,4.8-4.8Z"/>
+            <path d="M223.7,167.7h0c2.7,0,4.8,2.1,4.8,4.8v5c0,2.7-2.1,4.8-4.8,4.8h0c-2.7,0-4.8-2.1-4.8-4.8v-5c0-2.7,2.1-4.8,4.8-4.8Z"/>
+          </g>
+        </svg>
+        <h1 class="app-launch-word">EGO</h1>
+        <p class="app-launch-tag">내 시점이 AI가 된다</p>
       </div>
-      <div class="app-launch-copy"><h1>내 시점이<br>AI가 된다.</h1><p>에고 · EGO BY 60BASE</p></div>
-      <div class="app-launch-footer">
-        <p class="app-launch-status" role="status"><img class="app-loading-symbol" src="icons/symbol.svg" width="36" height="36" alt=""><span>일상을 불러오고 있어요.</span></p>
-        <button class="app-launch-continue" type="button">바로 시작하기</button>
-      </div>
+      <div class="app-launch-flood" aria-hidden="true"></div>
+      <button class="app-launch-continue" type="button">건너뛰기</button>
     </section>
     <div class="app-connection" id="app-connection" role="status" hidden></div>
     <header class="app-header" id="app-header"></header>

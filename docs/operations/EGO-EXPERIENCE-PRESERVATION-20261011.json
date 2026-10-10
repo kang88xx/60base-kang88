@@ -18,12 +18,24 @@
           "after": "const CACHE='60base-app-20261011-ego-experience-v5';"
         },
         {
+          "before": "const CACHE='60base-app-20261011-ego-experience-v5';",
+          "after": "const CACHE='60base-app-20261011-ego-intro-d-v6';"
+        },
+        {
           "before": "  \"/app/app.js\",",
           "after": "  \"/app/app.js\",\n  \"/app/access-boundary.js\",\n  \"/app/community.js\",\n  \"/app/experience-ui.js\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-forms.css\",\n  \"/app/welcome-popup.js\",\n  \"/app/welcome-popup.css\","
         },
         {
           "before": "  \"/app/icons/phosphor/t-shirt.svg\",",
           "after": "  \"/app/icons/phosphor/t-shirt.svg\",\n  \"/app/icons/phosphor/trophy.svg\","
+        },
+        {
+          "before": "const CACHE='60base-app-20261011-ego-intro-d-v6';",
+          "after": "const CACHE='60base-app-20261011-ego-reference-blue-v7';"
+        },
+        {
+          "before": "  \"/app/ego-experience.css\",",
+          "after": "  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\","
         }
       ]
     },

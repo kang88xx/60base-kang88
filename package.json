@@ -49,7 +49,7 @@
     "homepage:sync": "node scripts/sync-homepage-prototype.mjs",
     "preview:production": "node scripts/preview-production.mjs",
     "monitor:deployment": "node scripts/monitor-deployment.mjs",
-    "test:app-experience": "node --test tests/app-access-boundary.mjs && node tests/app-session-revalidation.mjs && node tests/welcome-popup.mjs && node tests/welcome-popup-browser.mjs",
+    "test:app-experience": "node --test tests/app-access-boundary.mjs && node tests/app-launch.mjs && node tests/app-session-revalidation.mjs && node tests/welcome-popup.mjs && node tests/welcome-popup-browser.mjs",
     "test:account-deletion": "node tests/account-deletion.mjs && node tests/account-deletion-receipt.mjs && node tests/account-deletion-browser.mjs"
   },
   "dependencies": {

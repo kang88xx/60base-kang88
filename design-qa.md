@@ -170,3 +170,56 @@ Remaining product inputs are explicit: benefit eligibility/payment/referral/with
 Final independent-review follow-up: foreground/session-age checks now close the reproduced expiry gap, with real-database regression and preserved same-session camera behavior. Root Chrome also observed the checking gate and successful return. Category filtering produced only the matching laundry mission; carousel selection kept the correct active dot. The final import memo label was compacted without changing file behavior. Build/static/release/app-experience checks passed after the final source changes.
 
 final result: passed for implemented UI and existing authentication/upload flows; benefit automation and real OTP delivery remain explicitly pending owner input.
+
+## Selected D intro — final blue adaptation
+
+Source visual: `../ego-intro-motion-20261011/intro-final-d.html?still`, captured as `.artifacts/ego-experience/intro-d-reference-390.jpg`. Implementation: `.artifacts/ego-experience/intro-d-blue-final-390.jpg`, captured in Chrome from development-only `/__qa/intro-final`, which reads the actual index markup, launch CSS and local fonts without runtime imports. Both images are 390×844 at CSS viewport 390×844 / density 1; they were opened together in the same comparison input. The full-view images show the entire sparse lockup legibly, so no focused crop was needed.
+
+Fonts/typography: local Inter Tight 800 at 46px matches the source word width (101.5417px); Pretendard tag is 14px. Spacing: symbol width 76px, bounding x157/y319.3675, symbol-to-word16px and word-to-tag10px match the source. A 2.17px vertical shift found in the initial comparison was corrected by restoring the source tag's normal line height, then recaptured. Asset fidelity: source path/eyes/geometry are unchanged. Colors: the user's later explicit all-blue request authorizes #2f86f4 flood/blob and #f3f6fd background instead of the orange/cream source. Copy remains EGO / 내 시점이 AI가 된다. The production skip control and clearly labelled dev-only QA caption are expected additions.
+
+Chrome observed a fresh home entry showing the intro, automatic transition to the authenticated member home, and same-tab reload without replay. `tests/app-launch.mjs` passed the 2700ms bound, login gate, skip/focus/inert restoration, reduced450ms, deep links, visibility/offline/error/dialog/route cancellation and unavailable storage. The complete app-experience chain also passed after the palette/intro integration. Independent code review found no material P0–P2 issue. Physical iOS is not validated here.
+
+Findings: no remaining actionable P0/P1/P2 mismatch in the adapted intro.
+
+final result: passed
+
+
+---
+
+# EGO reference blue palette QA — 2026-10-11
+
+**Findings**
+- [P2, fixed] The disabled upload save button initially retained the active blue gradient because the primary selector was more specific than the generic disabled selector. Added explicit disabled primary selectors, reloaded the local app and recaptured the same empty-upload state. It now has no background image, background rgb(237,240,244), text rgb(113,122,135), remains disabled, and is visually distinct from active controls.
+- No actionable P0/P1/P2 findings remain in the reference palette scope.
+
+**Source and scope**
+- Source visual truth: `C:/Users/kslee/Pictures/Screenshots/스크린샷 2026-10-11 005624.png`, 562×642 pixels. The owner requested its background/card/text treatment and finally its original blue palette, including recolored icons/symbol; this is a palette adaptation to EGO's existing screens, not a replacement with smart-home content or geometry.
+- Exact sampled source canvas is #f3f6fd, cards #fff; representative accent pixels are #2d80f6–#4a97fd. Current brand blue #2f86f4 sits in that family. Primary fill beneath white text is intentionally deeper for contrast; top highlighting and shadows stay restrained. This is an accessibility adaptation, not a different accent hue.
+- Existing locally bundled Pretendard/Satoshi and approved app composition remain. App-owned icons/logo retain geometry; symbol blue fill is visible in the captured home/rewards/ranking views. Install/store/icon generation and intro lifecycle are separately verified by the active release task.
+
+**Browser evidence and normalization**
+- Implementation: Chrome, http://127.0.0.1:5175/__qa/, disposable local fixtures only.
+- Home/rewards/profile/library-upload: 390×844 CSS px frame; ranking: 375×812. Frame border excluded gives captured content388×842 /373×810 pixels. Desktop screenshots1707×1695 were cropped using measured frame bounds (x659,y111; ranking x667,y111), density1. No UI rescaling was applied to saved content captures.
+- Full-view combined source/render comparison: `.artifacts/ego-reference-theme/reference-comparison.png`; source kept at562×642; app captures uniformly reduced to642px height for the board. It shows the entire supplied visual and four actual app states together.
+- Focused combined comparison: `.artifacts/ego-reference-theme/focused-comparison.png` contrasts the source card/control area with actual navigation and balance/summary surfaces. Crops are enlarged only for inspection; no new app imagery was produced.
+- Original-size implementation screenshots: `.artifacts/ego-reference-theme/home-390.png`, `wallet-390.png`, `profile-390.png`, `ranking-375.png`.
+- Fix history: `upload-disabled-before-fix.png` plus measured active-gradient/disabled=true evidence; corrected `upload-disabled-fixed.png` plus measured gradient:none. The corrected capture is scrolled to the footer to inspect the disabled button and blue keyboard focus outline.
+
+**Required fidelity surfaces**
+- Fonts/typography: existing Korean typefaces and heading/secondary hierarchy preserved; dark charcoal #242932 and neutral gray #69717e avoid the previous brown captions. No newly clipped headings/labels in the captured states.
+- Spacing/layout: existing app geometry, navigation, card radii and tap targets unchanged.375px ranking clientWidth/scrollWidth both374;390px app both389. The sheet can scroll to its actions and blue keyboard focus stays visible.
+- Colors/tokens: actual canvas computed rgb(243,246,253); cards white with4% neutral soft shadows; selected controls blue gradients; submitted/reviewing badge computed pale blue rgb(237,245,255), text rgb(22,95,183). Warm CSS scan on rendered ranking nodes found no remaining orange/brown color/background/border values. Main text contrast14.6:1; secondary gray on canvas4.55:1; blue text on pale blue5.7:1; white CTA text on main gradient region4.91–5.64:1. Disabled controls are visibly neutral.
+- Image quality/assets: real household footage preserved; original symbol geometry now blue, no CSS filter. Source smart-home images intentionally not copied because this request changes palette only.
+- Copy/content: EGO's existing catalog/session/point copy retained. Fixture identities/counts belong to QA only. No reference smart-home text or implementation instructions introduced into app flows.
+
+**Interactions and limits**
+- Verified route changes home→rewards→profile→ranking→library; profile review filter switched to only the reviewing submission; upload sheet opened/closed and empty-upload save remained disabled; keyboard Tab exposed the focus outline and footer.
+- Browser errors: no app-origin errors captured. One pre-existing browser wallet-extension ethereum injection error was outside the app origin.
+- No production accounts, uploads, real OTP delivery or store submission were performed by this QA. Physical iPhone/Safari remain outside this browser check. Release/native asset verification belongs to the ongoing release task.
+
+**Implementation checklist**
+- Theme linked after participant styles; SW includes it.
+- Disabled primary specificity correction verified after reload.
+- Active release task must mirror final theme into iOS overlay and complete native/build/release checks.
+
+final result: passed
