@@ -1,0 +1,12 @@
+# EGO clay artwork
+
+`ego-clay-original.svg` is the owner's exact selected `04_clay.svg`, preserved byte for byte. It is EGO participant-app artwork, separate from the 60BASE company and Studio logos.
+
+- Original viewBox: `0 0 320 336.7`
+- Size: 3,156 bytes
+- SHA-256: `7406e0bf02d59c102ef17bbb6042067ec96792d9698729e74c4db42aa2401401`
+- Selection date: 2026-10-10; web asset preparation: 2026-10-11.
+
+Preserve the whole artwork's aspect ratio and existing SVG filters. Use `object-fit: contain` when its layout box is square. The accompanying PWA and favicon PNGs are under `/app/icons/`.
+
+Source provenance, renderer, dimensions, validation and native masters are recorded in the workspace archive `brand/husuabi-clay-20261010/EGO-ASSETS-20261011.md`. Store uploads and submissions remain deferred.

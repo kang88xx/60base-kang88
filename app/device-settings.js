@@ -82,7 +82,7 @@ export function renderDeviceSettings({ profile, photo, icon = () => '', message 
       <div class="app-device-photo-preview" aria-label="이 기기 프로필 사진 미리보기">${previewMarkup(photo, safeProfile.name)}</div>
       <div>
         <h3>이 기기 촬영 설정</h3>
-        <p>이름, 촬영 목표, 사진은 현재 브라우저에만 저장됩니다. Google 또는 60BASE 로그인 계정 정보는 <strong>내 정보 수정</strong>에서 관리해주세요.</p>
+        <p>이름, 촬영 목표, 사진은 현재 브라우저에만 저장됩니다. 에고에서 사용하는 로그인 계정 정보는 <strong>내 정보 수정</strong>에서 관리해주세요.</p>
       </div>
     </div>
     <label>표시 이름

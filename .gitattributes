@@ -7,3 +7,6 @@ admin/admin.css -text
 admin/admin.js -text
 app/account-deletion.js -text
 app/sw.js -text
+# Keep the owner's selected vector master byte exact on Windows and CI.
+app/icons/icon.svg -text
+assets/brand/ego-clay-20261010/ego-clay-original.svg -text

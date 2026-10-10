@@ -1,0 +1,61 @@
+{
+  "reason": "Owner-requested EGO branding only. Reverse these exact text changes before comparing to the original production preservation hashes; account deletion and API behavior remain protected.",
+  "files": [
+    {
+      "file": "studio/online-api.js",
+      "replacements": [
+        {
+          "before": "dialog('60BASE 시작하기'",
+          "after": "dialog(document.querySelector('#app-shell')?'에고 시작하기':'60BASE 시작하기'"
+        }
+      ]
+    },
+    {
+      "file": "studio/privacy.html",
+      "replacements": [
+        {
+          "before": "개인정보와 영상 이용 안내 | 60BASE",
+          "after": "개인정보와 영상 이용 안내 | 에고 · 60BASE"
+        },
+        {
+          "before": "<p>운영: 60BASE · 개인정보 및 영상 관련 문의: 60base.ai@gmail.com</p>",
+          "after": "<p>에고(EGO)는 60BASE가 운영하는 촬영 참여 앱입니다.</p><p>운영: 60BASE · 개인정보 및 영상 관련 문의: 60base.ai@gmail.com</p>"
+        }
+      ]
+    },
+    {
+      "file": "studio/delete-account.html",
+      "replacements": [
+        {
+          "before": "계정과 데이터 삭제 | 60BASE",
+          "after": "계정과 데이터 삭제 | 에고 · 60BASE"
+        },
+        {
+          "before": ">60BASE로 돌아가기</a>",
+          "after": ">에고로 돌아가기</a>"
+        },
+        {
+          "before": "<p>60BASE 계정의 삭제와",
+          "after": "<p>에고(EGO)에서 사용하는 60BASE 계정의 삭제와"
+        }
+      ]
+    },
+    {
+      "file": "app/sw.js",
+      "replacements": [
+        {
+          "before": "const CACHE='60base-app-20260928-deletion-v1';",
+          "after": "const CACHE='60base-app-20261011-ego-v1';"
+        },
+        {
+          "before": "\"/app/icons/icon.svg\",",
+          "after": "\"/app/icons/icon.svg\",\n  \"/app/icons/favicon-32.png\","
+        },
+        {
+          "before": "\"/assets/brand/60base-logo3-20260914/60base-logo-dark.svg\",",
+          "after": "\"/assets/brand/ego-clay-20261010/ego-clay-original.svg\","
+        }
+      ]
+    }
+  ]
+}

@@ -61,9 +61,18 @@ test('Studio, administrator, app and shared public files survive the build uncha
   }
 });
 
-test('latest production account-deletion updates and API/routing sources stay byte exact', async () => {
+test('production behavior stays byte exact apart from reviewed EGO brand substitutions', async () => {
   const record = JSON.parse(await readFile(path.join(root, 'docs/operations/PRODUCTION-PRESERVATION-20261009.json'), 'utf8'));
-  for (const file of record.files) assert.equal(hash(await readFile(path.join(root, file.file))), file.productionSha256, file.file);
+  const branding = JSON.parse(await readFile(path.join(root, 'docs/operations/EGO-BRAND-PRESERVATION-20261011.json'), 'utf8'));
+  for (const file of record.files) {
+    let source = await readFile(path.join(root, file.file), 'utf8');
+    const changes = branding.files.find(change => change.file === file.file)?.replacements || [];
+    for (const { before, after } of [...changes].reverse()) {
+      assert.equal(source.split(after).length - 1, 1, `Expected exact reviewed branding in ${file.file}`);
+      source = source.replace(after, before);
+    }
+    assert.equal(hash(source), file.productionSha256, file.file);
+  }
   for (const file of record.protectedSourceFiles) {
     const source = await readFile(path.join(root, file.file));
     const portable = file.normalization === 'LF' ? source.toString('utf8').replaceAll('\r\n', '\n') : source;

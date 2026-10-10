@@ -34,7 +34,7 @@ export function cloudDisplayName() {
 
 export function showCloudAccount({returnTo} = {}) {
   if (openDialog?.isConnected) { if(returnTo)openDialog.dataset.returnTo=returnTo;openDialog.focus(); return; }
-  const element = dialog('60BASE 계정', '<div data-cloud-content></div>');
+  const element = dialog(document.querySelector('#app-shell')?'에고 계정':'60BASE 계정', '<div data-cloud-content></div>');
   element.id = 'cloud-account-dialog';
   element.classList.add('cloud-account-dialog');
   if(returnTo)element.dataset.returnTo=returnTo;

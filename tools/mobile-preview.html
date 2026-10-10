@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>에고 EGO · 모바일 미리보기</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font:13px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:#e9e9e7;color:#202120;height:100dvh;display:flex;flex-direction:column}
+    header{background:#fff;border-bottom:1px solid #d8d8d5;padding:14px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+    .brand{display:flex;align-items:center;gap:10px;white-space:nowrap}.brand b{font-size:16px;letter-spacing:-.5px}.dot{width:8px;height:8px;border-radius:50%;background:#ff5d17}.brand span{color:#696b66}
+    .controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-left:auto}label{display:flex;align-items:center;gap:7px;color:#62645f}[hidden]{display:none!important}select,button,a{font:inherit}select,button{min-height:34px;border:1px solid #deded9;background:white;border-radius:6px;padding:5px 10px;color:#242522}button{cursor:pointer}button:hover{background:#f1f1ed}button[aria-pressed=true]{background:#222;color:#fff;border-color:#222}select:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid #ff5d17;outline-offset:3px}
+    .context{margin:0;padding:7px 24px;background:#f8f8f5;border-bottom:1px solid #d8d8d5;color:#62645f;font-size:12px}.context.live{background:#fff3df;color:#715018}
+    main{flex:1;min-height:0;overflow:auto;display:grid;place-items:center;padding:20px;position:relative;background-image:radial-gradient(#cdcec9 .65px,transparent .65px);background-size:18px 18px}
+    #space{position:relative;flex:none}#device{position:absolute;left:0;top:0;padding:10px;background:#181a18;border-radius:38px;box-shadow:0 16px 40px #0002;transform-origin:top left}iframe{display:block;border:0;border-radius:28px;background:white}#device.wide{border-radius:12px}#device.wide iframe{border-radius:4px}
+    footer{background:#fff;border-top:1px solid #d8d8d5;padding:9px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#656760;font-size:12px}footer a{color:#474a42;text-underline-offset:3px}#dimensions{font-variant-numeric:tabular-nums;white-space:nowrap}.hint{display:flex;align-items:center;gap:7px}.status-dot{width:6px;height:6px;border-radius:50%;background:#378056}
+    @media(max-width:760px){header{padding:10px 14px;gap:10px}.controls{margin-left:0;gap:6px}.brand span{font-size:12px}footer{padding:8px 14px}label>span{display:none}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><i class="dot" aria-hidden="true"></i><b>에고 EGO</b><span>앱 미리보기</span></div>
+    <div class="controls">
+      <label><span>대상</span><select id="target" aria-label="미리보기 대상"><option value="app">앱 · 로컬 편집</option><option value="ios">iOS 앱 화면 · 로컬</option><option value="live">앱 · 운영 사이트</option><option value="homepage">60BASE 홈페이지 · 로컬</option></select></label>
+      <label><span>화면</span><select id="size" aria-label="미리보기 화면 크기"><option value="390,844">iPhone 크기 · 390 × 844</option><option value="375,812">작은 화면 · 375 × 812</option><option value="393,852">iPhone 크기 · 393 × 852</option><option value="430,932">큰 화면 · 430 × 932</option><option value="1440,900">데스크톱 · 1440 × 900</option></select></label>
+      <button id="rotate" type="button" aria-pressed="false">가로 전환</button>
+      <label id="language-control" hidden><span>언어</span><select id="language" aria-label="웹사이트 언어"><option value="en">EN</option><option value="ko">한국어</option></select></label>
+      <label><span>위치</span><select id="section" aria-label="미리보기 화면"></select></label>
+      <button id="scale" type="button" aria-pressed="true">화면에 맞춤</button>
+      <button id="refresh" type="button">새로고침</button>
+    </div>
+  </header>
+  <p class="context" id="context">로컬 앱 소스 · 저장하면 자동 새로고침 · 로그인·계정·서버 기능은 운영 앱에서 확인</p>
+  <main id="stage"><div id="space"><div id="device"><iframe id="screen" title="에고 EGO 촬영 참여 앱 미리보기" src="/app/#home" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads"></iframe></div></div></main>
+  <footer><span class="hint"><i class="status-dot" aria-hidden="true"></i>브라우저 반응형 화면 · 실제 iOS/Safari 아님</span><span id="dimensions" aria-live="polite"></span><a href="/app/#home" id="direct" target="_blank" rel="noopener">전체 창으로 열기</a></footer>
+  <script>
+    const $ = id => document.getElementById(id);
+    let rotated = false, fit = true;
+    const appRoutes=[['home','홈'],['missions','촬영 활동'],['education','촬영 교육·점검'],['estimate','포인트 계산'],['wallet','내 포인트'],['profile','프로필'],['settings','설정'],['library','보관한 영상'],['reviews','제출·심사'],['support','문의·도움']];
+    const homepageRoutes=[['hero','첫 화면'],['data','Selected Data'],['services','Services'],['process','How it works'],['quality','Quality'],['faq','FAQ'],['contact','Contact']];
+    const requestedTarget=new URLSearchParams(location.search).get('view');
+    if(['app','ios','live','homepage'].includes(requestedTarget)) $('target').value=requestedTarget;
+    function layout(){
+      let [w,h] = $('size').value.split(',').map(Number);
+      if(rotated) [w,h] = [h,w];
+      const scale = fit ? Math.min(1,Math.max(.1,($('stage').clientWidth-40)/(w+20)),Math.max(.1,($('stage').clientHeight-40)/(h+20))) : 1;
+      $('screen').style.width=w+'px'; $('screen').style.height=h+'px';
+      $('device').style.width=(w+20)+'px'; $('device').style.height=(h+20)+'px';
+      $('device').style.transform=`scale(${scale})`;
+      $('device').classList.toggle('wide',w>h);
+      $('space').style.width=(w+20)*scale+'px'; $('space').style.height=(h+20)*scale+'px';
+      $('dimensions').textContent=`${w} × ${h} · ${Math.round(scale*100)}%`;
+      $('rotate').setAttribute('aria-pressed',String(rotated));
+      $('rotate').textContent=rotated?'세로 전환':'가로 전환';
+      $('scale').setAttribute('aria-pressed',String(fit));
+      $('scale').textContent=fit?'화면에 맞춤':'실제 크기 100%';
+    }
+    function previewAddress(){
+      if($('target').value==='homepage') return `/homepage/?lang=${$('language').value}#${$('section').value}`;
+      if($('target').value==='ios') return `/__ios/app/#${$('section').value}`;
+      return `${$('target').value==='live'?'https://60base.ai':''}/app/#${$('section').value}`;
+    }
+    function load(){
+      const url=previewAddress();
+      $('screen').src=url; $('direct').href=url;
+    }
+    function changeTarget(){
+      const isHomepage=$('target').value==='homepage', isLive=$('target').value==='live';
+      $('language-control').hidden=!isHomepage;
+      $('section').replaceChildren(...(isHomepage?homepageRoutes:appRoutes).map(([value,label])=>new Option(label,value)));
+      $('context').classList.toggle('live',isLive);
+      $('context').textContent=isLive?'운영 앱 · 실제 계정·데이터에 연결 · 로컬 코드 변경은 반영되지 않음 · 로그인이 막히면 전체 창으로 열기':isHomepage?'회사 홈페이지 소스 · 저장하면 자동 반영 · 로컬 서버 기능 연결 없음':$('target').value==='ios'?'iOS 앱용 웹 화면 · 브라우저 렌더링 · 네이티브 로그인·촬영 기능 제외 · 모바일 빌드 후 화면에 반영':'로컬 앱 소스 · 저장하면 자동 새로고침 · 로그인·계정·서버 기능은 운영 앱에서 확인';
+      $('screen').title=isHomepage?'60BASE 회사 홈페이지 미리보기':'에고 EGO 촬영 참여 앱 미리보기';
+      load();
+    }
+    $('size').addEventListener('change',layout);
+    $('rotate').addEventListener('click',()=>{rotated=!rotated;layout()});
+    $('scale').addEventListener('click',()=>{fit=!fit;layout()});
+    $('language').addEventListener('change',load);
+    $('target').addEventListener('change',changeTarget);
+    $('section').addEventListener('change',()=>{
+      if($('target').value==='live') load();
+      else {try{$('screen').contentWindow.location.hash=$('section').value;}catch{load();}}
+      $('direct').href=previewAddress();
+    });
+    $('refresh').addEventListener('click',()=>{try{$('screen').contentWindow.location.reload();}catch{load();}});
+    $('screen').addEventListener('load',()=>{
+      if($('target').value==='live') return;
+      // Desktop scrollbars consume width; mobile browsers use overlay scrollbars.
+      try {
+        const doc=$('screen').contentDocument;
+        if(!doc) return;
+        if(!doc.getElementById('mobile-preview-scrollbars')) {
+          const style=doc.createElement('style');
+          style.id='mobile-preview-scrollbars';
+          style.textContent='html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';
+          doc.head.append(style);
+        }
+        $('screen').contentWindow.addEventListener('hashchange',()=>{
+          const current=$('screen').contentWindow.location.hash.slice(1);
+          if([...$('section').options].some(option=>option.value===current)) $('section').value=current;
+          $('direct').href=$('screen').contentWindow.location.href;
+        });
+      } catch {}
+    });
+    new ResizeObserver(layout).observe($('stage'));
+    changeTarget();
+    layout();
+  </script>
+</body>
+</html>

@@ -1,5 +1,15 @@
 # 60BASE web release
 
+## EGO participant app · 2026-10-11
+
+The owner renamed the participant app to 에고 / EGO per workspace-root NAMING-EGO-2026-10-10.md. Company 60BASE, domains, account/backend identifiers and native bundle ID kr.base60.app remain unchanged. Use the byte-exact selected 04_clay.svg master in assets/brand/ego-clay-20261010 and app/icons; do not recolor, flatten to a monochrome mark, crop it with the previous radial loading mask or claim it is maskable. App name, launch, installation, settings, favicon and homepage contributor entry now use EGO. Protected production behavior still compares against the original hashes after reversing only the explicit brand text changes recorded in docs/operations/EGO-BRAND-PRESERVATION-20261011.json.
+
+Windows mobile preview defaults to the actual participant /app/#home, with local source and live https://60base.ai/app/#home modes plus optional company homepage. Run npm run dev:mobile, open http://127.0.0.1:5173/__mobile/ and keep it available while editing. App saves trigger reload; homepage uses React HMR. Development APIs are deliberately disconnected; the live mode is the actual operating service. This is a browser preview, not an iOS runtime. Store listing/icon upload remains deferred to the owner's combined update; prepared private iOS source and opaque store artwork are outside this public checkout.
+
+## Windows mobile preview workflow · 2026-10-10
+
+The owner requests working with a visible mobile preview on Windows. The 2026-10-11 app preview workflow above supersedes the earlier company-homepage default. Workspace-root `모바일-미리보기.cmd` and the VS Code mobile preview task reopen it. Avoid `start-preview.bat` / `npm start` for the current homepage because they serve the older root source. Keep the helper development-only and loopback-only; do not deploy the preview page.
+
 ## Mobile arrows and selected app artwork · 2026-10-10
 
 The owner requests identical desktop/mobile arrows: use the shared inline SVG Arrow, never emoji-prone Unicode arrow glyphs. Remove the mobile Selected Data instruction sentence and its divider in both locales and keep the compact spacing before the shared Hugging Face link.

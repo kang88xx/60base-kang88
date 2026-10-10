@@ -45,15 +45,17 @@ export function FixedPromo({ language = 'en' }) {
 
     const badge = document.createElement('a');
     badge.className = 'base60-training-badge';
-    badge.href = '/studio/';
-    badge.setAttribute('aria-label', '60BASE Studio · Physical AI Training Data');
+    badge.href = '/app/#home';
+    badge.setAttribute('aria-label', language === 'en' ? 'EGO · Open the contributor app' : '에고 EGO · 촬영 참여 앱 열기');
     const symbol = document.createElement('img');
-    symbol.src = '/assets/promo/service-favicon.png';
+    symbol.src = '/app/icons/icon.svg';
     symbol.alt = '';
     symbol.width = 32;
     symbol.height = 32;
     const label = document.createElement('span');
-    label.innerHTML = '<span>PHYSICAL AI</span><span>TRAINING DATA</span>';
+    label.innerHTML = language === 'en'
+      ? '<span>EGO</span><span>CONTRIBUTOR APP</span>'
+      : '<span>에고 EGO</span><span>내 시점이 AI가 된다</span>';
     badge.append(symbol, label);
     controller.element.querySelector('.opal-promo-inner').append(badge);
 
@@ -69,7 +71,7 @@ export function FixedPromo({ language = 'en' }) {
       observer.disconnect();
       controller.destroy();
     };
-  }, []);
+  }, [language]);
 
-  return <aside id="fixed-promo-host" className="fixed-promo-dock" ref={hostRef} aria-label={language === 'en' ? '60BASE apps and contributor Studio' : '60BASE 앱 및 촬영 참여 Studio'} />;
+  return <aside id="fixed-promo-host" className="fixed-promo-dock" ref={hostRef} aria-label={language === 'en' ? 'EGO contributor app by 60BASE' : '60BASE의 촬영 참여 앱 에고'} />;
 }

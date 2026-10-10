@@ -1,4 +1,4 @@
-const CACHE='60base-app-20260928-deletion-v1';
+const CACHE='60base-app-20261011-ego-v1';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -17,6 +17,7 @@ const SHELL=[
   "/app/device-settings.css",
   "/app/manifest.webmanifest",
   "/app/icons/icon.svg",
+  "/app/icons/favicon-32.png",
   "/app/icons/icon-192.png",
   "/app/icons/icon-512.png",
   "/shared/base.css",
@@ -39,7 +40,7 @@ const SHELL=[
   "/studio/firebase-config.js",
   "/fonts/PretendardVariable.woff2",
   "/fonts/inter-tight/inter-tight-latin-variable.woff2",
-  "/assets/brand/60base-logo3-20260914/60base-logo-dark.svg",
+  "/assets/brand/ego-clay-20261010/ego-clay-original.svg",
   "/assets/brand/google-signin-g.png",
   "/app/icons/phosphor/arrow-clockwise.svg",
   "/app/icons/phosphor/arrow-left.svg",

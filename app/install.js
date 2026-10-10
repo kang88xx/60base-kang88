@@ -11,7 +11,7 @@ export function initializeInstall(options={}){
  publish({installed:display.matches||navigator.standalone===true});
  display.addEventListener?.('change',()=>publish({installed:display.matches||navigator.standalone===true}));
  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredPrompt=event;publish({available:true});});
- window.addEventListener('appinstalled',()=>{deferredPrompt=null;publish({installed:true,available:false});onMessage('60BASE가 홈 화면에 추가됐어요.');});
+ window.addEventListener('appinstalled',()=>{deferredPrompt=null;publish({installed:true,available:false});onMessage('에고가 홈 화면에 추가됐어요.');});
  if('serviceWorker'in navigator&&window.isSecureContext){
   navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).then(value=>{
    registration=value;
@@ -29,7 +29,7 @@ export async function requestInstall(){
   return;
  }
  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
- dialog('홈 화면에 60BASE 추가',ios?'<p>Safari에서 공유 버튼을 누른 뒤 <strong>홈 화면에 추가</strong>를 선택해주세요.</p><p class="online-help">다른 앱 안에서 열었다면 먼저 Safari로 열어주세요.</p>':'<p>브라우저 메뉴에서 <strong>앱 설치</strong> 또는 <strong>홈 화면에 추가</strong>를 선택해주세요.</p><p class="online-help">설치 메뉴가 보이지 않으면 최신 Chrome 또는 Edge에서 열어주세요. 브라우저에서도 촬영과 제출을 이용할 수 있습니다.</p>');
+ dialog('홈 화면에 에고 추가',ios?'<p>Safari에서 공유 버튼을 누른 뒤 <strong>홈 화면에 추가</strong>를 선택해주세요.</p><p class="online-help">다른 앱 안에서 열었다면 먼저 Safari로 열어주세요.</p>':'<p>브라우저 메뉴에서 <strong>앱 설치</strong> 또는 <strong>홈 화면에 추가</strong>를 선택해주세요.</p><p class="online-help">설치 메뉴가 보이지 않으면 최신 Chrome 또는 Edge에서 열어주세요. 브라우저에서도 촬영과 제출을 이용할 수 있습니다.</p>');
 }
 export function applyAppUpdate(){
  if(!registration?.waiting)return;

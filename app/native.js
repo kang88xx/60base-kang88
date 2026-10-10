@@ -53,7 +53,7 @@ export async function shareNativeBlob(blob,filename){
    if(offset===0)await Filesystem.writeFile({path,directory,data});else await Filesystem.appendFile({path,directory,data});
   }
   const {uri}=await Filesystem.getUri({path,directory});
-  await Share.share({title:'60BASE 영상',files:[uri],dialogTitle:'영상 저장 또는 공유'});
+  await Share.share({title:'에고 영상',files:[uri],dialogTitle:'영상 저장 또는 공유'});
   return true;
  }finally{await deleteShareFile(Filesystem,path,directory);}
 }

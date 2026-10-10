@@ -1,8 +1,8 @@
 {
   "id": "/app/",
-  "name": "60BASE · 촬영 참여",
-  "short_name": "60BASE",
-  "description": "한국의 일상을 촬영하고, 심사와 포인트를 확인하는 60BASE 앱",
+  "name": "에고 EGO · 촬영 참여",
+  "short_name": "에고",
+  "description": "내 시점이 AI가 된다. 일상을 촬영하고, 심사와 포인트를 확인하는 에고(EGO) 앱",
   "lang": "ko-KR",
   "start_url": "/app/",
   "scope": "/app/",
@@ -18,13 +18,13 @@
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "shortcuts": [
