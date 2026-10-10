@@ -67,17 +67,8 @@
     display: block;
   }
 
-  #main .section-data.data-catalog.data-editorial .catalog-mobile-hint {
-    margin: 18px 0 2px;
-    color: #777;
-    font-size: 12px;
-    line-height: 1.6;
-  }
-
   #main .section-data.data-catalog.data-editorial .catalog-mobile-hf {
-    margin-top: 16px;
-    padding-top: 8px;
-    border-top: 1px solid #e4e4e4;
+    margin-top: 12px;
   }
 
   #main .section-data.data-catalog.data-editorial .catalog-mobile-hf .editorial-hf {

@@ -1,5 +1,11 @@
 # 60BASE web release
 
+## Mobile arrows and selected app artwork · 2026-10-10
+
+The owner requests identical desktop/mobile arrows: use the shared inline SVG Arrow, never emoji-prone Unicode arrow glyphs. Remove the mobile Selected Data instruction sentence and its divider in both locales and keep the compact spacing before the shared Hugging Face link.
+
+The owner selected `C:/Users/kslee/Desktop/app_icon_variations_opus/04_clay.svg` as the app image/icon. Its byte-exact master and selection record are saved at `../../brand/husuabi-clay-20261010/`. Use this artwork when adding app imagery to the website. App Store icon and listing updates are explicitly deferred to a later combined update; do not build/upload/submit a store change for this request. Existing Apple/Android platform marks and company/Studio logos are separate from the app artwork.
+
 ## Full homepage QA · 2026-10-10
 
 The owner requested full homepage code/text/behavior QA and mobile optimization and selected mobile Selected Data option2: a compact2×2 grid below601px, with a shared Hugging Face link and full descriptions in the film dialog. Desktop stays unchanged. Keep HOW IT WORKS fine outlines and QUALITY animated trails/rings at a consistent1 CSSpx using non-scaling SVG strokes, preserving original geometry/timing and Services linework. The main mobile hero uses the960×540 mobile encoding up to600px; desktop keeps the original graded video. Restore the published Korean company-profile PDF link. Preserve sample once-through playback while suspending background previews during the film dialog. `check:homepage` includes the media playback regression tests; the comparison hub and QA screenshot report remain excluded from production.

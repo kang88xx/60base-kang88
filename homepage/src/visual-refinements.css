@@ -448,6 +448,10 @@ html, body { overflow-x: clip; }
   overflow-wrap: anywhere;
 }
 
+.arrow svg {
+  display: block;
+}
+
 .section-contact .contact-direct-email .arrow {
   font-size: 17px;
   flex-shrink: 0;

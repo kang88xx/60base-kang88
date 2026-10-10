@@ -85,7 +85,6 @@ export function SelectedData({ t, samples, localeIndex, onOpenFilm, filmOpen = f
             })}
           </div>
           <div className="catalog-mobile-summary">
-            <p className="catalog-mobile-hint">{localeIndex === 1 ? '샘플을 눌러 영상과 전체 설명을 확인하세요.' : 'Select a sample to view the film and full description.'}</p>
             <div className="catalog-mobile-hf">
               <a className="catalog-action editorial-hf" href="https://huggingface.co/datasets/60base/korea-household-egocentric-samples" target="_blank" rel="noopener noreferrer"><img src="/assets/brand/huggingface-logo.svg" className="editorial-hf-logo" alt="" aria-hidden="true" width="16" height="16" /><span>SAMPLE ON HUGGING FACE</span><img src="/assets/icons/selected-data-arrow-up-right.svg" className="editorial-arrow" alt="" aria-hidden="true" width="16" height="16" /></a>
             </div>

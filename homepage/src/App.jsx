@@ -102,7 +102,9 @@ const samples = [
   { id: 'dishwashing-2', category: 'kitchen', title: ['Rinsing dishes', '식기 헹구기'], desc: ['Following the flow from washing to rinsing.', '세척에서 헹굼으로 이어지는 움직임.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
 ];
 
-function Arrow({ diagonal = false }) { return <span className="arrow" aria-hidden="true">{diagonal ? '↗' : '→'}</span>; }
+function Arrow({ diagonal = false }) {
+  return <span className="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" focusable="false"><path d={diagonal ? 'M6 18 18 6M6 6h12v12' : 'M4 12h16M14 6l6 6-6 6'} /></svg></span>;
+}
 function Multiline({ text }) { return text.split('\n').map((line, i) => <span key={line}>{i > 0 && <br />}{line}</span>); }
 function SectionLabel({ children }) { return <div className="section-label"><span>{children}</span></div>; }
 
