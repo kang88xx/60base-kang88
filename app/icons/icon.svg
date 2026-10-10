@@ -1,31 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 336.7" width="320" height="336.7">
-<title>클레이 (Claymorphism)</title>
-<defs>
-<clipPath id="i04_clip"><rect width="320" height="336.7" rx="42.7" ry="42.7"/></clipPath>
-<linearGradient id="i04_bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbf6f1"/><stop offset="1" stop-color="#f1e7de"/></linearGradient>
-<filter id="i04_clay" x="-20%" y="-20%" width="140%" height="140%">
- <feOffset in="SourceAlpha" dx="10" dy="12" result="o1"/><feGaussianBlur in="o1" stdDeviation="10" result="b1"/>
- <feComposite in="SourceAlpha" in2="b1" operator="out" result="hi"/><feFlood flood-color="#fff" flood-opacity=".75"/><feComposite in2="hi" operator="in" result="hiC"/>
- <feOffset in="SourceAlpha" dx="-10" dy="-14" result="o2"/><feGaussianBlur in="o2" stdDeviation="10" result="b2"/>
- <feComposite in="SourceAlpha" in2="b2" operator="out" result="sh"/><feFlood flood-color="#a8380a" flood-opacity=".6"/><feComposite in2="sh" operator="in" result="shC"/>
- <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="hiC"/><feMergeNode in="shC"/></feMerge>
-</filter>
-<filter id="i04_clayEye" x="-60%" y="-60%" width="220%" height="240%">
- <feOffset in="SourceAlpha" dx="-4" dy="-5" result="o2"/><feGaussianBlur in="o2" stdDeviation="4" result="b2"/>
- <feComposite in="SourceAlpha" in2="b2" operator="out" result="sh"/><feFlood flood-color="#b9a99c" flood-opacity=".7"/><feComposite in2="sh" operator="in" result="shC"/>
- <feDropShadow in="SourceAlpha" dx="3" dy="6" stdDeviation="4" flood-color="#8a2b00" flood-opacity=".4" result="ds"/>
- <feMerge><feMergeNode in="ds"/><feMergeNode in="SourceGraphic"/><feMergeNode in="shC"/></feMerge>
-</filter>
-<filter id="i04_clayPup" x="-80%" y="-80%" width="260%" height="260%">
- <feOffset in="SourceAlpha" dx="1.5" dy="2" result="o"/><feGaussianBlur in="o" stdDeviation="1.5" result="b"/>
- <feComposite in="SourceAlpha" in2="b" operator="out" result="hi"/><feFlood flood-color="#fff" flood-opacity=".35"/><feComposite in2="hi" operator="in" result="hiC"/>
- <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="hiC"/></feMerge>
-</filter>
-</defs>
-<rect fill="url(#i04_bg)" width="320" height="336.7" rx="42.7" ry="42.7"/>
-<g clip-path="url(#i04_clip)"><path fill="#ff6b2b" d="M287,335.6l-13-133.9c-9.1-64.3-54.9-91.3-54.9-91.3-78.7-47.7-151.8-6-151.8-6L0,147v147c0,23.6,19.1,42.7,42.7,42.7h234.7c3.3,0,6.6-.4,9.7-1.1Z" filter="url(#i04_clay)"/></g>
-<g filter="url(#i04_clayEye)"><circle cx="180" cy="160.3" r="21" fill="#fffaf5"/><circle cx="216.9" cy="160.3" r="21" fill="#fffaf5"/></g>
-<g filter="url(#i04_clayPup)"><rect x="182" y="167.7" width="9.6" height="14.6" rx="4.8" ry="4.8" fill="#2b211c"/><rect x="218.9" y="167.7" width="9.6" height="14.6" rx="4.8" ry="4.8" fill="#2b211c"/></g>
-<path fill="#c9b8aa" opacity=".35" d="M277.3,0H42.7C19.1,0,0,19.1,0,42.7v251.3c0,23.6,19.1,42.7,42.7,42.7h234.7c23.6,0,42.7-19.1,42.7-42.7V42.7c0-23.6-19.1-42.7-42.7-42.7ZM312,294c0,19.1-15.6,34.7-34.7,34.7H42.7c-19.1,0-34.7-15.6-34.7-34.7V42.7c0-19.1,15.6-34.7,34.7-34.7h234.7c19.1,0,34.7,15.6,34.7,34.7v251.3Z"/>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 320 336.7">
+  <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #ff5d17;
+      }
+
+      .st1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <path class="st0" d="M287,335.6l-13-133.9c-9.1-64.3-54.9-91.3-54.9-91.3-78.7-47.7-151.8-6-151.8-6L0,147v189.7h277.4c3.3,0,6.6-.4,9.7-1.1h-.1Z"/>
+  <circle class="st1" cx="180" cy="160.3" r="21"/>
+  <path d="M186.8,167.7h0c2.7,0,4.8,2.1,4.8,4.8v5c0,2.7-2.1,4.8-4.8,4.8h0c-2.7,0-4.8-2.1-4.8-4.8v-5c0-2.7,2.1-4.8,4.8-4.8Z"/>
+  <circle class="st1" cx="216.9" cy="160.3" r="21"/>
+  <path d="M223.7,167.7h0c2.7,0,4.8,2.1,4.8,4.8v5c0,2.7-2.1,4.8-4.8,4.8h0c-2.7,0-4.8-2.1-4.8-4.8v-5c0-2.7,2.1-4.8,4.8-4.8Z"/>
 </svg>

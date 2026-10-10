@@ -1,8 +1,8 @@
 # 60BASE web release
 
-## App icon and in-app symbol separation · 2026-10-11
+## Final EGO artwork selection · 2026-10-11
 
-The owner clarified: 04_clay.svg is only the installed/store app icon. Keep its icon.svg, 192/512 PNG, Apple touch icon and App Store artwork unchanged. Inside the app, use the byte-exact transparent C:/Users/kslee/Desktop/app_simbol.svg saved as app/icons/symbol.svg and assets/brand/ego-clay-20261010/ego-symbol-original.svg. Header, launch, loading, web favicon and website app symbol use this transparent symbol, without an added white card, monochrome filter or crop. This clarification supersedes earlier instructions to use the clay app icon throughout the UI. Store upload remains deferred.
+The owner's latest instruction uses C:/Users/kslee/Desktop/app_simbol.svg for BOTH the installed app icon and all in-app symbols. This supersedes the earlier clay-only install-icon choice and the temporary split between icon and symbol. Byte-exact source copies are app/icons/icon.svg, app/icons/symbol.svg and assets/brand/ego-clay-20261010/ego-symbol-original.svg. PWA 192/512 and favicon PNGs derive from this source; iOS/store 1024 artwork is prepared outside this public checkout. Preserve original geometry and transparent in-app background, with no added white card, clay effects, monochrome filter or crop. Historical clay masters remain archived but are not the current artwork. Store upload remains deferred.
 
 ## EGO participant app · 2026-10-11
 
