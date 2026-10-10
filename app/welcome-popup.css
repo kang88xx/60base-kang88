@@ -1,0 +1,18 @@
+.ego-welcome-dialog{width:min(420px,calc(100vw - 36px));max-height:calc(100dvh - 48px);padding:0;border:0;border-radius:28px;background:#fff;color:#20201e;box-shadow:0 24px 80px #0003;overflow:auto;font-family:inherit}
+.ego-welcome-dialog::backdrop{background:rgba(25,25,22,.48)}
+.ego-welcome-card{padding:28px 26px 24px;text-align:center}
+.ego-welcome-preview{margin:0 0 16px;padding:7px 12px;border-radius:8px;background:#fff3ec;color:#aa4215;font-size:12px}
+.ego-welcome-art{height:150px;margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+.ego-welcome-art img{display:block;width:100%;height:100%;object-fit:contain;filter:none;mask:none;border-radius:0}
+.ego-welcome-card [hidden]{display:none!important}
+.ego-welcome-eyebrow{margin:0 0 10px;color:#df4a0c;font-size:11px;font-weight:700;letter-spacing:.08em}
+.ego-welcome-card h2{margin:0;color:#191a18;font-size:26px;line-height:1.35;letter-spacing:-.055em;font-weight:750;overflow-wrap:anywhere}
+.ego-welcome-body{margin:15px 0 26px;color:#72746f;font-size:14px;line-height:1.7;letter-spacing:-.025em;white-space:pre-wrap;overflow-wrap:anywhere}
+.ego-welcome-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ego-welcome-actions button{min-height:48px;border:0;border-radius:999px;padding:13px 12px;font:inherit;font-size:14px;font-weight:700;line-height:1.35;cursor:pointer;overflow-wrap:anywhere}
+.ego-welcome-close{background:#f3f3f1;color:#333630}
+.ego-welcome-primary{background:#ff5d17;color:#27190f}
+.ego-welcome-actions button:focus-visible{outline:3px solid #161713;outline-offset:3px}
+.ego-welcome-close:hover{background:#eaeae6}.ego-welcome-primary:hover{background:#e64e0f}
+@media(max-width:360px){.ego-welcome-card{padding:24px 20px 20px}.ego-welcome-card h2{font-size:23px}.ego-welcome-art{height:125px}.ego-welcome-actions button{font-size:13px}}
+@media(prefers-reduced-motion:no-preference){.ego-welcome-dialog[open]{animation:ego-welcome-enter .18s ease-out}@keyframes ego-welcome-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}}

@@ -3,7 +3,7 @@ import { isIP } from 'node:net';
 const MAX_BODY_BYTES = 2_097_152;
 const COMPLETE_TIMEOUT_MS = 285_000;
 const ALLOWED_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']);
-const AUTH_ENTRY_PATHS = new Set(['/api/auth/login', '/api/auth/firebase', '/api/auth/register']);
+const SESSION_INDEPENDENT_POST_PATHS = new Set(['/api/auth/login', '/api/auth/firebase', '/api/auth/register', '/api/account/deletion/receipt']);
 const HOP_BY_HOP = new Set(['connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization', 'te', 'trailer', 'transfer-encoding', 'upgrade']);
 const STRIP_REQUEST = new Set(['host', 'authorization', 'proxy-authorization', 'x-dongjakso-gateway-key', 'x-dongjakso-client-ip', 'x-forwarded-host', 'x-forwarded-proto', 'x-real-ip', 'cf-connecting-ip']);
 const COPY_RESPONSE = new Set(['content-type', 'content-length', 'content-range', 'accept-ranges', 'etag', 'last-modified', 'cache-control', 'referrer-policy', 'cross-origin-resource-policy']);
@@ -76,9 +76,9 @@ export async function proxyOperations(req, res, { fetchImpl = globalThis.fetch, 
   if (!['GET', 'HEAD'].includes(req.method || '')) {
     const cookies = parseCookies(req.headers.cookie || '');
     // Only the backend can distinguish an active session from a stale HttpOnly cookie.
-    // Auth entry routes delegate session-CSRF validation to its existing csrf() guard.
-    const authEntry = req.method === 'POST' && AUTH_ENTRY_PATHS.has(operationPath);
-    if (!isAllowedOrigin(req) || !cookies || (!authEntry && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });
+    // Login and possession-authorized receipt reads delegate active-session CSRF validation to the backend.
+    const sessionIndependent = req.method === 'POST' && SESSION_INDEPENDENT_POST_PATHS.has(operationPath);
+    if (!isAllowedOrigin(req) || !cookies || (!sessionIndependent && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });
   }
   const upstreamUrl = buildUpstreamUrl(spaceUrl, operationPath, search);
   const headers = requestHeaders(req.headers, gatewayKey, hfToken);

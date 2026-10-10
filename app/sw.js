@@ -1,8 +1,15 @@
-const CACHE='60base-app-20261011-ego-lowercase-v4';
+const CACHE='60base-app-20261011-ego-experience-v5';
 const SHELL=[
   "/app/",
   "/app/index.html",
   "/app/app.js",
+  "/app/access-boundary.js",
+  "/app/community.js",
+  "/app/experience-ui.js",
+  "/app/ego-experience.css",
+  "/app/ego-forms.css",
+  "/app/welcome-popup.js",
+  "/app/welcome-popup.css",
   "/app/account-deletion.js",
   "/app/native.js",
   "/app/app.css",
@@ -73,6 +80,7 @@ const SHELL=[
   "/app/icons/phosphor/sign-out.svg",
   "/app/icons/phosphor/squares-four.svg",
   "/app/icons/phosphor/t-shirt.svg",
+  "/app/icons/phosphor/trophy.svg",
   "/app/icons/phosphor/upload-simple.svg",
   "/app/icons/phosphor/user.svg",
   "/app/icons/phosphor/video-camera.svg",

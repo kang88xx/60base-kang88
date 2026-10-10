@@ -1,16 +1,21 @@
 import { isNativeApp } from './native.js';
 import { openAccountDeletion } from './account-deletion.js';
 import { activities, categories, examples, exampleFor, activityFor } from './catalog.js';
-import { getAppState, subscribeApp, refreshApp, appReady, login, logout, manageAccount, record, importVideo, openClip, submitClip, viewSubmission, resubmitSubmission, mountSupport } from './service.js';
+import { getAppState, subscribeApp, refreshApp, appReady, login, logout, manageAccount, record, importVideo, openClip, submitClip, viewSubmission, resubmitSubmission, mountSupport, requireFreshAppSession } from './service.js';
 import { dialog, esc, points, money, date, size } from '../studio/online-api.js';
 import { initializeInstall, requestInstall, getInstallState, applyAppUpdate } from './install.js';
 import { getPreparationState, subscribePreparation, toggleSavedActivity, selectPreparationActivity, renderEducation, handlePreparationClick, handlePreparationChange } from './preparation.js';
 import { openDeviceSettings, getDevicePhoto } from './device-settings.js';
 import { updateLaunch } from './launch.js';
+import { canEnterApp } from './access-boundary.js';
+import { welcomeScreen, homeScreen, rankingScreen, profileScreen } from './experience-ui.js';
+import { getCommunity, subscribeCommunity, refreshCommunity } from './community.js';
+import { showAccountEntry } from '../studio/online.js';
+import { initializeWelcomePopup } from './welcome-popup.js';
 
 const main=document.querySelector('#app-main'), header=document.querySelector('#app-header'), shell=document.querySelector('.app-shell'), nav=document.querySelector('.app-bottom-nav');
 const ui={category:'전체',query:'',savedOnly:false,examplesOnly:false,reviewFilter:'all',reviewQuery:'',libraryQuery:'',libraryStatus:'all',librarySort:'newest',feature:0,estimateCount:3,estimateActivity:'dishwashing'};
-const titles={home:'홈',missions:'촬영 활동',activity:'활동 안내',guide:'촬영 가이드',education:'촬영 교육·점검',estimate:'포인트 계산',announcements:'운영 안내',library:'보관한 영상',reviews:'제출·심사',wallet:'내 포인트',profile:'프로필',settings:'설정',support:'문의·도움'};
+const titles={home:'홈',ranking:'랭킹',missions:'촬영 활동',activity:'활동 안내',guide:'촬영 가이드',education:'촬영 교육·점검',estimate:'포인트 계산',announcements:'운영 안내',library:'보관한 영상',reviews:'제출·심사',wallet:'보상',profile:'프로필',settings:'설정',support:'문의·도움'};
 let toastTimer,renderQueued=false;
 const pendingActions=new Map();
 const markupCache=new WeakMap();
@@ -30,7 +35,7 @@ function updateProgress(){
  const needsAccount=state.access==='checking'||state.accountConnecting;
  const message=action?.message||(needsAccount?'계정을 확인하고 있어요.':state.loading?(['profile','wallet','reviews','library'].includes(current.name)?'내역을 불러오고 있어요.':'최신 활동을 확인하고 있어요.'):'');
  const cameraOpen=Boolean(document.querySelector('.studio-camera-dialog[open]'));
- node.hidden=!message||cameraOpen||Boolean(main.querySelector('.app-loading'));
+ node.hidden=!canEnterApp(state)||!message||cameraOpen||Boolean(main.querySelector('.app-loading'));
  node.querySelector('[data-progress-message]').textContent=message;
  for(const button of document.querySelectorAll('[data-app-action]')){
   const key=button.dataset.appAction+':'+(button.dataset.id||'');
@@ -40,7 +45,7 @@ function updateProgress(){
  }
 }
 
-const guardedActions=new Set(['login','logout','account','device-settings','record','import','open-clip','submit-clip','submit-video','view-submission','resubmit','refresh','install','update-app']);
+const guardedActions=new Set(['share-app','refresh-community','login','logout','account','device-settings','record','import','open-clip','submit-clip','submit-video','view-submission','resubmit','refresh','install','update-app']);
 function focusSelector(node){
  if(!node||!shell.contains(node))return '';
  if(node.id)return '#'+CSS.escape(node.id);
@@ -64,21 +69,18 @@ function empty(title,copy,action=''){return `<section class="app-empty"><span cl
 function button(label,action,extra='',kind='primary'){return `<button type="button" class="app-button ${kind}" data-app-action="${action}" ${extra}>${label}</button>`;}
 function backHref(current){if(['activity','education','estimate'].includes(current.name))return '#missions';if(current.name==='guide')return current.step>1?`#guide/${current.id||tasks()[0]?.id}/${current.step-1}`:current.id?`#activity/${current.id}`:'#home';if(['settings','library','reviews','support'].includes(current.name))return '#profile';return '#home';}
 function renderHeader(current,state){
- if(current.name==='home')setMarkup(header,`<a class="app-brand" href="#home" aria-label="에고 홈"><img src="icons/symbol.svg" width="34" height="36" alt=""><span>ego</span></a>${state.access==='allowed'?`<a href="#wallet" class="header-points" aria-label="내 포인트 ${state.me?points(state.me.wallet.available):'확인'}">${pointPill(state.me?state.me.wallet.available:'—','compact')}</a>`:`<button type="button" class="header-signin" data-app-action="login">회원가입 / 로그인 ${icon('arrow-right')}</button>`}`);
+ if(['home','ranking','wallet'].includes(current.name))setMarkup(header,`<a class="app-brand" href="#home" aria-label="에고 홈"><img src="icons/symbol.svg" width="34" height="36" alt=""><span>ego</span></a>${state.access==='allowed'?`<a href="#wallet" class="header-points" aria-label="내 포인트 ${state.me?points(state.me.wallet.available):'확인'}">${pointPill(state.me?state.me.wallet.available:'—','compact')}</a>`:`<button type="button" class="header-signin" data-app-action="login">회원가입 / 로그인 ${icon('arrow-right')}</button>`}`);
  else setMarkup(header,`<a class="app-back" href="${backHref(current)}" aria-label="이전 화면">${icon('arrow-left')}</a><span class="header-title">${esc(titles[current.name])}</span>${current.name==='profile'?`<a class="app-back" href="#settings" aria-label="설정">${icon('gear')}</a>`:current.name==='library'?`<button type="button" class="app-back" data-app-action="import" aria-label="영상 가져오기">${icon('plus')}</button>`:'<span class="header-spacer"></span>'}`);
 }
 function renderNav(current){
- const active=['activity','guide','education','estimate'].includes(current.name)?'missions':['library','reviews','settings','support','announcements'].includes(current.name)?'profile':current.name;
- setMarkup(nav,[['home','house','홈'],['missions','squares-four','활동'],['wallet','wallet','포인트'],['profile','user','프로필']].map(([id,image,label])=>`<a href="#${id}" data-tab="${id}" ${active===id?'aria-current="page"':''}>${icon(image)}<span>${label}</span></a>`).join(''));
+ const active=['missions','activity','guide','education','estimate'].includes(current.name)?'home':['library','reviews','settings','support','announcements'].includes(current.name)?'profile':current.name;
+ setMarkup(nav,[['home','house','홈'],['ranking','trophy','랭킹'],['wallet','wallet','보상'],['profile','user','프로필']].map(([id,image,label])=>`<a href="#${id}" data-tab="${id}" aria-label="${label}" ${active===id?'aria-current="page"':''}>${icon(image)}<span>${label}</span></a>`).join(''));
  nav.hidden=['activity','guide'].includes(current.name);
 }
 function categoryRail(home=false){return `<div class="category-rail ${home?'on-blue':''}" role="group" aria-label="촬영 활동 분류">${categories.map(item=>`<button type="button" data-category="${esc(item.name)}" ${home?'data-home-category':''} aria-pressed="${ui.category===item.name}"><span class="category-icon">${icon(item.icon)}</span><span>${esc(item.label||item.name)}</span></button>`).join('')}</div>`;}
 function taskMedia(task,{hero=false}={}){const example=exampleFor(task);return example?`<div class="task-media"><img src="${example.poster}" width="640" height="360" ${hero?'':'loading="lazy"'} alt="${esc(example.label)} 촬영 예시"><span class="media-label">실제 촬영 예시</span></div>`:`<div class="task-icon-media">${icon(categories.find(item=>item.name===task.category)?.icon||'camera')}<span>${esc(task.category)}</span></div>`;}
-function home(state){
- const task=tasks().find(item=>item.id==='folding-clothes')||tasks().find(item=>exampleFor(item))||tasks()[0];
- const example=exampleFor(task)||examples[0];
- return `<section class="home-photo-story"><p class="home-photo-eyebrow">오늘의 촬영</p><a class="home-photo" href="#activity/${encodeURIComponent(task.id)}" aria-label="${esc(task.title)} 촬영 안내"><img src="${example.poster}" width="640" height="360" fetchpriority="high" alt="${esc(example.label)} 실제 촬영 예시"></a><h1>평범한 하루가,<br>새로운 배움으로.</h1><div class="home-photo-meta"><p>${esc(task.title)} · 약 5분</p><p class="home-photo-reward">${reward(task)===null?(state.loading?'승인 포인트 확인 중':'연결 후 승인 포인트 확인'):`검수 승인 시 ${points(reward(task))}`}</p></div>${button(`${icon('camera')} 이 활동 촬영하기`,'record',`data-id="${esc(task.id)}"`)}<a class="home-browse" href="#missions">다른 활동 둘러보기 ${icon('arrow-right')}</a></section><div class="home-quick-links"><a href="#education">촬영 교육·점검 ${icon('caret-right')}</a><a href="#library">보관한 영상 ${icon('caret-right')}</a><a href="#estimate">예상 포인트 계산 ${icon('caret-right')}</a></div>`;
-}
+function home(state){return homeScreen(state,{tasks,taskMedia,rewardPill,categoryRail,icon,ui});}
+
 function taskCard(task){return `<a class="task-card" href="#activity/${encodeURIComponent(task.id)}">${taskMedia(task)}<div class="task-card-copy"><span>${esc(task.category)} · 약 5분</span><h2>${esc(task.title)}</h2><p>${esc(task.description)}</p><div><small>검수 승인 시</small>${rewardPill(task,'small')}</div></div></a>`;}
 function preparationNotice(){const {notice}=getPreparationState();return notice?`<p class="app-alert" role="status">${esc(notice)}</p>`:'';}
 function missions(){
@@ -93,7 +95,8 @@ const guideSteps=[
  {title:'밝고 흔들림 없이,\n평소 하던 대로.',body:'하나의 집안일을 약 5분 동안 자연스럽게 이어가요. 빠르게 연출하거나 카메라를 보며 설명할 필요는 없어요.',label:'촬영 준비 완료',checks:['충분히 밝은 곳에서 촬영해요.','안전을 먼저 확인하고 시작해요.']},
 ];
 function guide(current){const task=selectedTask(current.id),step=current.step,data=guideSteps[step-1],example=exampleFor(task)||examples[0];return `<div class="guide-progress"><span class="step-chip">3단계 중 ${step}단계</span><div class="step-dots" aria-label="${step}/3단계">${[1,2,3].map(value=>`<a href="#guide/${task.id}/${value}" aria-label="${value}단계" ${step===value?'aria-current="step"':''}></a>`).join('')}</div></div><div class="screen-heading guide-heading"><span class="blue-label">${data.label}</span><h1>${data.title.replace('\n','<br>')}</h1></div><figure class="guide-visual"><img src="${example.poster}" width="640" height="360" alt="${esc(example.label)}의 손과 작업 대상이 함께 보이는 실제 촬영 예시"><figcaption>실제 촬영 예시 · ${esc(example.label)}</figcaption></figure><p class="guide-explanation">${data.body}</p><div class="guide-checks">${data.checks.map(copy=>`<p>${icon('check-circle')}${copy}</p>`).join('')}</div><button type="button" class="settings-row sample-row" data-app-action="sample" data-example="${example.id}"><span class="row-icon navy">${icon('play')}</span><span><strong>샘플 영상 보기</strong><small>20초로 촬영 구도를 확인해요.</small></span>${icon('caret-right')}</button>${step===3?'<a class="app-button secondary" href="#education">교육 확인 문제·촬영 전 점검</a><p class="muted-caption">촬영 후 먼저 영상을 확인하고 저장해요.<br>심사 제출은 이용 동의를 확인한 뒤 직접 진행합니다.</p>':''}<div class="screen-footer">${step<3?`<a class="app-button primary" href="#guide/${task.id}/${step+1}">다음 ${icon('arrow-right')}</a>`:`${button('영상 가져오기','import','','secondary')}${button(`${icon('camera')} 촬영 시작`,'record',`data-id="${task.id}"`)}`}</div>`;}
-function gate(state,current){if(state.accountConnectionError)return empty('계정 연결을 확인해주세요.',state.accountConnectionError,button('다시 연결하기','login'));const checking=state.access==='checking'||state.accountConnecting;if(checking)return loadingScreen('계정을 확인하고 있어요.','연결이 끝나면 바로 이어서 이용할 수 있어요.')+'<a class="text-button" href="#missions">촬영 활동 둘러보기</a>';return `<section class="login-screen"><span class="login-symbol">${icon('user')}</span><h1>${checking?'계정을 확인하고 있어요.':'내 일상의 기록,\n한곳에서 이어가요.'.replace('\n','<br>')}</h1><p>${checking?'잠시만 기다려주세요.':'로그인하면 영상을 촬영·보관하고<br>심사 결과와 포인트를 확인할 수 있어요.'}</p>${checking?'':button(`${icon('arrow-right')} ${state.access==='registrationRequired'?'회원가입 완료하기':'로그인 / 회원가입'}`,'login')}<a class="text-button" href="#missions">먼저 촬영 활동 둘러보기</a><p class="login-note">촬영한 영상은 자동으로 제출되지 않아요.</p></section>`;}
+function gate(state){return welcomeScreen(state,{icon});}
+
 function loadingPrivate(state){if(state.loading&&!state.me)return loadingScreen('내역을 불러오고 있어요.','심사 결과와 포인트를 확인하고 있어요.');if(!state.online)return empty('연결이 필요해요.','심사 결과와 포인트는 인터넷에 연결한 뒤 확인할 수 있어요.',button('다시 연결하기','refresh'));if(state.error||!state.me)return empty('내역을 불러오지 못했어요.',state.error||'다시 연결해 확인해주세요.',button('다시 불러오기','refresh'));return '';}
 function localLibrary(state){const list=state.clips.filter(clip=>!clip.example&&(ui.libraryStatus==='all'||clip.status===ui.libraryStatus)&&`${clip.title} ${clip.category||''} ${clip.notes||''}`.toLowerCase().includes(ui.libraryQuery.trim().toLowerCase())).sort((a,b)=>ui.librarySort==='title'?a.title.localeCompare(b.title,'ko'):(new Date(b.createdAt)-new Date(a.createdAt))*(ui.librarySort==='oldest'?-1:1));return `<div class="screen-heading"><h1>내 기기에 보관한 영상</h1><p>저장된 영상은 자동 제출되지 않아요.<br>필요한 원본은 다운로드해 보관해주세요.</p></div><div class="action-pair">${button(`${icon('camera')} 바로 촬영`,'record')}${button(`${icon('upload-simple')} 가져오기`,'import','','secondary')}</div><label class="app-search">${icon('magnifying-glass')}<input id="app-search" type="search" value="${esc(ui.libraryQuery)}" placeholder="영상 제목·활동·메모 검색" aria-label="보관한 영상 검색"></label><div class="app-filters"><label>기록 상태<select id="app-library-status">${[['all','전체'],['ready','준비 완료'],['draft','초안'],...['submitted','reviewing','approved','rejected'].map(status=>[status,'이전 기록 · '+statusNames[status]])].map(([value,label])=>`<option value="${value}" ${ui.libraryStatus===value?'selected':''}>${label}</option>`).join('')}</select></label><label>정렬<select id="app-library-sort">${[['newest','최신순'],['oldest','오래된순'],['title','이름순']].map(([value,label])=>`<option value="${value}" ${ui.librarySort===value?'selected':''}>${label}</option>`).join('')}</select></label></div><div class="section-row"><p class="muted-caption" role="status">전체 ${state.clips.length}개 · 표시 ${list.length}개 · ${size(state.clips.reduce((n,c)=>n+(c.size||c.blob?.size||0),0))}</p><button class="text-button" type="button" data-app-action="reset-library">초기화</button></div>${state.localError?`<div class="app-alert" role="status">${esc(state.localError)}${button('다시 불러오기','refresh','','secondary')}</div>`:''}<div class="library-list">${list.map(clip=>`<article class="local-card"><button type="button" class="clip-open" data-app-action="open-clip" data-id="${esc(clip.id)}"><span class="clip-symbol">${icon('video-camera')}</span><span><b>${esc(clip.title)}</b><small>${stamp(clip.createdAt)} · ${duration(clip.duration)} · ${size(clip.size||clip.blob?.size)}</small><span class="status-pill local">이 기기에 저장됨</span></span>${icon('caret-right')}</button>${clip.blob?button('심사 제출하기','submit-clip',`data-id="${esc(clip.id)}"`,'secondary'):''}</article>`).join('')||empty(ui.libraryQuery||ui.libraryStatus!=='all'?'검색된 영상이 없어요.':'첫 영상을 담아보세요.',ui.libraryQuery||ui.libraryStatus!=='all'?'검색어나 상태를 바꿔보세요.':'촬영하거나 가져온 영상이 여기에 보관돼요.')}</div><p class="muted-caption">영상을 열면 이름·메모 수정, 다운로드와 삭제를 할 수 있어요.</p><p class="muted-caption">브라우저 데이터를 삭제하면 보관한 영상도 지워집니다. 제출한 영상의 처리 상태는 <a href="#reviews">제출·심사</a>에서 확인하세요.</p>`;}
 function filterVideos(videos){return videos.filter(video=>(ui.reviewFilter==='all'||(ui.reviewFilter==='pending'?['submitted','reviewing'].includes(video.status):video.status===ui.reviewFilter))&&video.title.toLowerCase().includes(ui.reviewQuery.trim().toLowerCase()));}
@@ -102,7 +105,8 @@ function reviewFilters(){return `<div class="review-filters" role="group" aria-l
 function reviews(state){const issue=loadingPrivate(state);return `<div class="screen-heading"><h1>제출부터 승인까지</h1><p>실제 심사 상태를 확인해요.<br>포인트는 영상이 승인된 뒤 적립됩니다.</p></div>${issue||`<ol class="app-review-steps" aria-label="심사 진행 순서"><li>영상 제출</li><li>기준 확인</li><li>승인·보완</li><li>포인트 적립</li></ol><div class="action-pair">${button('영상 파일 제출','submit-video')}<a class="app-button secondary" href="#library">보관 영상 선택</a></div><label class="app-search">${icon('magnifying-glass')}<input id="app-review-search" type="search" value="${esc(ui.reviewQuery)}" placeholder="제출한 영상 제목 검색" aria-label="제출한 영상 검색"></label><div class="section-row"><a class="text-button" href="#library">보관한 영상 제출 ${icon('arrow-right')}</a><button type="button" class="round-button" data-app-action="refresh" aria-label="심사 내역 새로고침">${icon('arrow-clockwise')}</button></div>${reviewFilters()}${reviewList(state.me.videos)}`}`;}
 function wallet(state){const issue=loadingPrivate(state);if(issue)return issue;const me=state.me,pending=me.videos.filter(video=>['submitted','reviewing'].includes(video.status)),pendingPoints=pending.reduce((total,video)=>total+(Number(video.reward)||0),0);return `<section class="balance-card"><span>보유 포인트</span><strong data-points-balance>${new Intl.NumberFormat('ko-KR').format(me.wallet.available)}<small>P</small></strong><p>검수 승인으로 차곡차곡 쌓은 기록</p><span class="balance-icon" aria-hidden="true">P</span></section><div class="points-summary"><div><span>승인 대기 예상</span><strong data-pending-points>${points(pendingPoints)}</strong><small>${pending.length}개 영상 · 잔액에 미포함</small></div><div><span>누적 적립</span><strong>${points(me.wallet.earned)}</strong><small>실제 승인된 영상의 보상</small></div></div><section class="bank-coming"><span class="row-icon cyan">${icon('wallet')}</span><div><strong>국내 은행 연동 예정</strong><p>현재는 포인트 적립만 운영해요.</p></div><button type="button" disabled>준비 중</button></section><section class="detail-section"><div class="section-row"><h2>포인트 내역</h2><button type="button" class="round-button" data-app-action="refresh" aria-label="포인트 새로고침">${icon('arrow-clockwise')}</button></div><div class="ledger-list">${me.ledger.length?me.ledger.map(entry=>`<article><span class="row-icon mint">${icon('check-circle')}</span><div><h3>${esc({reward:'영상 승인',purchase:'포인트 사용',refund:'사용 취소 반환'}[entry.kind]||'포인트 조정')}</h3><small>${stamp(entry.createdAt)}</small></div><strong>${entry.amount>0?'+':''}${points(entry.amount)}</strong></article>`).join(''):empty('아직 적립 내역이 없어요.','영상이 승인되면 포인트와 내역이 표시됩니다.','<a class="app-button secondary" href="#reviews">제출·심사 확인</a>')}</div></section>${me.payouts?.length?`<section class="detail-section"><h2>기존 출금 기록</h2><p class="muted-caption">과거 기록은 조회만 가능합니다.</p><div class="ledger-list">${me.payouts.map(item=>`<article><div><h3>${esc({pending:'처리 대기',paid:'지급 확인',rejected:'반려',cancelled:'취소'}[item.status]||item.status)}</h3><small>${stamp(item.createdAt)}${item.note?' · '+esc(item.note):''}</small></div><strong>${money(item.amount)}</strong></article>`).join('')}</div></section>`:''}`;}
 function row(label,detail,image,target,{action=false,tone='',end=''}={}){const tag=action?'button':'a',attr=action?`type="button" data-app-action="${target}"`:`href="${target}"`;return `<${tag} class="settings-row" ${attr}><span class="row-icon ${tone}">${icon(image)}</span><span class="row-copy"><strong>${label}</strong>${detail?`<small>${esc(detail)}</small>`:''}</span>${end?`<span class="row-value">${end}</span>`:''}${icon('caret-right')}</${tag}>`;}
-function profile(state){const me=state.me,user=state.user;return `<a class="identity-card" href="#settings"><span class="identity-avatar">${getDevicePhoto()?`<img src="${getDevicePhoto()}" alt="이 기기의 기록용 사진">`:esc(initial(user?.name))}</span><span><strong>${esc(user?.name||'참여자')}</strong><small>${esc(user?.email||'가입한 계정')}</small><span class="identity-meta">${icon('shield-check')}한국 내 촬영 참여</span></span>${icon('caret-right')}</a><section class="contribution-card"><span class="blue-label">나의 영상 기여</span><h1>평소의 움직임이<br>새로운 배움으로.</h1><div class="contribution-stats"><div><strong>${me?me.videos.filter(v=>!['deleted','deleting'].includes(v.status)).length:'—'}<small>개</small></strong><span>제출한 영상</span></div><div><strong>${me?me.videos.filter(v=>v.status==='approved').length:'—'}<small>개</small></strong><span>승인된 영상</span></div><div><strong>${me?Math.floor(me.videos.filter(v=>!['deleted','deleting'].includes(v.status)).reduce((n,v)=>n+v.duration,0)/60):'—'}<small>분</small></strong><span>촬영 분량</span></div></div></section><div class="settings-group">${row('보관한 영상','이 기기의 원본과 아직 제출하지 않은 영상','video-camera','#library',{tone:'lavender'})}${row('제출·심사','접수 상태와 검수 결과 확인','cloud-check','#reviews',{tone:'cyan'})}${row('내 포인트',me?`현재 ${points(me.wallet.available)}`:'연결 후 잔액 확인','wallet','#wallet',{tone:'mint'})}</div><div class="section-row profile-review-title"><h2>최근 제출</h2><a class="text-button" href="#reviews">모두 보기</a></div>${loadingPrivate(state)||reviewList(me.videos.slice(0,2),{compact:true})}`;}
+function profile(state){return profileScreen(state,{icon,getDevicePhoto,reviewFilters,reviewList,loadingPrivate,points});}
+
 function settings(state){const install=getInstallState();return `<div class="settings-section"><h2>계정</h2><div class="settings-group">${state.access==='allowed'?row('내 정보 수정',state.user?.email||'이름과 로그인 계정','user','account',{action:true,tone:'lavender'}):row('로그인 / 회원가입','계정으로 시작해요','user','login',{action:true,tone:'lavender'})}${state.access==='allowed'?row('이 기기의 기록 설정','기록용 이름·목표·사진','gear','device-settings',{action:true,tone:'cyan'}):''}<div class="settings-row is-disabled"><span class="row-icon cyan">${icon('wallet')}</span><span class="row-copy"><strong>국내 은행 연동</strong><small>현재는 포인트 적립만 운영합니다.</small></span><span class="row-value">예정</span></div></div></div><div class="settings-section"><h2>촬영과 데이터</h2><div class="settings-group">${row('촬영 교육·점검','예시 영상·확인 문제·촬영 전 점검','check-circle','#education',{tone:'mint'})}${row('예상 포인트 계산','승인될 영상 수로 계산해요','wallet','#estimate',{tone:'peach'})}${row('촬영 가이드','촬영 전에 확인하는 세 가지','camera','#guide/dishwashing/1',{tone:'lavender'})}${row('보관한 영상','자동으로 업로드되지 않습니다.','video-camera','#library',{tone:'cyan'})}${row('개인정보 안내','수집 항목·보관·삭제 요청','shield-check','../studio/privacy.html',{tone:'mint'})}</div></div><div class="settings-section"><h2>앱</h2><div class="settings-group">${install.updateAvailable?row('앱 업데이트','열린 작업을 마친 뒤 최신 버전으로 열어요.','arrow-clockwise','update-app',{action:true,tone:'mint'}):''}${row(install.installed?'홈 화면에서 사용 중':'홈 화면에 앱 설치',install.installed?'설치된 에고 앱입니다.':'빠르게 열고 촬영을 시작해요.','device-mobile','install',{action:true,tone:'peach'})}${row('문의하기','촬영·심사·계정에 대해 물어보세요.','question','#support',{tone:'cyan'})}${row('운영 안내','현재 운영 공지 확인','envelope','#announcements',{tone:'mint'})}${!isNativeApp()&&state.online&&state.user?.role==='admin'?row('관리자 콘솔','검수와 운영 관리','shield-check','/admin/',{tone:'lavender'}):''}${row('서비스 약관','','shield-check','../studio/terms.html',{tone:'lavender'})}<div class="settings-row"><span class="row-icon mint">${icon('squares-four')}</span><span class="row-copy"><strong>앱 버전</strong></span><span class="row-value">2026.10.11</span></div>${state.access==='allowed'?row('로그아웃','','sign-out','logout',{action:true,tone:'peach'}):''}</div></div>${install.error?`<p class="muted-caption" role="status">${esc(install.error)}</p>`:''}<p class="muted-caption">휴대폰 번호 인증은 웹과 동일하게 점검 중입니다.</p><button type="button" class="deletion-help" data-app-action="delete-account">계정과 데이터 삭제</button><p class="settings-footer"><strong>에고 EGO</strong><span>내 시점이 AI가 된다.</span><a href="https://60base.ai/">운영 · 60BASE</a></p>`;}
 function support(){return '<div class="screen-heading"><h1>무엇을 도와드릴까요?</h1><p>촬영부터 제출까지, 궁금한 점을 남겨주세요.</p></div><div id="app-support"></div>';}
 function announcements(state){
@@ -120,20 +124,25 @@ function render({navigation=false}={}){
  if(!sameContext){markupCache.delete(main);supportAccount='';}
  if(composing&&sameContext){updateProgress();return;}
  const scrollTop=main.scrollTop;
- shell.dataset.screen=current.name;
- document.title=`${titles[current.name]} · 에고 EGO`;
- renderHeader(current,state);renderNav(current);
- document.querySelector('meta[name="theme-color"]').content=current.name==='home'?'#08183e':'#f7f8fc';
- const privateRoute=['library','reviews','wallet','profile'].includes(current.name);
- const content=privateRoute&&state.access!=='allowed'?gate(state,current):({home:()=>home(state),missions,activity:()=>activity(current,state),guide:()=>guide(current),education:()=>renderEducation({icon,esc}),estimate,announcements:()=>announcements(state),library:()=>localLibrary(state),reviews:()=>reviews(state),wallet:()=>wallet(state),profile:()=>profile(state),settings:()=>settings(state),support}[current.name]||(()=>home(state)))();
+ const allowed=canEnterApp(state);
+ shell.dataset.screen=allowed?current.name:'welcome';
+ document.title=`${allowed?titles[current.name]:'시작하기'} · 에고 EGO`;
+ header.hidden=!allowed;
+ if(allowed){renderHeader(current,state);renderNav(current);}else{setMarkup(header,'');nav.hidden=true;}
+ document.querySelector('meta[name="theme-color"]').content='#f7f8fa';
+ const content=!allowed?gate(state,current):({home:()=>home(state),ranking:()=>rankingScreen(getCommunity(),{icon,button,empty}),missions,activity:()=>activity(current,state),guide:()=>guide(current),education:()=>renderEducation({icon,esc}),estimate,announcements:()=>announcements(state),library:()=>localLibrary(state),reviews:()=>reviews(state),wallet:()=>wallet(state),profile:()=>profile(state),settings:()=>settings(state),support}[current.name]||(()=>home(state)))();
  const changed=setMarkup(main,content);
+ if(changed&&allowed&&current.name==='home'){
+  const rail=main.querySelector('.feature-rail'),cards=rail?.querySelectorAll('.feature-card');
+  if(cards?.length){ui.feature=Math.min(ui.feature,cards.length-1);rail.scrollLeft=cards[ui.feature].offsetLeft-cards[0].offsetLeft;}
+ }
  if(changed&&sameContext&&focus?.matches('input[type="search"]')&&focus.id){
   const replacement=main.querySelector('#'+CSS.escape(focus.id));
   if(replacement){replacement.replaceWith(focus);}
  }
  renderedRoute=routeKey;renderedAccount=accountKey;
- if(!navigator.onLine){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='오프라인 · 제출과 계정 내역은 연결 후 이용할 수 있어요.';}else if(state.catalogError&&['home','missions','activity'].includes(current.name)){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='최신 활동 정보를 연결하지 못했어요. 저장된 촬영 안내를 표시합니다.';}else document.querySelector('#app-connection').hidden=true;
- if(current.name==='support'&&(changed||supportAccount!==accountKey)){supportAccount=accountKey;void mountSupport(document.querySelector('#app-support'));}
+ if(!allowed)document.querySelector('#app-connection').hidden=true;else if(!navigator.onLine){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='오프라인 · 제출과 계정 내역은 연결 후 이용할 수 있어요.';}else if(state.catalogError&&['home','missions','activity'].includes(current.name)){document.querySelector('#app-connection').hidden=false;document.querySelector('#app-connection').textContent='최신 활동 정보를 연결하지 못했어요. 저장된 촬영 안내를 표시합니다.';}else document.querySelector('#app-connection').hidden=true;
+ if(allowed&&current.name==='support'&&(changed||supportAccount!==accountKey)){supportAccount=accountKey;void mountSupport(document.querySelector('#app-support'));}
  if(navigation){main.scrollTo({top:0,behavior:'instant'});window.scrollTo({top:0,behavior:'instant'});main.focus({preventScroll:true});}
  else if(changed){main.scrollTop=scrollTop;if(focusTarget){const next=document.querySelector(focusTarget);if(next&&next!==document.activeElement){next.focus({preventScroll:true});if(selection&&next.setSelectionRange&&next.type!=='number')next.setSelectionRange(...selection);}}}
  updateProgress();
@@ -142,6 +151,13 @@ function render({navigation=false}={}){
 function queueRender(){if(renderQueued)return;renderQueued=true;queueMicrotask(()=>{renderQueued=false;render();});}
 function toast(message){clearTimeout(toastTimer);const node=document.querySelector('#app-toast');node.textContent=message;node.hidden=false;toastTimer=setTimeout(()=>{node.hidden=true;},4200);}
 function sample(id){if(!navigator.onLine){toast('예시 영상은 인터넷에 연결한 뒤 재생할 수 있어요.');return;}const example=examples.find(item=>item.id===id);if(!example)return;const d=dialog('촬영 예시',`<video src="${example.src}" poster="${example.poster}" controls playsinline preload="metadata"></video><p class="sample-note">${esc(example.note)}</p>`,{wide:true});d.classList.add('app-sample-dialog');}
+main.addEventListener('scroll',event=>{
+ const rail=event.target;if(!rail.matches?.('.feature-rail'))return;
+ const cards=[...rail.querySelectorAll('.feature-card')];if(!cards.length)return;
+ const start=cards[0].offsetLeft;
+ ui.feature=cards.reduce((best,card,index)=>Math.abs(card.offsetLeft-start-rail.scrollLeft)<Math.abs(cards[best].offsetLeft-start-rail.scrollLeft)?index:best,0);
+ main.querySelectorAll('[data-app-action=feature]').forEach(dot=>dot.setAttribute('aria-pressed',String(Number(dot.dataset.index)===ui.feature)));
+},{capture:true,passive:true});
 main.addEventListener('compositionstart',()=>{composing=true;});
 main.addEventListener('compositionend',()=>{composing=false;queueRender();});
 main.addEventListener('input',event=>{
@@ -157,6 +173,7 @@ main.addEventListener('change',event=>{
 });
 document.addEventListener('click',async event=>{
  if(event.target.closest('.skip-link')){event.preventDefault();main.focus();return;}
+ if(event.target.closest('[data-prep-action],[data-category],[data-review-filter],[data-app-action]:not([data-app-action=login])')&&(!canEnterApp(getAppState())||!requireFreshAppSession()))return;
  const prep=event.target.closest('[data-prep-action]');if(prep){const result=handlePreparationClick(prep);if(result?.message)toast(result.message);if(result?.handled)return;}
  const category=event.target.closest('[data-category]');if(category){ui.category=category.dataset.category;if(category.hasAttribute('data-home-category'))location.hash='missions';else render();return;}
  const filter=event.target.closest('[data-review-filter]');if(filter){ui.reviewFilter=filter.dataset.reviewFilter;render();return;}
@@ -165,7 +182,9 @@ document.addEventListener('click',async event=>{
  const actionKey=action+':'+(target.dataset.id||'');
  if(guardedActions.has(action)){if(pendingActions.has(actionKey))return;pendingActions.set(actionKey,{message:actionMessages[action]||'처리하고 있어요.'});target.disabled=true;target.setAttribute('aria-busy','true');target.dataset.appBusy='true';updateProgress();}
  try{
-  if(action==='login')await login(location.hash||'#profile');
+  if(action==='login')await showAccountEntry({returnTo:location.hash||'#home',provider:target.dataset.provider});
+  if(action==='refresh-community')await refreshCommunity({force:true});
+  if(action==='share-app'){const share={title:'에고 — 내 시점이 AI가 된다',text:'일상의 순간을 영상으로 담고 AI의 배움에 함께해요.',url:'https://60base.ai/app/'};if(navigator.share){try{await navigator.share(share);}catch(error){if(error.name!=='AbortError')throw error;}}else if(navigator.clipboard){await navigator.clipboard.writeText(share.url);toast('에고 링크를 복사했어요.');}else dialog('에고 소개 공유하기',`<p>아래 주소를 복사해서 공유해주세요.</p><input aria-label="공유 주소" readonly value="${share.url}">`);}
   if(action==='logout'){target.disabled=true;await logout();location.hash='home';}
   if(action==='account')await manageAccount();
   if(action==='delete-account')await openAccountDeletion();
@@ -187,14 +206,16 @@ document.addEventListener('click',async event=>{
   if(action==='reset-search'){ui.query='';ui.category='전체';ui.savedOnly=false;ui.examplesOnly=false;render();document.querySelector('#app-search')?.focus();}
   if(action==='install')await requestInstall();
   if(action==='update-app')applyAppUpdate();
-  if(action==='feature'){const index=Number(target.dataset.index),rail=main.querySelector('.feature-rail');if(rail){ui.feature=index;rail.scrollTo({left:index*(rail.querySelector('.feature-card').offsetWidth+12),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}}
+  if(action==='feature'){const index=Number(target.dataset.index),rail=main.querySelector('.feature-rail');if(rail){ui.feature=index;main.querySelectorAll('[data-app-action=feature]').forEach(dot=>dot.setAttribute('aria-pressed',String(Number(dot.dataset.index)===index)));rail.scrollTo({left:index*(rail.querySelector('.feature-card').offsetWidth+12),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}}
  }catch(error){toast(error.message||'완료하지 못했어요. 다시 시도해주세요.');}
  finally{pendingActions.delete(actionKey);target.disabled=false;target.removeAttribute('aria-busy');delete target.dataset.appBusy;updateProgress();}
 });
-window.addEventListener('hashchange',()=>{if(route().name==='reviews'){ui.reviewFilter='all';ui.reviewQuery='';}render({navigation:true});if(['profile','reviews','wallet'].includes(route().name))void refreshApp({reuse:true});});
+window.addEventListener('hashchange',()=>{if(canEnterApp(getAppState()))requireFreshAppSession();if(route().name==='reviews'){ui.reviewFilter='all';ui.reviewQuery='';}render({navigation:true});if(route().name==='ranking'&&canEnterApp(getAppState()))void refreshCommunity();if(['profile','reviews','wallet'].includes(route().name))void refreshApp({reuse:true});});
 window.addEventListener('online',()=>void refreshApp({refreshSession:true}));window.addEventListener('offline',queueRender);
 subscribeApp(state=>{if(renderedAccount&&renderedAccount!==state.accountKey+'|'+(state.user?.id||'')+'|'+state.access)render();else queueRender();});
 subscribePreparation(queueRender);
+subscribeCommunity(queueRender);
+initializeWelcomePopup();
 window.addEventListener('app-device-settings-changed',queueRender);
 window.addEventListener('storage',event=>{if(event.key==='momjit-studio-photo-v1'||event.key===null)queueRender();});
 initializeInstall({onChange:queueRender,onMessage:toast});

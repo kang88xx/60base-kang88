@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {syncBuiltinESMExports} from 'node:module';
 import {randomBytes} from 'node:crypto';
 import {mkdtemp,readdir,readFile,rm,writeFile} from 'node:fs/promises';
 import os from 'node:os';
@@ -43,6 +45,21 @@ async function makeDir(){
  return mkdtemp(path.join(os.tmpdir(),'hf-state-'));
 }
 
+async function assertNoSnapshots(directory){
+ assert.deepEqual((await readdir(directory)).filter(name=>/^(checkpoint|restore)-/.test(name)),[]);
+}
+
+async function withFsFailure(method,shouldFail,operation){
+ const original=fs[method];
+ fs[method]=async(...args)=>{
+  if(shouldFail(...args))throw Object.assign(new Error('Injected filesystem failure'),{code:'EACCES'});
+  return original(...args);
+ };
+ syncBuiltinESMExports();
+ try{return await operation();}
+ finally{fs[method]=original;syncBuiltinESMExports();}
+}
+
 function close(store){store?.db?.close();}
 function setRevision(store,value){Object.defineProperty(store,'revision',{value,writable:true,configurable:true,enumerable:true});}
 
@@ -67,6 +84,7 @@ async function seedStore(directory){
  assert.equal(result.skipped,false);
  assert.equal(result.etag,'"etag-1"');
  assert.equal(result.generation,1);
+ await assertNoSnapshots(directory);
  const remote=storage.bytes();
  assert.ok(remote.length>0);
  assert.equal(remote.includes(bankKey),false);
@@ -76,6 +94,7 @@ async function seedStore(directory){
  const restoredDir=await makeDir();
  const restoredState=createHfState({storage,directory:restoredDir,encryptionKey:KEY});
  assert.equal(await restoredState.restore(),true);
+ await assertNoSnapshots(restoredDir);
  const restored=openDatabase(restoredDir);
  assert.equal(restored.one('SELECT email FROM users WHERE id=?','user-1').email,'secret.member@example.test');
  assert.equal(restored.one('SELECT token FROM sessions WHERE userId=?','user-1').token,'session-secret-token');
@@ -190,6 +209,7 @@ async function seedStore(directory){
  const restoredDir=await makeDir();
  const restoredState=createHfState({storage,directory:restoredDir,encryptionKey:KEY});
  assert.equal(await restoredState.restore(),true);
+ await assertNoSnapshots(restoredDir);
  const restored=openDatabase(restoredDir);
  assert.equal(restored.one('SELECT email FROM users WHERE id=?','user-1').email,'secret.member@example.test');
  close(restored);
@@ -206,10 +226,64 @@ async function seedStore(directory){
  const store=await seedStore(directory);
  storage.put=async()=>{throw Object.assign(new Error('precondition'),{status:412});};
  await assert.rejects(()=>state.checkpoint(store),{status:503,code:'HF_STATE_FENCED'});
- assert.equal((await readdir(directory)).some(name=>name.startsWith('checkpoint-')&&name.endsWith('.sqlite')),false);
+ await assertNoSnapshots(directory);
  close(store);
  await rm(directory,{recursive:true,force:true});
  checks.push('failed checkpoint removes orphan temporary SQLite snapshots');
+}
+
+{
+ const storage=new MemoryCasStorage();
+ const directory=await makeDir();
+ const state=createHfState({storage,directory,encryptionKey:KEY,allowInitialize:true});
+ await state.restore();
+ const store=await seedStore(directory);
+ const unknown=path.join(directory,'checkpoint-unknown.sqlite-wal');
+ await writeFile(unknown,'unreviewed snapshot');
+ await state.checkpoint(store);
+ assert.equal(await readFile(unknown,'utf8'),'unreviewed snapshot');
+ assert.deepEqual((await readdir(directory)).filter(name=>name.startsWith('checkpoint-')),['checkpoint-unknown.sqlite-wal']);
+ setRevision(store,2);
+ await withFsFailure('rm',file=>file.endsWith('.sqlite-wal'),async()=>{
+  await assert.rejects(()=>state.checkpoint(store),{status:503,code:'HF_STATE_FENCED'});
+ });
+ assert.equal(state.healthy,false);
+ assert.throws(()=>state.assertHealthy(),{code:'HF_STATE_FENCED'});
+ const leftovers=(await readdir(directory)).filter(name=>name.startsWith('checkpoint-')&&name!=='checkpoint-unknown.sqlite-wal');
+ assert.equal(leftovers.length,1);
+ assert.ok(leftovers[0].endsWith('.sqlite-wal'));
+ assert.equal(await readFile(unknown,'utf8'),'unreviewed snapshot');
+ close(store);
+ await rm(directory,{recursive:true,force:true});
+ checks.push('checkpoint preserves unknown snapshots and fences on owned-sidecar cleanup failure while still removing other owned files');
+}
+
+{
+ const storage=new MemoryCasStorage();
+ const sourceDir=await makeDir();
+ const source=createHfState({storage,directory:sourceDir,encryptionKey:KEY,allowInitialize:true});
+ await source.restore();
+ const store=await seedStore(sourceDir);
+ await source.checkpoint(store);
+ close(store);
+ for(const method of ['rename','rm']){
+  const directory=await makeDir();
+  const state=createHfState({storage,directory,encryptionKey:KEY});
+  await withFsFailure(method,file=>method==='rename'||file.endsWith('.sqlite-wal'),async()=>{
+   await assert.rejects(()=>state.restore(),{code:'EACCES'});
+  });
+  const files=await readdir(directory);
+  if(method==='rename')assert.deepEqual(files,[]);
+  else{
+   assert.equal(files.length,1);
+   assert.match(files[0],/^restore-.*\.sqlite-wal$/);
+  }
+  assert.equal(files.includes('dongjakso.sqlite'),false);
+  assert.equal(files.includes('encryption.key'),false);
+  await rm(directory,{recursive:true,force:true});
+ }
+ await rm(sourceDir,{recursive:true,force:true});
+ checks.push('restore failure removes owned snapshots and sidecars; sidecar cleanup failure rejects before publishing runtime files');
 }
 
 {

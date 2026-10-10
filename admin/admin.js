@@ -309,6 +309,8 @@ function settingsPage(){
   <li><div>회원·운영 데이터<small>운영 서버에 저장</small></div><span class="admin-pill">연결됨</span></li><li><div>영상 보관<small>비공개 원본 저장소</small></div><span class="admin-pill">연결됨</span></li><li><div>포인트·출금<small>포인트 적립만 운영 · 국내 은행 연동 예정</small></div><span class="admin-pill">출금 비활성</span></li><li><div>계정 복구 메일<small>메일 서비스 연결 필요</small></div><span class="admin-pill">미연결</span></li><li><div>원본 백업<small>운영 서버에서 별도 보관</small></div><span class="admin-pill">운영자 관리</span></li>
  </ul><p class="admin-info-line">보관 한도: 영상당 ${size(s.maxVideoBytes)} · 회원당 ${size(s.memberStorageBytes)} · 전체 ${size(s.totalStorageBytes)}</p></section></div>`;
  const form=main.querySelector('form'),notice=main.querySelector('#admin-settings-change');
+ const popupPanel=document.createElement('section');popupPanel.className='online-panel';main.append(popupPanel);
+ void import('./welcome-popup.js').then(module=>{if(popupPanel.isConnected&&canManage())return module.mountWelcomePopupSettings(popupPanel,{api});}).catch(error=>{if(popupPanel.isConnected)popupPanel.textContent='팝업 설정을 불러오지 못했습니다: '+error.message;});
  const deletionPanel=document.createElement('section');deletionPanel.className='online-panel';
  const deletionButton=document.createElement('button');deletionButton.type='button';deletionButton.className='button';deletionButton.textContent='계정 삭제 요청 관리';deletionPanel.append(deletionButton);main.append(deletionPanel);
  deletionButton.onclick=async()=>{deletionButton.disabled=true;try{const module=await import('./account-deletions.js');if(deletionPanel.isConnected&&canManage())await module.mountAccountDeletions(deletionPanel,{api});}catch(error){if(deletionPanel.isConnected){deletionButton.disabled=false;deletionButton.textContent='다시 불러오기: '+error.message;}}};

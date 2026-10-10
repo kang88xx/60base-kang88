@@ -2,7 +2,7 @@
 const launch = document.querySelector('#app-launch');
 const content = launch ? [...launch.parentElement.children, ...document.querySelectorAll('.skip-link')].filter(node => node !== launch) : [];
 const previousInert = new Map(content.map(node => [node, node.inert]));
-let dismissed = !launch;
+let dismissed = !launch || launch.hidden;
 let fallback;
 
 function dismissLaunch() {
@@ -26,7 +26,7 @@ export function updateLaunch(state) {
   if (!state.loading || state.catalog || state.catalogError || !navigator.onLine || document.querySelector('dialog[open]')) dismissLaunch();
 }
 
-if (launch) {
+if (launch && !launch.hidden) {
   const homeEntry = !location.hash || location.hash === '#home';
   if (!homeEntry || !navigator.onLine) dismissLaunch();
   else {

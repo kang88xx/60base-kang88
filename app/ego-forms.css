@@ -1,0 +1,62 @@
+/* Participant app sheets only. Studio keeps its existing forms and behavior. */
+.online-dialog.ego-form-sheet{width:min(520px,calc(100vw - 28px));max-height:calc(100dvh - 32px);border:1px solid #ece9e5;border-radius:30px;background:#fff;color:#242424;box-shadow:0 24px 80px #19222926;font-family:var(--sans,Arial,sans-serif)}
+.online-dialog.ego-form-sheet::backdrop{background:#16202966;backdrop-filter:blur(5px)}
+.ego-form-sheet .online-dialog-head{padding:25px 26px 10px;border:0;gap:12px}
+.ego-form-sheet .online-dialog-head h2{font-size:24px;font-weight:750;letter-spacing:-.04em;line-height:1.35}
+.ego-form-sheet .online-dialog-head [data-close]{min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #e7e3df;background:#fff;font-size:12px;color:#686561;border-radius:50px}
+.ego-form-sheet .online-dialog-body{padding:14px 26px 26px}
+.ego-form-sheet .ego-form-intro{margin:0 0 23px;color:#75716d;font-size:14px;line-height:1.65;word-break:keep-all}
+.ego-form-sheet .online-form{gap:18px}
+.ego-form-sheet .online-form label{color:#3e3b38;font-size:13px;line-height:1.55;gap:8px}
+.ego-form-sheet .online-form :is(input:not([type=checkbox]):not([type=radio]),select,textarea){border:1px solid #e5e1dc;background:#fff;border-radius:14px;min-height:48px;padding:12px 14px;font-size:16px;color:#292623}
+.ego-form-sheet :is(input,select,textarea):disabled{background:#f7f5f2;color:#77716b}
+.ego-form-sheet :is(.button,.cloud-google-button){min-height:48px;border-radius:50px;font-size:14px;font-weight:650;box-shadow:none}
+.ego-form-sheet .button{border:1px solid #e5e1dc;background:#fff;color:#403c38;padding:12px 20px}
+.ego-form-sheet .button.primary{border-color:#ff5d17;background:#ff5d17;color:#27190f}
+.ego-form-sheet .button.primary:hover{background:#ed4c09;border-color:#ed4c09}
+.ego-form-sheet :is(button,input,select,textarea):focus-visible{outline:3px solid #ff5d17;outline-offset:3px}
+.ego-form-sheet .online-check{font-size:12px!important;font-weight:400;line-height:1.7!important;gap:10px!important}
+.ego-form-sheet .online-check input{width:18px;height:18px;margin-top:2px;accent-color:#ff5d17}
+.ego-form-sheet .online-check a{color:#a33405}
+.ego-form-sheet .online-status,.ego-form-sheet .capture-status{font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.ego-form-sheet .ego-form-actions,.ego-form-sheet .save-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.ego-form-sheet .ego-form-actions>.primary,.ego-form-sheet .save-actions>.primary{flex:1}
+.ego-form-sheet .online-form .ego-file-drop{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;border:1.5px dashed #d6d0c8;border-radius:22px;background:#fffdfb;padding:25px 18px;cursor:pointer;overflow:hidden}
+.ego-form-sheet .ego-file-drop:focus-within{outline:3px solid #ff5d17;outline-offset:3px;border-color:#ff5d17}
+.ego-form-sheet .ego-file-drop:hover{border-color:#ff5d17;background:#fff8f3}
+.ego-form-sheet .ego-file-drop input[type=file]{position:absolute;inset:0;width:100%;height:100%;min-height:100%;opacity:0;cursor:pointer;padding:0}
+.ego-form-sheet .ego-file-drop:has(input:disabled){opacity:.55;cursor:wait}
+.ego-form-sheet .ego-file-drop strong{font-size:15px;letter-spacing:-.02em}
+.ego-form-sheet .ego-file-drop small{max-width:310px;color:#6e6259;font-size:11px;line-height:1.65}
+.ego-file-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:17px;background:#fff0e6;color:#ff5d17}
+.ego-file-icon svg{width:27px;height:27px}
+.ego-file-choose{font-size:12px;font-weight:650;color:#b63800;text-decoration:underline;text-underline-offset:3px}
+.ego-file-card{display:flex;align-items:center;gap:12px;min-width:0;padding:14px;border:1px solid #ebe5de;border-radius:18px;background:#fff}
+.ego-form-sheet [hidden]{display:none!important}
+.ego-file-thumbnail{flex:0 0 40px;display:grid;place-items:center;width:40px;height:46px;border-radius:12px;background:#fff0e6;color:#e95311}
+.ego-file-thumbnail svg{width:22px;height:22px}
+.ego-file-card>div{flex:1;min-width:0;display:grid;gap:4px}
+.ego-file-card strong{font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+.ego-file-card small{font-size:11px;color:#6e6259}
+.ego-file-card [data-file-remove]{flex:none;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:#fff;font:24px/1 Arial,sans-serif;color:#7b726a}
+.ego-file-card [data-file-remove]:hover{background:#fff0e6;color:#b63800}
+.ego-form-sheet .online-upload-stages{display:flex;gap:7px;justify-content:space-between;padding:0;list-style:none;color:#6e6259;font-size:11px;line-height:1.5}
+.ego-form-sheet .online-upload-stages [aria-current=step]{color:#ad3500;font-weight:700}
+.ego-form-sheet .online-progress{display:block;width:100%;height:7px;border:0;border-radius:20px;overflow:hidden;background:#f0e9e3;accent-color:#ff5d17}
+.ego-form-sheet .online-progress::-webkit-progress-bar{background:#f0e9e3;border-radius:20px}
+.ego-form-sheet .online-progress::-webkit-progress-value{background:#ff5d17;border-radius:20px}
+.ego-form-sheet .online-progress::-moz-progress-bar{background:#ff5d17;border-radius:20px}
+.ego-form-sheet .local-notice{border-radius:14px;background:#faf6f1;color:#766a60;font-size:12px;line-height:1.65}
+.ego-form-sheet .local-record-preview video{border-radius:16px;max-height:32dvh}
+.ego-auth-sheet .ego-auth-mark{height:68px;display:flex;justify-content:center;margin:0 0 12px}
+.ego-auth-mark img{object-fit:contain;transform:translateY(-10px)}
+.ego-auth-sheet [data-cloud-content]>h3{text-align:center;font-size:23px;letter-spacing:-.04em;line-height:1.4;margin:0 0 10px}
+.ego-auth-sheet .cloud-intro{color:#6e6259;text-align:center;font-size:14px;line-height:1.7;margin:0 0 25px}
+.ego-auth-sheet .cloud-google-button{width:100%;border:1px solid #e8e2dc;background:#fff;color:#26221f;padding:14px 18px;justify-content:center}
+.ego-auth-sheet .cloud-email{overflow-wrap:anywhere}
+.ego-auth-sheet .cloud-account-identity{border-radius:16px;background:#faf6f1;padding:14px;margin:20px 0}
+.ego-auth-sheet .cloud-registered .cloud-check{color:#ff5d17;background:#fff0e6}
+.ego-auth-sheet .online-auth-tabs{gap:0;border:0;padding:4px;background:#f7f3ef;border-radius:50px;margin:0 0 24px}
+.ego-auth-sheet .online-auth-tabs button{flex:1;padding:12px 15px;border-radius:40px;font-size:14px;color:#6e6259}
+.ego-auth-sheet .online-auth-tabs [aria-pressed=true]{box-shadow:0 2px 7px #3124190b;background:#fff;color:#b73a00;font-weight:700}
+@media(max-width:380px){.ego-form-sheet .online-dialog-head{padding:20px 20px 8px}.ego-form-sheet .online-dialog-body{padding:12px 20px 22px}.ego-form-sheet .online-dialog-head h2{font-size:22px}.ego-form-sheet .ego-file-drop{padding:22px 14px}.ego-form-sheet .online-upload-stages{font-size:10px;gap:4px}}

@@ -1,0 +1,44 @@
+{
+  "reason": "Owner-requested authenticated EGO app redesign and admin popup. Exact reversible changes preserve every unrelated production byte. Receipt proxy exception restores the deployed 2026-09-28 possession-token contract; it does not bypass backend receipt authorization or Origin checks.",
+  "files": [
+    {
+      "file": "admin/admin.js",
+      "replacements": [
+        {
+          "before": " const deletionPanel=document.createElement('section');",
+          "after": " const popupPanel=document.createElement('section');popupPanel.className='online-panel';main.append(popupPanel);\n void import('./welcome-popup.js').then(module=>{if(popupPanel.isConnected&&canManage())return module.mountWelcomePopupSettings(popupPanel,{api});}).catch(error=>{if(popupPanel.isConnected)popupPanel.textContent='팝업 설정을 불러오지 못했습니다: '+error.message;});\n const deletionPanel=document.createElement('section');"
+        }
+      ]
+    },
+    {
+      "file": "app/sw.js",
+      "replacements": [
+        {
+          "before": "const CACHE='60base-app-20261011-ego-lowercase-v4';",
+          "after": "const CACHE='60base-app-20261011-ego-experience-v5';"
+        },
+        {
+          "before": "  \"/app/app.js\",",
+          "after": "  \"/app/app.js\",\n  \"/app/access-boundary.js\",\n  \"/app/community.js\",\n  \"/app/experience-ui.js\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-forms.css\",\n  \"/app/welcome-popup.js\",\n  \"/app/welcome-popup.css\","
+        },
+        {
+          "before": "  \"/app/icons/phosphor/t-shirt.svg\",",
+          "after": "  \"/app/icons/phosphor/t-shirt.svg\",\n  \"/app/icons/phosphor/trophy.svg\","
+        }
+      ]
+    },
+    {
+      "file": "api/operations.js",
+      "replacements": [
+        {
+          "before": "const AUTH_ENTRY_PATHS = new Set(['/api/auth/login', '/api/auth/firebase', '/api/auth/register']);",
+          "after": "const SESSION_INDEPENDENT_POST_PATHS = new Set(['/api/auth/login', '/api/auth/firebase', '/api/auth/register', '/api/account/deletion/receipt']);"
+        },
+        {
+          "before": "    // Auth entry routes delegate session-CSRF validation to its existing csrf() guard.\n    const authEntry = req.method === 'POST' && AUTH_ENTRY_PATHS.has(operationPath);\n    if (!isAllowedOrigin(req) || !cookies || (!authEntry && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });",
+          "after": "    // Login and possession-authorized receipt reads delegate active-session CSRF validation to the backend.\n    const sessionIndependent = req.method === 'POST' && SESSION_INDEPENDENT_POST_PATHS.has(operationPath);\n    if (!isAllowedOrigin(req) || !cookies || (!sessionIndependent && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });"
+        }
+      ]
+    }
+  ]
+}

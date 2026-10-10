@@ -44,10 +44,13 @@
     "test:mobile": "node tests/native-adapter.mjs && node tests/mobile-readiness-backend.mjs && node tests/mobile-auth-integration.mjs && node tests/account-deletion.mjs && node tests/firebase-erasure.mjs && node tests/hf-erasure.mjs && node tests/apple-tokens.mjs && node tests/firebase-identity.mjs && node tests/cloud-account-apple.mjs && node tests/account-deletion-browser.mjs",
     "dev:homepage": "vite --config homepage/vite.config.mjs",
     "dev:mobile": "node scripts/dev-mobile-preview.mjs",
+    "dev:mobile:qa": "node scripts/dev-mobile-qa.mjs",
     "check:homepage": "node --test tests/homepage-release.test.mjs tests/homepage-contact.test.mjs tests/homepage-media.test.mjs",
     "homepage:sync": "node scripts/sync-homepage-prototype.mjs",
     "preview:production": "node scripts/preview-production.mjs",
-    "monitor:deployment": "node scripts/monitor-deployment.mjs"
+    "monitor:deployment": "node scripts/monitor-deployment.mjs",
+    "test:app-experience": "node --test tests/app-access-boundary.mjs && node tests/app-session-revalidation.mjs && node tests/welcome-popup.mjs && node tests/welcome-popup-browser.mjs",
+    "test:account-deletion": "node tests/account-deletion.mjs && node tests/account-deletion-receipt.mjs && node tests/account-deletion-browser.mjs"
   },
   "dependencies": {
     "react": "19.2.0",

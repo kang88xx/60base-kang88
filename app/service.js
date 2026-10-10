@@ -29,6 +29,12 @@ let clipsGeneration = 0;
 let catalogGeneration = 0;
 const CATALOG_CACHE_MS = 30000;
 const ME_CACHE_MS = 10000;
+// Revalidate on foreground return and after 45s before entering a member screen
+// or starting a private action. No timer/polling interrupts active recording.
+const SESSION_FRESH_MS = 45000;
+const SESSION_RESUME_DEBOUNCE_MS = 1000;
+let sessionVerifiedAt = 0;
+let sessionCheck = null;
 
 const emptyState = () => ({
   access: 'checking',
@@ -44,6 +50,7 @@ const emptyState = () => ({
   localError: '',
   accountConnecting: false,
   accountConnectionError: '',
+  sessionChecking: false,
 });
 
 let state = emptyState();
@@ -254,9 +261,39 @@ export function subscribeApp(listener) {
   return () => listeners.delete(listener);
 }
 
+export function revalidateAppSession({ force = false } = {}) {
+  if (sessionCheck) return sessionCheck;
+  const maxAge = force ? SESSION_RESUME_DEBOUNCE_MS : SESSION_FRESH_MS;
+  if (Date.now() - sessionVerifiedAt < maxAge) return Promise.resolve(session);
+  publish({ sessionChecking: true });
+  sessionCheck = (async () => {
+    try {
+      await sessionReady;
+      // Startup or another auth operation may have just verified the session.
+      if (Date.now() - sessionVerifiedAt >= maxAge) await refreshSession();
+      return session;
+    } finally {
+      sessionCheck = null;
+      publish({ sessionChecking: false, access: getStudioAccess(), accountKey: studioAccountKey(), online: Boolean(session.online), user: publicUser() });
+    }
+  })();
+  return sessionCheck;
+}
+
+// Synchronous so a valid camera click retains its browser user activation.
+// A stale click starts verification; the user retries after it finishes.
+export function requireFreshAppSession() {
+  if (state.sessionChecking) return false;
+  if (Date.now() - sessionVerifiedAt >= SESSION_FRESH_MS) {
+    void revalidateAppSession();
+    return false;
+  }
+  return true;
+}
+
 export async function refreshApp({ refreshSession: shouldRefreshSession = false, reuse = false } = {}) {
   await sessionReady;
-  if (shouldRefreshSession) await refreshSession();
+  if (shouldRefreshSession) await revalidateAppSession({ force: true });
 
   // Session notifications must join an explicit refresh for the same account.
   const identity = refreshIdentity();
@@ -325,11 +362,11 @@ export function manageAccount() {
 }
 
 function assertMember() {
-  if (getStudioAccess() !== 'allowed') {
+  if (getStudioAccess() !== 'allowed' || !session.online || !session.user) {
     void login(appHash());
     return false;
   }
-  return true;
+  return requireFreshAppSession();
 }
 
 export function record(activity = {}) {
@@ -365,18 +402,12 @@ export async function submitClip(id) {
 }
 
 export function viewSubmission(id) {
-  if (!session.online || !session.user) {
-    void login('#reviews');
-    return;
-  }
+  if (!assertMember()) return;
   return viewVideo(id);
 }
 
 export function resubmitSubmission(id) {
-  if (!session.online || !session.user) {
-    void login('#reviews');
-    return;
-  }
+  if (!assertMember()) return;
   return resubmit(id, () => { void refreshApp(); });
 }
 
@@ -401,6 +432,7 @@ subscribeClips(() => {
   if (getStudioAccess() === 'allowed') scheduleRefresh();
 });
 addWindowListener('service-session', () => {
+  sessionVerifiedAt = Date.now();
   syncPrivateBoundary();
   scheduleRefresh({ reuse: true });
 });
@@ -413,5 +445,13 @@ syncAccountConnection();
 addWindowListener('hashchange', () => {
   closeStudioCamera({ preserve: true });
 });
+const revalidateOnResume = () => {
+  if (typeof document !== 'undefined' && document.hidden) return;
+  void revalidateAppSession({ force: true });
+};
+addWindowListener('focus', revalidateOnResume);
+addWindowListener('pageshow', revalidateOnResume);
+if (typeof document !== 'undefined') document.addEventListener('visibilitychange', revalidateOnResume);
+sessionReady.then(() => { sessionVerifiedAt ||= Date.now(); });
 
 scheduleRefresh({ reuse: true });

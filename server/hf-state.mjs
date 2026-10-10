@@ -97,7 +97,8 @@ export function createHfState({storage,directory,encryptionKey,allowInitialize=f
   }catch{
    return fence();
   }finally{
-   await rm(temporary,{force:true}).catch(()=>{});
+   try{await removeFiles(sqliteFiles(temporary));}
+   catch{return fence();}
   }
  }
 
@@ -156,14 +157,26 @@ async function restoreFiles({directory,bankKey,database}){
  try{
   await writeFile(tempDb,database,{flag:'wx',mode:0o600});
   await verifySqlite(tempDb);
+  // Read-only verification can still create WAL/SHM files. Remove them before
+  // publishing the verified database under its runtime name.
+  await removeFiles(sqliteFiles(tempDb).slice(1));
   await writeFile(path.join(directory,'encryption.key'),bankKey,{flag:'wx',mode:0o600});
   await rename(tempDb,path.join(directory,'dongjakso.sqlite'));
  }catch(error){
-  await rm(tempDb,{force:true}).catch(()=>{});
-  await rm(path.join(directory,'encryption.key'),{force:true}).catch(()=>{});
-  await rm(path.join(directory,'dongjakso.sqlite'),{force:true}).catch(()=>{});
+  await removeFiles([path.join(directory,'encryption.key'),path.join(directory,'dongjakso.sqlite')]);
   throw error;
+ }finally{
+  await removeFiles(sqliteFiles(tempDb));
  }
+}
+
+function sqliteFiles(file){return [file,`${file}-wal`,`${file}-shm`];}
+
+async function removeFiles(files){
+ // Attempt every exact owned path even if one removal fails; never sweep the directory.
+ const results=await Promise.allSettled(files.map(file=>rm(file,{force:true})));
+ const failure=results.find(result=>result.status==='rejected');
+ if(failure)throw failure.reason;
 }
 
 async function verifySqlite(file){

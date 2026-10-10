@@ -61,11 +61,21 @@ test('Studio, administrator, app and shared public files survive the build uncha
   }
 });
 
-test('production behavior stays byte exact apart from reviewed EGO brand substitutions', async () => {
+test('production behavior stays byte exact apart from reviewed EGO substitutions and receipt restoration', async () => {
   const record = JSON.parse(await readFile(path.join(root, 'docs/operations/PRODUCTION-PRESERVATION-20261009.json'), 'utf8'));
   const branding = JSON.parse(await readFile(path.join(root, 'docs/operations/EGO-BRAND-PRESERVATION-20261011.json'), 'utf8'));
+  const experience = JSON.parse(await readFile(path.join(root, 'docs/operations/EGO-EXPERIENCE-PRESERVATION-20261011.json'), 'utf8'));
+  const reverseReview = (source, file, record) => {
+    for (const { before, after } of [...(record.files.find(change => change.file === file)?.replacements || [])].reverse()) {
+      assert.equal(source.split(after).length - 1, 1, `Expected exact reviewed change in ${file}`);
+      source = source.replace(after, before);
+    }
+    return source;
+  };
   for (const file of record.files) {
     let source = await readFile(path.join(root, file.file), 'utf8');
+    // Undo this release first, then the earlier branding; original hashes remain immutable.
+    source = reverseReview(source.replaceAll('\r\n', '\n'), file.file, experience);
     const changes = branding.files.find(change => change.file === file.file)?.replacements || [];
     for (const { before, after } of [...changes].reverse()) {
       assert.equal(source.split(after).length - 1, 1, `Expected exact reviewed branding in ${file.file}`);
@@ -75,7 +85,7 @@ test('production behavior stays byte exact apart from reviewed EGO brand substit
   }
   for (const file of record.protectedSourceFiles) {
     const source = await readFile(path.join(root, file.file));
-    const portable = file.normalization === 'LF' ? source.toString('utf8').replaceAll('\r\n', '\n') : source;
+    const portable = file.normalization === 'LF' ? reverseReview(source.toString('utf8').replaceAll('\r\n', '\n'), file.file, experience) : source;
     assert.equal(hash(portable), file.sha256, file.file);
   }
 });

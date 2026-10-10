@@ -1,0 +1,15 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인증번호 디자인 QA · 실제 인증 불가</title><link rel="stylesheet" href="/shared/base.css"><link rel="stylesheet" href="/app/verification-code.css"><style>body{margin:0;background:#f7f8fa;color:#252727;font-family:Pretendard,system-ui,sans-serif}.qa-verification-notice{padding:14px 18px;background:#fff0e7;border-bottom:1px solid #ffdfcd;font-size:12px;line-height:1.6;color:#8d3916}.qa-verification-notice strong{display:block;font-size:14px}.qa-verification-toolbar{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:18px}.qa-verification-toolbar button{min-height:40px;padding:7px 12px;border:1px solid #dfe2e6;border-radius:12px;background:#fff;color:#555;font:inherit;font-size:12px;cursor:pointer}main{min-height:620px;padding:12px 20px 40px;display:grid;place-content:start center}#verification{width:min(460px,calc(100vw - 40px))}</style></head><body><aside class="qa-verification-notice"><strong>디자인 확인용 · 실제 인증 불가</strong>인증번호를 발송하거나 계정·세션을 만들지 않습니다. 발송 방법은 확정 후 연결합니다.</aside><div class="qa-verification-toolbar"><button type="button" data-mode="ready">입력 화면</button><button type="button" data-mode="expiry">5초 후 만료</button><button type="button" data-mode="resend-error">재전송 오류</button></div><main><div id="verification"></div></main><script type="module">
+import { mountVerificationCode } from '/studio/verification-code-ui.js';
+let view;
+function mount(mode='ready') {
+  view?.destroy();
+  view=mountVerificationCode(document.querySelector('#verification'),{
+    description:'인증번호 입력 화면을 확인해 주세요. 실제 번호를 입력하지 마세요.',
+    expiresAt:Date.now()+(mode==='expiry'?5000:180000),resendAvailableAt:Date.now(),
+    async onVerify(){await new Promise(resolve=>setTimeout(resolve,700));throw Error('디자인 확인용 화면입니다. 실제 인증은 진행되지 않았어요.');},
+    async onResend(){await new Promise(resolve=>setTimeout(resolve,500));if(mode==='resend-error')throw Error('재전송 오류 표시 예시입니다. 실제 발송 요청은 없습니다.');return {expiresAt:Date.now()+180000,resendAvailableAt:Date.now()+5000,message:'미리보기 타이머를 초기화했어요. 실제 발송은 없습니다.'};},
+    async onVerified(){throw Error('이 미리보기에서는 인증을 완료할 수 없습니다.');},
+  });
+}
+document.querySelectorAll('[data-mode]').forEach(button=>button.onclick=()=>mount(button.dataset.mode));mount();
+</script></body></html>

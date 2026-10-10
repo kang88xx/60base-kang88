@@ -8,6 +8,8 @@ import {fileURLToPath} from 'node:url';
 import {openDatabase} from './database.mjs';
 import {createPlaybackLeases} from './playback-leases.mjs';
 import {createAccountDeletionService} from './account-deletion.mjs';
+import {createWelcomePopupService} from './welcome-popup.mjs';
+import {communitySummary} from './community-summary.mjs';
 import {probeVideo,recoverUploads,processDeletions} from './media.mjs';
 import {token,digest,id,hashPassword,verifyPassword,fail,str,integer,choice,email,password,csv,HttpError} from './security.mjs';
 const root=path.resolve(fileURLToPath(new URL('../',import.meta.url)));
@@ -17,6 +19,7 @@ const COOKIE='dongjakso_session';
 const pointsPolicy=Object.freeze({rewardUnit:'points',payoutsEnabled:false,bankLinkEnabled:false,redemptionEnabled:false,requiresKoreaDeclaration:true,consentVersion:'2026-09-17-points-kr-v1',shopOpen:false});
 export function createService({directory,origin='http://localhost:4318',allowRegistration=true,trustProxy=false,persistence=null,media=null,verifyFirebase=null,gatewayKey=null,identityEraser=null,copiesEraser=null,appleTokens=null,mobileServicesFactory=null}={}){
  const store=openDatabase(directory);const {db,run,one,all,now,transaction,audit,settings,wallet,publicUser}=store;
+ const welcomePopup=createWelcomePopupService(store);
  const configuredOrigin=new URL(origin).origin,secure=configuredOrigin.startsWith('https:'),locks=new Set();
  // Keep shipped native clients working while the canonical web origin migrates.
  const productionOrigins=['https://60base.ai','https://60base.kr'];
@@ -81,6 +84,9 @@ export function createService({directory,origin='http://localhost:4318',allowReg
   if(!['GET','HEAD'].includes(method)){csrf(req);rate(req,method==='PUT'?'write-chunk':'write',method==='PUT'?600:180,60000);}
   if(method==='GET'&&p==='/session'){const s=getUser(req);return send(res,200,{online:true,user:publicUser(s?.user),csrf:s?.session.csrf||null,settings:publicSettings(),authProvider:verifyFirebase?'google':'password',authMethod:authMethod(s?.user)});}
   if(method==='GET'&&p==='/catalog')return send(res,200,{tasks:all('SELECT * FROM tasks WHERE published=1 ORDER BY createdAt'),products:all('SELECT * FROM products WHERE published=1 ORDER BY createdAt DESC'),announcements:all('SELECT * FROM announcements WHERE published=1 ORDER BY createdAt DESC LIMIT 20'),settings:publicSettings()});
+  if(method==='GET'&&p==='/community/summary'){const {user}=requireUser(req);return send(res,200,communitySummary(store,user));}
+  if(method==='GET'&&p==='/welcome-popup'){const {user,session}=requireUser(req);return send(res,200,{popup:welcomePopup.eligible(user,session)});}
+  if(method==='POST'&&p==='/welcome-popup/seen'){const {user,session}=requireUser(req);welcomePopup.seen(user,session,await body(req));return send(res,200,{ok:true});}
   if(method==='POST'&&p==='/auth/firebase'){
    if(!verifyFirebase)fail(503,'Google 계정 연결을 준비하고 있습니다.');rate(req,'google-login',12);
    const b=await body(req,20000),identity=await verifyFirebase(b.idToken);
@@ -111,6 +117,11 @@ export function createService({directory,origin='http://localhost:4318',allowReg
    if(b.newPassword){if(!await verifyPassword(String(b.currentPassword||''),user.password))fail(400,'현재 비밀번호를 확인해주세요.');hash=await hashPassword(password(b.newPassword));force=0;}
    transaction(()=>{run('UPDATE users SET name=?,bank=?,password=?,forcePassword=?,updatedAt=? WHERE id=?',name,bank,hash,force,now(),user.id);if(b.newPassword)run('DELETE FROM sessions WHERE userId=?',user.id);audit(user,'account.update',user.id,{passwordChanged:!!b.newPassword,bankChanged:!!b.bank});});
    const updated=one('SELECT * FROM users WHERE id=?',user.id);return send(res,200,b.newPassword?setSession(res,updated):{user:publicUser(updated)});
+  }
+  // A possession credential permits only this non-identifying receipt, never account access.
+  if(method==='POST'&&p==='/account/deletion/receipt'){
+   rate(req,'deletion-receipt',60,60000);const b=await body(req,1024);
+   return send(res,200,{deletion:accountDeletion.lookup(b.receiptToken)});
   }
   if(p==='/account/deletion'){const {user}=requireUser(req);if(method==='GET')return send(res,200,{deletion:accountDeletion.get(user)});if(method==='POST'){const b=await body(req);if(b.confirm!=='DELETE')fail(400,'계정과 데이터 삭제 확인이 필요합니다.');return send(res,202,{deletion:accountDeletion.request(user)});}}
   if(method==='GET'&&p==='/me'){const {user}=requireUser(req);return send(res,200,{user:publicUser(user),videos:jsonRows('videos','userId',user.id).map(safeVideo),wallet:wallet(user.id),ledger:jsonRows('ledger','userId',user.id),payouts:jsonRows('payouts','userId',user.id).map(safePayout),orders:jsonRows('orders','userId',user.id).map(safeOrder),tickets:jsonRows('tickets','userId',user.id)});}
@@ -164,6 +175,8 @@ export function createService({directory,origin='http://localhost:4318',allowReg
  // Administrator routes are defined separately below and share transactional data access.
  async function adminApi(req,res,url,p,b){
   const actor=admin(req),method=req.method;
+  if(method==='GET'&&p==='/admin/welcome-popup')return send(res,200,{popup:welcomePopup.config()});
+  if(method==='PATCH'&&p==='/admin/welcome-popup')return send(res,200,{popup:welcomePopup.update(actor,b)});
   if(method==='GET'&&p==='/admin/account-deletions')return send(res,200,{deletions:accountDeletion.list(actor)});
   const deletionMatch=p.match(/^\/admin\/account-deletions\/([\w-]+)\/process$/);
   if(method==='POST'&&deletionMatch){if(b.confirm!==deletionMatch[1])fail(400,'삭제 요청 번호 확인이 필요합니다.');if(locks.size)fail(409,'진행 중인 영상 처리가 끝난 뒤 다시 시도해주세요.');return send(res,200,{deletion:await accountDeletion.process(actor,deletionMatch[1])});}

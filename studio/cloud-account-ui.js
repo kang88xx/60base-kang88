@@ -32,15 +32,26 @@ export function cloudDisplayName() {
   return account.registration?.displayName || account.user?.displayName || '';
 }
 
-export function showCloudAccount({returnTo} = {}) {
-  if (openDialog?.isConnected) { if(returnTo)openDialog.dataset.returnTo=returnTo;openDialog.focus(); return; }
-  const element = dialog(document.querySelector('#app-shell')?'에고 계정':'60BASE 계정', '<div data-cloud-content></div>');
+export function showCloudAccount({returnTo, provider} = {}) {
+  if (openDialog?.isConnected) { if(returnTo)openDialog.dataset.returnTo=returnTo;openDialog.focus();if(provider)openDialog.dispatchEvent(new CustomEvent('cloud-provider-entry',{detail:provider}));return openDialog; }
+  const inApp = !!document.querySelector('#app-shell');
+  const element = dialog(inApp?'에고 계정':'60BASE 계정', '<div data-cloud-content></div>');
   element.id = 'cloud-account-dialog';
   element.classList.add('cloud-account-dialog');
+  if(inApp)element.classList.add('ego-form-sheet','ego-auth-sheet');
   if(returnTo)element.dataset.returnTo=returnTo;
   openDialog = element;
   const content = element.querySelector('[data-cloud-content]');
   let renderedKey = '', localError = null, localStage = '', draft = null;
+
+  function startProvider(selected) {
+    const account=getCloudAccount();
+    if(!['google','apple'].includes(selected)||account.busy||account.phase!=='signedOut')return;
+    if(account.availability!=='ready')return;
+    localError=null;localStage=selected;
+    (selected==='apple'?continueWithApple():continueWithGoogle()).catch(error=>{localError=error;}).finally(()=>{localStage='';render(getCloudAccount());});
+  }
+  element.addEventListener('cloud-provider-entry',event=>startProvider(event.detail));
 
   function rememberDraft() {
     const form = content.querySelector('#cloud-registration-form');
@@ -78,11 +89,11 @@ export function showCloudAccount({returnTo} = {}) {
       if (account.availability === 'loading') {
         content.innerHTML = busyLine('계정 연결을 확인하고 있습니다.');
       } else if (account.availability === 'unconfigured') {
-        content.innerHTML = `<p class="cloud-intro">Google 회원가입을 준비하고 있습니다.</p><p class="online-help">문의: ${support}</p><a class="button primary" href="#missions" data-cloud-browse>촬영 활동 보기</a>`;
+        content.innerHTML = `<p class="cloud-intro">Google 회원가입을 준비하고 있습니다.</p><p class="online-help">문의: ${support}</p>${inApp?'':'<a class="button primary" href="#missions" data-cloud-browse>촬영 활동 보기</a>'}`;
       } else if (account.availability === 'error') {
         content.innerHTML = `<p class="cloud-intro">로그인 연결을 확인해주세요.</p><p class="online-help">문의: ${support}</p><button type="button" class="button primary" data-cloud-retry>다시 연결하기</button>`;
       } else if (account.phase === 'signedOut') {
-        content.innerHTML = `<h3>로그인 / 회원가입</h3><p class="cloud-intro">${appleSignInEnabled ? 'Google 또는 Apple 계정으로 계속하세요.' : 'Google 계정으로 계속하세요.'}</p><button type="button" class="cloud-google-button" data-google-signin><img src="../assets/brand/google-signin-g.png" alt="" width="20" height="20"><span>Google 계정으로 계속하기</span></button>${appleSignInEnabled ? '<button type="button" class="cloud-google-button" style="background:#000;color:#fff;border-color:#000;margin-top:12px" data-apple-signin><span>Apple로 계속하기</span></button>' : ''}`;
+        content.innerHTML = `${inApp?'<div class="ego-auth-mark"><img src="/app/icons/symbol.svg" alt="" width="64" height="67"></div>':''}<h3>${inApp?'나의 일상을 담을 준비':'로그인 / 회원가입'}</h3><p class="cloud-intro">${appleSignInEnabled ? 'Google 또는 Apple 계정으로 계속하세요.' : 'Google 계정으로 계속하세요.'}</p><button type="button" class="cloud-google-button" data-google-signin><img src="../assets/brand/google-signin-g.png" alt="" width="20" height="20"><span>Google 계정으로 계속하기</span></button>${appleSignInEnabled ? '<button type="button" class="cloud-google-button" style="background:#000;color:#fff;border-color:#000;margin-top:12px" data-apple-signin><span>Apple로 계속하기</span></button>' : ''}`;
       } else if (account.phase === 'registrationRequired') {
         const name = draft?.displayName ?? account.user?.displayName ?? '';
         content.innerHTML = `<h3>회원가입</h3><div class="cloud-account-identity"><p class="cloud-email">${esc(account.user.email)}</p><button type="button" class="cloud-account-switch" data-cloud-signout>계정 변경</button></div><form class="online-form" id="cloud-registration-form"><label>이름<input name="displayName" value="${esc(name)}" required maxlength="60" autocomplete="name"></label><label class="online-check"><input type="checkbox" name="adult" required ${draft?.adult?'checked':''}>만 19세 이상입니다.</label><label class="online-check"><input type="checkbox" name="terms" required ${draft?.terms?'checked':''}><span><a href="/studio/terms.html" target="_blank" rel="noopener">이용약관</a>에 동의합니다.</span></label><label class="online-check"><input type="checkbox" name="privacy" required ${draft?.privacy?'checked':''}><span><a href="/studio/privacy.html" target="_blank" rel="noopener">로그인과 개인정보 처리 안내</a>를 확인했습니다.</span></label><button class="button primary" type="submit">가입 완료하기</button></form>`;
@@ -92,15 +103,8 @@ export function showCloudAccount({returnTo} = {}) {
         content.innerHTML = `<p class="cloud-intro">${account.busy?'회원 정보를 확인하고 있습니다.':'회원 정보를 다시 확인해주세요.'}</p>${account.user?`<p class="cloud-email">${esc(account.user.email)}</p>`:''}<button type="button" class="button" data-cloud-retry>다시 확인하기</button><button type="button" class="button" data-cloud-signout>로그아웃</button>`;
       }
       content.insertAdjacentHTML('beforeend', '<p class="online-status" data-cloud-error role="status" aria-live="polite"></p>');
-      content.querySelector('[data-google-signin]')?.addEventListener('click', () => {
-        localError = null;
-        localStage = 'google';
-        continueWithGoogle().catch(error => { localError = error; }).finally(() => { localStage = ''; render(getCloudAccount()); });
-      });
-      content.querySelector('[data-apple-signin]')?.addEventListener('click', () => {
-        localError = null; localStage = 'apple';
-        continueWithApple().catch(error => { localError = error; }).finally(() => { localStage = ''; render(getCloudAccount()); });
-      });
+      content.querySelector('[data-google-signin]')?.addEventListener('click', () => startProvider('google'));
+      content.querySelector('[data-apple-signin]')?.addEventListener('click', () => startProvider('apple'));
       content.querySelector('[data-cloud-retry]')?.addEventListener('click', () => {
         localError = null;
         retryCloudAccount().catch(error => { localError = error; render(getCloudAccount()); });
@@ -154,4 +158,6 @@ export function showCloudAccount({returnTo} = {}) {
   }
   const unsubscribe = subscribeCloudAccount(render);
   element.addEventListener('close', () => { unsubscribe();openDialog = null; }, {once:true});
+  if(provider)startProvider(provider);
+  return element;
 }

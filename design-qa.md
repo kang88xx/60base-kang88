@@ -139,3 +139,34 @@ Direct screenshot review found completed-state pending-points copy and hidden mo
 - Remaining limit: iOS runtime/native behavior was not exercised; this change affects the prepared web-view artwork only. Launch shares the same font/size/alignment; transient startup timing remains unchanged.
 
 final result: passed
+
+
+## Verification-code component review — 2026-10-11
+
+- Scope: reusable UI only; SMS/email channel awaits the owner's decision. No production login route imports it. No delivery, authentication session, or local verification bypass exists. The caller must provide onVerify, onResend and onVerified; both positive verification and successful completion callbacks are required.
+- Reference: C:/Users/kslee/Pictures/Screenshots/스크린샷 2026-10-11 005554.png (516×456). Implementation: http://127.0.0.1:5175/__qa/verification; captures .artifacts/verification-qa/entry-390.jpg, expired-390.jpg, resend-error-390.jpg and entry-final.jpg.
+- Viewports: mobile 390×844 CSS/pixels at density 1; desktop final capture 1707×1695. Reference is an isolated four-cell card; requested adaptation uses six cells, Korean copy, original EGO symbol, white/orange palette, explicit confirm button and required QA disclosure. It is not claimed as a pixel-identical four-digit authenticator clone.
+- Full-view comparison: source and final mobile capture were opened together. Original symbol stays uncropped; title/body, rounded card, evenly spaced cells and resend footer preserve the reference's hierarchy. Focused number/focus/error checks used the earlier six-digit browser state and the final partial-entry desktop capture.
+- Typography: local Pretendard, 22px title and 30px digits, no truncation. Spacing: six mobile cells fit within the 350px card without overflow. Colors: orange #ff5d17; secondary text darkened to #687078 after initial review. Asset fidelity: byte-exact existing symbol; no generated QR or fake OS chrome. Copy: channel-neutral, with explicit design-only/no-authentication notice confined to QA.
+- Interactions: numeric entry; formatted paste (37 90-24 → 379024); arrow/Backspace; incomplete confirm disabled; asynchronous verify rejection never shows completion; five-second expiry/read-only state; resend cooldown/reset and failure; accessible single one-time-code field, live error text and non-announcing countdown.
+- Console: no application errors observed. One unrelated installed browser-extension ethereum injection error was excluded. Physical-device OTP autofill remains unverified; actual channel/backend integration is intentionally pending.
+- Iteration: adjusted low-contrast secondary text, reloaded and captured the corrected mobile view. No remaining P0/P1/P2 findings in this UI-only scope.
+- final result: passed
+
+# Authenticated EGO app adaptation — 2026-10-11
+
+The owner's Numo screenshots define page composition, not the competing brand or its blue/lime palette. The explicit adaptation is a light canvas, original orange #ff5d17, transparent app_simbol artwork, and the previously selected lowercase ego lockup. Reference paths are Desktop/photo_2026-10-04_01-10-{02,11}.jpg; Downloads/Telegram Desktop/photo_{1..6}_2026-10-11_00-52-40.jpg; and Screenshots/스크린샷 2026-10-11 005{453,554,559,624}.png. All were inspected before implementation.
+
+Source/render comparison: source popup + implemented member-popup-390.png, and source profile + profile-390.jpg were opened together. Root Chrome captures in .artifacts/ego-experience/final-{welcome,home,popup,profile,import,verification}-390.jpg use a 390×844 CSS-pixel viewport. Earlier home/ranking/wallet/profile/welcome JPG captures include the local desktop wrapper (390×844 embedded app), so their full image dimensions are not mobile dimensions. Additional 375×812 and 430×932 checks covered layout and the login boundary. Windows Chrome is not native iOS.
+
+Typography retains the selected Satoshi wordmark and uses Pretendard for Korean UI, with large welcome copy, clear page headings and compact supporting labels. Original symbol geometry/transparency stays byte-exact. Cards, thumbnail rows, category rail, podium/own rank, wallet ledger, profile identity and submission filters follow the supplied hierarchy. User-selected orange replaces reference blue/lime; small muted copy and orange button text were darkened during review for readability. Header, controls and floating pill navigation fit all reviewed widths; inactive tabs retain accessible labels and 48px minimum targets. Reduced motion, native dialog focus and keyboard focus indicators are retained.
+
+Interaction evidence includes actual local email login, post-login popup, closing/CTA and once-per-version persistence; category/route controls and carousel dot synchronization; real approved-point aggregates, ledger and submission status; logout and protected deep links; local file selection card/cancel and real upload-byte progress. Administrator preview and save were exercised through Chrome using explicitly labelled local fixtures. Popup/API tests cover auth, CSRF, version conflicts, timing/frequency and anonymous ranking. Upload tests cover aborted server cleanup and local-only imports. Verification design QA never sends or verifies an actual code.
+
+Findings corrected during iteration: old launch overlay appeared before auth (hidden); offline/provider-only identity opened app routes (server-session gate); carousel dots did not track swipes (scroll synchronization); low-contrast small labels/buttons (darkened); optional memo label wrapped to an extra line (grouped label text). A final independent review reproduced delayed session-expiry detection after foreground return; its focused fix and regression are tracked in the release document.
+
+Remaining product inputs are explicit: benefit eligibility/payment/referral/withdrawal rules and SMS versus email OTP delivery. The interface marks referral/payout features as pending and does not fabricate balances, invite codes, payout operations or completed verification. These are integration dependencies, not silent mock success.
+
+Final independent-review follow-up: foreground/session-age checks now close the reproduced expiry gap, with real-database regression and preserved same-session camera behavior. Root Chrome also observed the checking gate and successful return. Category filtering produced only the matching laundry mission; carousel selection kept the correct active dot. The final import memo label was compacted without changing file behavior. Build/static/release/app-experience checks passed after the final source changes.
+
+final result: passed for implemented UI and existing authentication/upload flows; benefit automation and real OTP delivery remain explicitly pending owner input.

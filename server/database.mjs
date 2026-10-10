@@ -36,8 +36,12 @@ export function openDatabase(directory){
  CREATE TABLE IF NOT EXISTS account_deletion_files(requestId TEXT NOT NULL REFERENCES account_deletions(id),kind TEXT NOT NULL,file TEXT NOT NULL,removed INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(requestId,kind,file));
  CREATE TABLE IF NOT EXISTS finance_events(id TEXT PRIMARY KEY,kind TEXT NOT NULL,amount INTEGER NOT NULL,method TEXT NOT NULL,reference TEXT NOT NULL UNIQUE,createdAt TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS app_popup_views(userId TEXT NOT NULL REFERENCES users(id),version INTEGER NOT NULL,scope TEXT NOT NULL,seenAt TEXT NOT NULL,PRIMARY KEY(userId,version,scope));
  CREATE INDEX IF NOT EXISTS videos_user ON videos(userId,createdAt);CREATE INDEX IF NOT EXISTS videos_status ON videos(status,submittedAt);CREATE INDEX IF NOT EXISTS reviews_video ON reviews(videoId,createdAt);CREATE INDEX IF NOT EXISTS ledger_user ON ledger(userId,createdAt);CREATE INDEX IF NOT EXISTS audit_time ON audit(createdAt);
  `);
+ const deletionColumns=db.prepare('PRAGMA table_info(account_deletions)').all();
+ for(const name of ['receiptTokenHash','receiptTokenCiphertext'])if(!deletionColumns.some(c=>c.name===name))db.exec(`ALTER TABLE account_deletions ADD COLUMN ${name} TEXT NOT NULL DEFAULT ''`);
+ db.exec("CREATE UNIQUE INDEX IF NOT EXISTS deletion_receipt_hash ON account_deletions(receiptTokenHash) WHERE receiptTokenHash!=''");
  const videoColumns=db.prepare('PRAGMA table_info(videos)').all();
  if(!videoColumns.some(c=>c.name==='captureTask'))db.exec("ALTER TABLE videos ADD COLUMN captureTask TEXT NOT NULL DEFAULT '{}'");
  if(!videoColumns.some(c=>c.name==='reviewStage'))db.exec("ALTER TABLE videos ADD COLUMN reviewStage TEXT NOT NULL DEFAULT 'ai'");

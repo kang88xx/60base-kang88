@@ -8,13 +8,17 @@ import { digest } from '../server/security.mjs';
 const { chromium } = await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE || path.join(os.homedir(), '.claude/skills/gstack/node_modules/playwright/index.mjs')));
 const directory = await mkdtemp(path.join(os.tmpdir(), '60base-delete-ui-'));
 const origin = 'http://localhost:4498';
-const service = createService({ directory, origin });
+const service = createService({ directory, origin, identityEraser: { preflight: async () => {}, erase: async () => ({ complete: true }) } });
 const at = service.store.now();
 service.store.run('INSERT INTO users(id,email,password,name,createdAt,updatedAt) VALUES(?,?,?,?,?,?)', 'ui-member', 'member@example.test', 'unused', '테스트 회원', at, at);
 service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)', digest('ui-session'), 'ui-member', 'ui-csrf', Date.now() + 3600000, Date.now());
+service.store.run('INSERT INTO users(id,email,password,name,role,createdAt,updatedAt) VALUES(?,?,?,?,?,?,?)', 'ui-admin', 'admin@example.test', 'unused', '관리자', 'admin', at, at);
+service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)', digest('admin-session'), 'ui-admin', 'admin-csrf', Date.now() + 3600000, Date.now());
+service.store.run('INSERT INTO users(id,email,password,name,createdAt,updatedAt) VALUES(?,?,?,?,?,?)', 'ui-other', 'other@example.test', 'unused', '다른 회원', at, at);
+service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)', digest('other-session'), 'ui-other', 'other-csrf', Date.now() + 3600000, Date.now());
 await new Promise(resolve => service.server.listen(4498, '127.0.0.1', resolve));
 const browser = await chromium.launch({ headless: true });
-const out = path.resolve('../.omx/reviews/mobile-store-readiness-20260918');
+const out = path.resolve(process.env.DELETION_QA_OUT || '../evidence/browser');
 await mkdir(out, { recursive: true });
 try {
   const guest = await browser.newPage();
@@ -43,12 +47,64 @@ try {
   assert.equal(service.store.one("SELECT status FROM users WHERE id='ui-member'").status, 'active');
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   assert.deepEqual(errors, []);
-  // A session change closes private dialogs and never paints the old receipt.
+  // This minimal possession-authorized receipt remains usable after logout.
   await page.evaluate(async () => {
     const { api, refreshSession } = await import('/studio/online-api.js');
     await api('/auth/logout', { method: 'POST', body: {} }); await refreshSession();
   });
-  assert.equal(await page.locator('dialog[open]').count(), 0);
-  await page.getByRole('button', { name: '로그인하고 삭제 요청' }).waitFor();
-  console.log('PASS public deletion guest/member, required confirmation, real request/idempotent receipt, mobile overflow, session-loss privacy; zero browser errors.');
+  await page.getByRole('heading', { name: '삭제 요청 접수' }).waitFor();
+  assert.equal(await page.locator('dialog').getByText('member@example.test', { exact: true }).count(), 0);
+  const requestId=service.store.one("SELECT id FROM account_deletions WHERE userId='ui-member'").id;
+  const processed=await fetch(origin+'/api/admin/account-deletions/'+requestId+'/process',{method:'POST',headers:{Origin:origin,Cookie:'dongjakso_session=admin-session','X-CSRF-Token':'admin-csrf','Content-Type':'application/json'},body:JSON.stringify({confirm:requestId})});
+  assert.equal(processed.status,200);assert.equal((await processed.json()).deletion.status,'completed');
+  await page.getByRole('button',{name:'처리 상태 새로고침'}).click();
+  await page.getByRole('heading',{name:'삭제 완료',exact:true}).waitFor();
+  assert.equal(service.store.one("SELECT status FROM users WHERE id='ui-member'").status,'deleted');
+  await page.screenshot({path:path.join(out,'deletion-completed-logged-out-mobile.png'),fullPage:true});
+  await page.reload();
+  await page.getByRole('button',{name:'삭제 처리 결과 확인',exact:true}).click();
+  await page.getByRole('heading',{name:'삭제 완료',exact:true}).waitFor();
+  // Signing into another account in a second tab must also close the first tab's receipt.
+  const otherTab=await context.newPage();
+  await context.addCookies([{name:'dongjakso_session',value:'other-session',url:origin,httpOnly:true,sameSite:'Strict'}]);
+  await otherTab.goto(origin+'/studio/delete-account.html');
+  await otherTab.getByRole('button',{name:'계정과 데이터 삭제 요청',exact:true}).waitFor();
+  await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
+  assert.equal(await page.locator('dialog[open]').count(),0);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('husuabi.deletion-receipt.v1')),null);
+  await otherTab.evaluate(async()=>{const {api,refreshSession}=await import('/studio/online-api.js');await api('/auth/logout',{method:'POST',body:{}});await refreshSession();});
+  assert.equal(await page.locator('#request-deletion').textContent(),'로그인하고 삭제 요청');
+  await context.addCookies([{name:'dongjakso_session',value:'other-session-2',url:origin,httpOnly:true,sameSite:'Strict'}]);
+  service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)',digest('other-session-2'),'ui-other','other-csrf-2',Date.now()+3600000,Date.now());
+  await page.evaluate(async()=>{const {refreshSession}=await import('/studio/online-api.js');await refreshSession();});
+  await page.locator('#request-deletion').click();
+  await page.getByText('other@example.test',{exact:true}).waitFor();
+  assert.equal(await page.getByText(requestId,{exact:true}).count(),0);
+  await page.evaluate(async()=>{const {api,refreshSession}=await import('/studio/online-api.js');await api('/auth/logout',{method:'POST',body:{}});await refreshSession();});
+  assert.equal(await page.locator('dialog[open]').count(),0);
+  assert.deepEqual(errors,[]);
+  // Device storage can reject writes while reads still succeed (for example quota exhaustion).
+  service.store.run('INSERT INTO sessions VALUES(?,?,?,?,?)',digest('quota-session'),'ui-other','quota-csrf',Date.now()+3600000,Date.now());
+  const quotaContext=await browser.newContext();
+  await quotaContext.addCookies([{name:'dongjakso_session',value:'quota-session',url:origin,httpOnly:true,sameSite:'Strict'}]);
+  await quotaContext.addInitScript(()=>{
+    const original=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(key,value){if(key==='husuabi.deletion-receipt.v1')throw new DOMException('Storage full','QuotaExceededError');return original.call(this,key,value);};
+  });
+  const quotaPage=await quotaContext.newPage();
+  quotaPage.on('pageerror',error=>errors.push(error.message));
+  await quotaPage.goto(origin+'/studio/delete-account.html');
+  await quotaPage.locator('#request-deletion').click();
+  await quotaPage.getByRole('checkbox').check();
+  await quotaPage.getByRole('dialog').getByRole('button',{name:'계정과 데이터 삭제 요청',exact:true}).click();
+  await quotaPage.getByRole('heading',{name:'삭제 요청 접수'}).waitFor();
+  assert.match(await quotaPage.getByRole('dialog').textContent(),/확인 정보를 저장하지 못했습니다/);
+  assert.equal(await quotaPage.evaluate(()=>localStorage.getItem('husuabi.deletion-receipt.v1')),null);
+  await quotaPage.evaluate(async()=>{const {api,refreshSession}=await import('/studio/online-api.js');await api('/auth/logout',{method:'POST',body:{}});await refreshSession();});
+  await quotaPage.getByRole('button',{name:'닫기',exact:true}).click();
+  await quotaPage.getByRole('button',{name:'삭제 처리 결과 확인',exact:true}).click();
+  await quotaPage.getByRole('heading',{name:'삭제 요청 접수'}).waitFor();
+  assert.match(await quotaPage.getByRole('dialog').textContent(),/확인 정보를 저장하지 못했습니다/);
+  assert.deepEqual(errors,[]);
+  console.log('PASS deletion UI: required confirmation, receipt after logout, real completion, reload, cross-tab account-switch isolation, storage-write failure fallback/warning, ordinary form closes on logout, mobile overflow; zero browser errors.');
 } finally { await browser.close(); await service.close(); await rm(directory, { recursive: true, force: true }); }

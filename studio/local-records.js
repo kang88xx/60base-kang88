@@ -111,12 +111,15 @@ export function openLocalImport({ missionId } = {}) {
   if(getStudioAccess()!=='allowed'){location.hash='library';return;}
   activeImport?.close();
   const initialTitle = missionId ? getMission(missionId).title : FALLBACK_TITLE;
+  const inApp = !!document.querySelector('#app-shell');
   const element = dialog('영상 가져오기', `
+    ${inApp?'<p class="ego-form-intro">기기에 있는 영상을 골라주세요.<br>재생을 확인한 뒤 내 기록에 보관할 수 있어요.</p>':''}
     <form id="local-import-form" class="online-form local-record-form">
-      <label>영상 파일
-        <input name="file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" required>
+      <label class="${inApp?'ego-file-drop':''}">${inApp?'<span class="ego-file-icon" aria-hidden="true">'+icon('upload',28)+'</span><strong>보관할 영상을 선택하세요</strong><span class="ego-file-choose">파일 선택</span>':'영상 파일'}
+        <input name="file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" required aria-label="보관할 영상 파일 선택">
         <small>최대 250 MB · MP4·WebM 권장. MOV·M4V는 브라우저에서 재생 가능한 경우에만 보관할 수 있습니다.</small>
       </label>
+      ${inApp?'<div class="ego-file-card" data-file-card hidden><span class="ego-file-thumbnail" aria-hidden="true">'+icon('video',24)+'</span><div><strong data-file-name></strong><small data-file-size></small></div><button type="button" data-file-remove aria-label="선택한 영상 제외">×</button></div>':''}
       <div id="local-import-preview" class="local-record-preview" hidden>
         <video controls playsinline preload="metadata"></video>
         <p class="online-help" data-meta></p>
@@ -130,7 +133,7 @@ export function openLocalImport({ missionId } = {}) {
           <option value="draft">초안</option>
         </select>
       </label>
-      <label>메모 <span class="optional">선택</span>
+      <label><span>메모 <span class="optional">선택</span></span>
         <textarea name="notes" rows="3" maxlength="1000" placeholder="촬영 조건이나 확인할 점을 적어두세요."></textarea>
       </label>
       <p class="capture-status" role="status" aria-live="polite"></p>
@@ -141,6 +144,7 @@ export function openLocalImport({ missionId } = {}) {
       </div>
     </form>
   `, { wide: true });
+  if(inApp)element.classList.add('ego-form-sheet','ego-upload-sheet');
   activeImport = element;
 
   const form = element.querySelector('#local-import-form');
@@ -168,6 +172,7 @@ export function openLocalImport({ missionId } = {}) {
   }, { once: true });
   form.querySelector('[data-cancel]').onclick = () => element.close();
   form.elements.title.addEventListener('input', () => { titleTouched = true; });
+  form.querySelector('[data-file-remove]')?.addEventListener('click',()=>{fileInput.value='';fileInput.dispatchEvent(new Event('change'));fileInput.focus();});
 
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files?.[0];
@@ -180,6 +185,8 @@ export function openLocalImport({ missionId } = {}) {
     video.removeAttribute('src');
     video.load();
     clearObjectURL();
+    const card=form.querySelector('[data-file-card]');
+    if(card){card.hidden=!file;if(file){card.querySelector('[data-file-name]').textContent=file.name;card.querySelector('[data-file-size]').textContent=formatBytes(file.size);}}
     if (!file) {
       status(statusNode, '');
       return;
@@ -313,7 +320,7 @@ export async function openLocalClip(id) {
             <option value="draft" ${clip.status === 'draft' ? 'selected' : ''}>초안</option>
           </select>
         </label>
-        <label>메모 <span class="optional">선택</span>
+        <label><span>메모 <span class="optional">선택</span></span>
           <textarea name="notes" rows="3" maxlength="1000" ${protectedRecord ? 'disabled' : ''}>${esc(clip.notes || '')}</textarea>
         </label>
         <p class="capture-status" role="status" aria-live="polite"></p>

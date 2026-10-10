@@ -167,7 +167,7 @@ async function call(options, { env = privateSpaceEnv, fetchImpl } = {}) {
       assert.equal(res.statusCode, 403);
     }
   }
-  for (const [method, path] of [['PATCH', 'auth/login'], ['POST', 'auth/logout'], ['POST', 'auth/login/extra'], ['POST', 'uploads'], ['DELETE', 'videos/vid']]) {
+  for (const [method, path] of [['PATCH', 'auth/login'], ['POST', 'auth/logout'], ['POST', 'auth/login/extra'], ['POST', 'account/deletion'], ['POST', 'account/deletion/receipt/extra'], ['DELETE', 'account/deletion/receipt'], ['POST', 'admin/account-deletions/id/process'], ['POST', 'uploads'], ['DELETE', 'videos/vid']]) {
     const res = await call({ method, url: `/api/operations?path=${path}`, headers: { Origin: 'https://60base.kr' } }, { fetchImpl: noFetch });
     assert.equal(res.statusCode, 403);
   }
@@ -216,7 +216,7 @@ async function call(options, { env = privateSpaceEnv, fetchImpl } = {}) {
 
 {
   for (const cookie of ['dongjakso_session=%E0%A4%A', 'dongjakso_csrf=%', 'other=%FF', 'dongjakso_session', '=invalid']) {
-    for (const path of ['auth/login', 'uploads']) {
+    for (const path of ['auth/login', 'uploads', 'account/deletion/receipt']) {
       const headers = { Origin: 'https://60base.kr', Cookie: cookie, 'X-CSRF-Token': 'csrf' };
       assert.equal(csrfValid(new MockReq({ headers })), false);
       const res = await call({ method: 'POST', url: `/api/operations?path=${path}`, headers }, { fetchImpl: async () => assert.fail('malformed cookies must not reach upstream') });

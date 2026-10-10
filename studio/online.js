@@ -9,6 +9,7 @@ import {getStudioAccess,requiresStudioAccount} from './access.js';
 let releaseSupportFaq=()=>{};
 const consentFields=`<label class="online-check"><input type="checkbox" name="filming" required>제가 촬영한 영상이며, 촬영 장소와 등장 인물의 동의를 확인했습니다.</label><label class="online-check"><input type="checkbox" name="privacy" required>얼굴·주소·개인 문서·사적 대화가 포함되지 않았는지 확인했습니다.</label><label class="online-check"><input type="checkbox" name="usage" required>영상과 작업 정보를 피지컬 AI 학습·연구 및 계약된 데이터 제공에 이용하는 데 동의합니다. <a href="/studio/privacy.html" target="_blank" rel="noopener">이용 범위</a></label><label class="online-check"><input type="checkbox" name="training" required>촬영 교육과 가로 화면·손/작업 대상의 가시성 기준을 확인했습니다.</label><label class="online-check"><input type="checkbox" name="recordedInKorea" required>대한민국 내에서 직접 촬영한 영상입니다.</label>`;
 const supportEmail='60base.ai@gmail.com';
+const uploadMark='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M5 15v5h14v-5"/></svg>';
 let currentMount=null,mountVersion=0;
 let bridgeInFlight=null,bridgeAttemptKey='',bridgeError=null,logoutInFlight=false,suppressBridge=false;
 let cloudLogoutAttemptKey='';
@@ -19,16 +20,27 @@ export function getAccountConnectionState(){
  return {busy:current&&bridgeBusy,error:current&&bridgeError?(bridgeError.message||'계정 연결을 완료하지 못했습니다.'):''};
 }
 function notifyAccountConnection(){window.dispatchEvent(new Event('service-account-connection'));}
-export async function showAccountEntry({returnTo}={}){
+export async function showAccountEntry({returnTo,provider}={}){
  await sessionReady;
  if(session.online&&session.user)return showAccount({onSignOut:signOutAccount});
+ if(provider==='email'){
+  const existing=new Set(document.querySelectorAll('.online-dialog'));
+  showAccount({onSignOut:signOutAccount});
+  const element=[...document.querySelectorAll('.online-dialog')].find(item=>!existing.has(item));
+  if(element&&document.querySelector('#app-shell')){
+   element.classList.add('ego-form-sheet','ego-auth-sheet');
+   if(session.online)element.querySelector('.online-dialog-body').insertAdjacentHTML('afterbegin','<p class="ego-form-intro">이메일과 비밀번호로 에고를 시작하세요.</p>');
+   else element.querySelector('.online-dialog-body').innerHTML='<p class="ego-form-intro">계정 서비스에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 로그인해주세요.</p>';
+  }
+  return element;
+ }
  if(session.online&&session.authProvider==='google'){
-  showCloudAccount({returnTo});
+  const element=showCloudAccount({returnTo,provider});
   void bridgeCloudSession({force:true,interactive:true});
-  return;
+  return element;
  }
  if(getStudioAccess()==='allowed'){location.hash='profile';return;}
- return showCloudAccount({returnTo});
+ return showCloudAccount({returnTo,provider});
 }
 export async function signOutAccount(){
  closeAccountMenu(true);
@@ -200,15 +212,31 @@ async function uploadDialog(catalog,refresh,{clipId}={}){
  const actorId=session.user?.id,actorEpoch=sessionEpoch;
  const clips=await getClips().catch(()=>[]);
  if(!actorId||!session.online||session.user?.id!==actorId||sessionEpoch!==actorEpoch)return;
- const d=dialog('영상 제출',`<form class="online-form"><label>촬영 활동<select name="taskId" required>${catalog.tasks.map(t=>`<option value="${esc(t.id)}">${esc(t.title)} · 검수 통과 시 ${points(t.reward)}</option>`).join('')}</select></label><label>영상 제목<input name="title" required maxlength="120" placeholder="예: 주방 설거지"></label><label>영상 선택<input name="file" type="file" accept="video/mp4,video/webm"><small>MP4·WebM · 최대 ${size(catalog.settings.maxVideoBytes)}</small></label>${clips.length?`<label>또는 내 기록에서 선택<select name="local"><option value="">선택 안 함</option>${clips.filter(c=>c.blob).map(c=>`<option value="${esc(c.id)}">${esc(c.title)}</option>`).join('')}</select><small>기존 기록은 지워지지 않습니다.</small></label>`:''}${consentFields}<ol class="online-upload-stages" aria-label="제출 진행 단계" hidden><li data-stage="transfer">1. 파일 전송</li><li data-stage="validation">2. 원본 확인</li><li data-stage="submission">3. 심사 접수</li></ol><progress class="online-progress" aria-label="서버에 전송된 영상 용량" max="100" value="0" hidden></progress>${statusLine}<button type="submit" class="button primary">동의하고 제출</button></form>`);
- const form=d.querySelector('form'),controller=new AbortController();let uploadId=null,completedVideoId=null,finished=false;
+ const inApp=!!document.querySelector('#app-shell');
+ const fileField=inApp?`<label class="ego-file-drop"><span class="ego-file-icon" aria-hidden="true">${uploadMark}</span><strong>제출할 영상을 선택하세요</strong><span class="ego-file-choose">파일 선택</span><input name="file" type="file" accept="video/mp4,video/webm" aria-label="제출할 영상 파일 선택"><small>MP4·WebM · 최대 ${size(catalog.settings.maxVideoBytes)}</small></label>`:`<label>영상 선택<input name="file" type="file" accept="video/mp4,video/webm"><small>MP4·WebM · 최대 ${size(catalog.settings.maxVideoBytes)}</small></label>`;
+ const d=dialog('영상 제출',`${inApp?'<p class="ego-form-intro">촬영한 일상을 보내주세요.<br>원본 확인 후 심사가 시작됩니다.</p>':''}<form class="online-form"><label>촬영 활동<select name="taskId" required>${catalog.tasks.map(t=>`<option value="${esc(t.id)}">${esc(t.title)} · 검수 통과 시 ${points(t.reward)}</option>`).join('')}</select></label><label>영상 제목<input name="title" required maxlength="120" placeholder="예: 주방 설거지"></label>${fileField}${clips.length?`<label>또는 내 기록에서 선택<select name="local"><option value="">선택 안 함</option>${clips.filter(c=>c.blob).map(c=>`<option value="${esc(c.id)}">${esc(c.title)}</option>`).join('')}</select><small>기존 기록은 지워지지 않습니다.</small></label>`:''}${inApp?'<div class="ego-file-card" data-file-card hidden><span class="ego-file-thumbnail" aria-hidden="true">'+uploadMark+'</span><div><strong data-file-name></strong><small data-file-size></small></div><button type="button" data-file-remove aria-label="선택한 영상 제외">×</button></div>':''}${consentFields}<ol class="online-upload-stages" aria-label="제출 진행 단계" hidden><li data-stage="transfer">1. 파일 전송</li><li data-stage="validation">2. 원본 확인</li><li data-stage="submission">3. 심사 접수</li></ol><progress class="online-progress" aria-label="서버에 전송된 영상 용량" max="100" value="0" hidden></progress>${statusLine}${inApp?'<div class="ego-form-actions"><button type="button" class="button" data-upload-cancel>취소</button>':''}<button type="submit" class="button primary">동의하고 제출</button>${inApp?'</div>':''}</form>`);
+ if(inApp)d.classList.add('ego-form-sheet','ego-upload-sheet');
+ const form=d.querySelector('form'),controller=new AbortController();let uploadId=null,completedVideoId=null,finished=false,transferring=false;
  if(clipId){const clip=clips.find(item=>item.id===clipId&&item.blob);if(!clip){d.close();throw Error('저장한 영상을 찾지 못했습니다. 보관한 영상을 확인해주세요.');}form.elements.local.value=clip.id;form.elements.title.value=clip.title;const taskId=clip.activityId||clip.missionId;if(catalog.tasks.some(task=>task.id===taskId))form.elements.taskId.value=taskId;else{const option=new Option('촬영 활동을 선택해주세요.','',true,true);option.disabled=true;form.elements.taskId.prepend(option);}}
+ const updateFileCard=()=>{
+  const card=form.querySelector('[data-file-card]');if(!card)return;
+  const local=clips.find(item=>item.id===form.elements.local?.value),file=form.elements.file.files[0]||local?.blob;
+  card.hidden=!file;
+  if(file){card.querySelector('[data-file-name]').textContent=file.name||local?.title||'촬영 영상';card.querySelector('[data-file-size]').textContent=size(file.size);}
+ };
+ if(inApp){
+  form.elements.file.addEventListener('change',()=>{if(form.elements.file.files.length&&form.elements.local)form.elements.local.value='';updateFileCard();});
+  form.elements.local?.addEventListener('change',()=>{if(form.elements.local.value)form.elements.file.value='';updateFileCard();});
+  form.querySelector('[data-file-remove]').onclick=()=>{if(transferring||completedVideoId)return;form.elements.file.value='';if(form.elements.local)form.elements.local.value='';updateFileCard();form.elements.file.focus();};
+  form.querySelector('[data-upload-cancel]').onclick=()=>d.close();
+  updateFileCard();
+ }
  d.addEventListener('close',()=>{controller.abort();if(uploadId&&!finished)api('/uploads/'+uploadId,{method:'DELETE'}).catch(()=>{});});
  const stage=name=>{form.querySelector('.online-upload-stages').hidden=false;form.querySelectorAll('[data-stage]').forEach(item=>{if(item.dataset.stage===name)item.setAttribute('aria-current','step');else item.removeAttribute('aria-current');});};
- form.onsubmit=async e=>{e.preventDefault();if(finished)return;busy(form,true);const status=form.querySelector('[role="status"]'),progress=form.querySelector('progress');try{
+ form.onsubmit=async e=>{e.preventDefault();if(finished||transferring)return;transferring=true;busy(form,true);if(inApp)form.querySelector('[data-file-remove]').disabled=true;const status=form.querySelector('[role="status"]'),progress=form.querySelector('progress');try{
   const consent=readConsent(form);
   if(!completedVideoId){
-   const values=new FormData(form),local=clips.find(c=>c.id===values.get('local')),selectedFile=form.elements.file.files[0],file=selectedFile||local?.blob;if(!file)throw Error('영상 파일 또는 내 기록을 선택해주세요.');if(file.size>catalog.settings.maxVideoBytes)throw Error('파일 용량이 업로드 한도를 초과했습니다.');status.textContent='영상 파일 정보를 확인하고 있습니다.';const meta=await metadata(file,selectedFile?0:local?.duration),mime=file.type.split(';')[0];
+   const values=new FormData(form),local=clips.find(c=>c.id===values.get('local')),selectedFile=form.elements.file.files[0],file=selectedFile||local?.blob;if(!file)throw Error('영상 파일 또는 내 기록을 선택해주세요.');if(file.size>catalog.settings.maxVideoBytes)throw Error('파일 용량이 업로드 한도를 초과했습니다.');if(inApp)form.querySelectorAll('[name="file"],[name="local"]').forEach(input=>input.disabled=true);status.textContent='영상 파일 정보를 확인하고 있습니다.';const meta=await metadata(file,selectedFile?0:local?.duration),mime=file.type.split(';')[0];
    const upload=await api('/uploads',{method:'POST',body:{...meta,title:values.get('title'),taskId:values.get('taskId'),filename:file.name||(local?.title||'촬영 영상')+(mime==='video/mp4'?'.mp4':'.webm'),size:file.size,mime},signal:controller.signal});uploadId=upload.id;stage('transfer');progress.hidden=false;progress.max=file.size;progress.value=0;let offset=0;
    status.textContent=`파일 전송 중 · 0% · ${size(0)} / ${size(file.size)}. 이 창을 닫으면 전송이 중단됩니다.`;
    while(offset<file.size){const result=await api(`/uploads/${uploadId}?offset=${offset}`,{method:'PUT',raw:file.slice(offset,offset+upload.chunkSize),signal:controller.signal});if(!Number.isInteger(result.offset)||result.offset<=offset||result.offset>file.size)throw Error('전송된 영상 용량을 확인하지 못했습니다. 다시 제출해주세요.');offset=result.offset;progress.value=offset;status.textContent=`파일 전송 중 · ${Math.floor(offset/file.size*100)}% · ${size(offset)} / ${size(file.size)}`;}
@@ -219,7 +247,7 @@ async function uploadDialog(catalog,refresh,{clipId}={}){
   const video=submission?.video,task=submission?.task,hasDetails=video?.id===completedVideoId&&video.status==='submitted'&&typeof video.title==='string'&&typeof task?.title==='string'&&Number.isSafeInteger(video.reward)&&video.reward>=0;
   d.querySelector('.online-dialog-body').innerHTML=`<section class="online-receipt" data-submission-receipt><span class="online-badge status-submitted">접수 완료</span><h3 tabindex="-1">영상 심사가 접수되었습니다.</h3>${hasDetails?`<dl><div><dt>영상</dt><dd>${esc(video.title)}</dd></div><div><dt>촬영 활동</dt><dd>${esc(task.title)}</dd></div><div><dt>심사 상태</dt><dd>승인 대기</dd></div><div><dt>승인 시 포인트</dt><dd>${points(video.reward)}</dd></div></dl>`:'<p>접수는 완료되었습니다. 영상과 포인트의 상세 정보는 제출·심사 내역에서 확인해주세요.</p>'}<p>아직 포인트가 적립되지 않았습니다. 검수 승인 후 내 포인트에 반영됩니다.</p><button type="button" class="button primary" data-go-history>제출·심사 내역 보기</button></section>`;
   d.querySelector('h3').focus();d.querySelector('[data-go-history]').onclick=()=>{d.close();location.hash='reviews';if(currentMount?.args[0]==='reviews')void refresh();};
- }catch(e){if(e.name!=='AbortError'){status.textContent=completedVideoId?`원본 전송은 완료되었지만 심사 접수에 실패했습니다. ${e.message} 같은 원본으로 다시 요청하거나 제출·심사 내역에서 이어서 제출하세요.`:e.message;if(completedVideoId){form.querySelectorAll('[name="taskId"],[name="title"],[name="file"],[name="local"]').forEach(input=>input.disabled=true);form.querySelector('[type="submit"]').textContent='같은 원본으로 심사 접수 재시도';}}if(uploadId){await api('/uploads/'+uploadId,{method:'DELETE'}).catch(()=>{});uploadId=null;}}finally{busy(form,false);}};
+ }catch(e){if(e.name!=='AbortError'){status.textContent=completedVideoId?`원본 전송은 완료되었지만 심사 접수에 실패했습니다. ${e.message} 같은 원본으로 다시 요청하거나 제출·심사 내역에서 이어서 제출하세요.`:e.message;if(completedVideoId){form.querySelectorAll('[name="taskId"],[name="title"],[name="file"],[name="local"]').forEach(input=>input.disabled=true);form.querySelector('[type="submit"]').textContent='같은 원본으로 심사 접수 재시도';}}if(uploadId){await api('/uploads/'+uploadId,{method:'DELETE'}).catch(()=>{});uploadId=null;}}finally{transferring=false;busy(form,false);if(inApp&&!completedVideoId)form.querySelectorAll('[name="file"],[name="local"],[data-file-remove]').forEach(input=>input.disabled=false);}};
 
 }
 export async function viewVideo(id){const d=dialog('영상과 심사 기록','<p role="status">불러오는 중입니다.</p>',{wide:true});try{const data=await api(`/videos/${id}`);const playable=!['deleting','deleted'].includes(data.video.status);const playback=playable&&isNativeApp()?await api(`/videos/${id}/playback`,{method:'POST',body:{}}):null;if(!d.isConnected||!d.open)return;const mediaURL=playback?.url||`/api/videos/${encodeURIComponent(id)}/file`;if(playback&&!(new URL(mediaURL).origin==='https://60base.ai'&&new URL(mediaURL).pathname===`/api/videos/${encodeURIComponent(id)}/file`))throw Error('영상 주소를 확인하지 못했습니다.');d.querySelector('.online-dialog-body').innerHTML=`${['deleting','deleted'].includes(data.video.status)?'<p class="online-notice">영상 삭제 요청이 반영되었습니다. 처리 상태는 내역에서 확인해주세요.</p>':`<video src="${esc(mediaURL)}" controls playsinline preload="metadata"></video>`}<h3>${esc(data.video.title)}</h3><p>${badge(data.video.status)} · ${Math.round(data.video.duration)}초 · ${size(data.video.size)}</p>${videoPoints(data.video)}<h3>심사 기록</h3>${data.reviews.length?`<ol class="online-history">${data.reviews.map(r=>`<li>${badge(r.decision)}<p>${date(r.createdAt)} · ${r.revision}차 제출</p><p>${esc(r.reason||'등록된 검수 기준으로 확인했습니다.')}</p></li>`).join('')}</ol>`:'<p>아직 심사 결과가 없습니다.</p>'}`;}catch(e){if(d.isConnected&&d.open)d.querySelector('.online-dialog-body').textContent=e.message;}}

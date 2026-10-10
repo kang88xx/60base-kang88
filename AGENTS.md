@@ -1,5 +1,13 @@
 # 60BASE web release
 
+## Authenticated EGO app and administrator popup · 2026-10-11
+
+The owner explicitly requested the participant app redesign from supplied mobile screenshots. This authorizes the app, shared account/upload form presentation, administrator popup settings and their backend endpoints. Keep the white/light canvas, existing #ff5d17 orange, transparent original symbol and selected lowercase ego lockup. The app remains on the welcome screen until a verified application-server session is available; provider identity alone must never open member routes. Use authoritative balances and approved contributions, anonymize rankings, and preserve recording/upload consent, native cancellation and account deletion. Popups have server-persisted per-account delivery rules and admin-only, CSRF-protected editing.
+
+The owner plans mount/signup/referral/withdrawal benefits but has not supplied their conditions. Do not invent payout rules or activate automatic rewards. OTP delivery channel is pending; prepare its input UI without claiming actual verification. Store submission is still deferred. iOS-only UI overlays must preserve native authentication, orientation and receipt logic; do not overwrite private native files with this public tree.
+
+The public checkout had stale backend/proxy receipt code. Reconcile against verified live HF revision 3f0bcc4a57db05e3dfe2d5bac44c6b3842ddb4b7 before any backend release. Restore receipt-token and encrypted-checkpoint sidecar fixes, then deploy only reviewed differences. Keep the original production preservation hashes immutable; exact reviewed app/admin/proxy substitutions are in EGO-EXPERIENCE-PRESERVATION-20261011.json. Local QA at 127.0.0.1:5175 uses only disposable fixtures, no production/Firebase/external-storage connection; do not ship its helper.
+
 ## Selected lowercase ego wordmark · 2026-10-11
 
 The owner selected header concept 2: lowercase `ego`. Home header and launch lockups use local Satoshi Variable 600, 30px, line-height 1, tracking -.015em and an 8px gap. Preserve the byte-exact transparent symbol; its 34×36px image box translates up 4.7px to compensate for the source SVG's top whitespace, and the lowercase wordmark translates up 5px for optical alignment. This presentation choice does not rename the service metadata, change company branding or replace install/store artwork. Keep Satoshi in the app's offline cache. The private iOS overlay mirrors the lockup; store submission remains deferred.

@@ -1,19 +1,35 @@
 import path from 'node:path';
 import {unlink,readdir} from 'node:fs/promises';
-import {id,fail} from './security.mjs';
+import {id,fail,token,digest} from './security.mjs';
 
 // All callers must run through the service's serialized persistence boundary.
 export function createAccountDeletionService(store,{media=null,checkpoint=async()=>{},assertCurrent=async()=>{},identityEraser=null,copiesEraser=null}={}){
  const {one,all,run,now,transaction}=store;
- const receipt=row=>row?{id:row.id,status:row.status,stage:row.stage,requestedAt:row.createdAt,updatedAt:row.updatedAt,completedAt:row.completedAt}:null;
+ const receipt=row=>row?{id:row.id,status:row.status,stage:row.stage,requestedAt:row.createdAt,updatedAt:row.updatedAt,completedAt:row.completedAt,processingDays:7,dueAt:new Date(Date.parse(row.createdAt)+7*86400000).toISOString()}:null;
  const requireAdmin=actor=>{if(!actor?.id||one('SELECT role,status FROM users WHERE id=?',actor.id)?.role!=='admin'||one('SELECT status FROM users WHERE id=?',actor.id)?.status!=='active')fail(403,'관리자 권한이 필요합니다.');};
  const lastAdmin=user=>{if(user.role==='admin'&&one("SELECT COUNT(*) n FROM users WHERE role='admin' AND status='active' AND id!=?",user.id).n===0)fail(409,'다른 활성 관리자를 지정한 후 삭제를 요청해주세요.');};
- function get(user){if(!user?.id)fail(401,'로그인이 필요합니다.');return receipt(one('SELECT * FROM account_deletions WHERE userId=?',user.id));}
+ function get(user){
+  if(!user?.id||one('SELECT status FROM users WHERE id=?',user.id)?.status!=='active')fail(401,'로그인이 필요합니다.');
+  const row=one('SELECT * FROM account_deletions WHERE userId=?',user.id);
+  return row?{...receipt(row),...(row.receiptTokenCiphertext?{receiptToken:store.unseal(row.receiptTokenCiphertext)}:{})}:null;
+ }
+ function lookup(receiptToken){
+  if(typeof receiptToken!=='string'||!/^[-_A-Za-z0-9]{43}$/.test(receiptToken))fail(404,'삭제 처리 확인 정보를 찾을 수 없습니다.');
+  const row=one('SELECT * FROM account_deletions WHERE receiptTokenHash=?',digest(receiptToken));
+  if(!row)fail(404,'삭제 처리 확인 정보를 찾을 수 없습니다.');
+  return receipt(row);
+ }
+ function ensureReceiptToken(row){
+  if(row.receiptTokenHash&&row.receiptTokenCiphertext)return;
+  const secret=token();
+  run('UPDATE account_deletions SET receiptTokenHash=?,receiptTokenCiphertext=? WHERE id=?',digest(secret),store.seal(secret),row.id);
+ }
+
  function request(user){
   if(!user?.id)fail(401,'로그인이 필요합니다.');
   return transaction(()=>{const current=one('SELECT * FROM users WHERE id=?',user.id);if(!current||current.status!=='active')fail(401,'로그인이 필요합니다.');
-   const existing=one('SELECT * FROM account_deletions WHERE userId=?',current.id);if(existing)return receipt(existing);
-   lastAdmin(current);const requestId=id('del');run('INSERT INTO account_deletions(id,userId,createdAt,updatedAt) VALUES(?,?,?,?)',requestId,current.id,now(),now());store.audit(current,'account.delete.request',requestId);return get(current);
+   const existing=one('SELECT * FROM account_deletions WHERE userId=?',current.id);if(existing){ensureReceiptToken(existing);return get(current);}
+   lastAdmin(current);const requestId=id('del');run('INSERT INTO account_deletions(id,userId,createdAt,updatedAt) VALUES(?,?,?,?)',requestId,current.id,now(),now());ensureReceiptToken(one('SELECT * FROM account_deletions WHERE id=?',requestId));store.audit(current,'account.delete.request',requestId);return get(current);
   });
  }
  function list(actor){requireAdmin(actor);return all('SELECT * FROM account_deletions ORDER BY createdAt DESC').map(row=>({...receipt(row),userId:row.userId,actorId:row.actorId,attempts:row.attempts,lastError:row.lastError}));}
@@ -67,13 +83,13 @@ export function createAccountDeletionService(store,{media=null,checkpoint=async(
     for(const identity of identities)run('DELETE FROM apple_refresh_tokens WHERE firebaseUid=?',identity.uid);
     const owned=all('SELECT id FROM videos WHERE userId=?',user.id);
     for(const video of owned){for(const table of ['cleanup_jobs','reviews','annotations'])run(`DELETE FROM ${table} WHERE videoId=?`,video.id);run('DELETE FROM audit WHERE target=?',video.id);}
-    for(const table of ['videos','uploads','ledger','payouts','orders','tickets','requests','auth_identities','sessions'])run(`DELETE FROM ${table} WHERE userId=?`,user.id);
+    for(const table of ['videos','uploads','ledger','payouts','orders','tickets','requests','auth_identities','sessions','app_popup_views'])run(`DELETE FROM ${table} WHERE userId=?`,user.id);
     // Preserve other members' decisions and bookkeeping; the actor becomes an anonymous tombstone.
     run("UPDATE reviews SET reason='',checks='{}' WHERE actorId=?",user.id);run("UPDATE annotations SET note='' WHERE actorId=?",user.id);
     run('DELETE FROM audit WHERE actorId=? OR target=?',user.id,user.id);
     run("UPDATE users SET email=?,password='',name='삭제된 계정',role='member',status='deleted',notes='',consent='{}',bank=NULL,forcePassword=0,updatedAt=? WHERE id=?",`${user.id}@deleted.invalid`,now(),user.id);
     run('DELETE FROM account_deletion_files WHERE requestId=?',job.id);
-    run("UPDATE account_deletions SET status='completed',stage='completed',completedAt=?,updatedAt=?,lastError='',evidence='{}' WHERE id=?",now(),now(),job.id);
+    run("UPDATE account_deletions SET status='completed',stage='completed',completedAt=?,updatedAt=?,lastError='',evidence='{}',receiptTokenCiphertext='' WHERE id=?",now(),now(),job.id);
     store.audit(actor,'account.delete.complete',job.id);
    });
    // Rebuild away historical free pages before making the next SQLite snapshot.
@@ -86,5 +102,5 @@ export function createAccountDeletionService(store,{media=null,checkpoint=async(
   }catch(error){run("UPDATE account_deletions SET status='blocked',completedAt=NULL,lastError=?,updatedAt=? WHERE id=?",/^[A-Z_0-9]{1,64}$/.test(error.code||'')?error.code:'DELETION_FAILED',now(),job.id);await checkpoint();return receipt(one('SELECT * FROM account_deletions WHERE id=?',job.id));}
   finally{processing=false;}
  }
- return {get,request,list,process};
+ return {get,request,lookup,list,process};
 }

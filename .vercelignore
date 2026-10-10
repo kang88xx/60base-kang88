@@ -9,6 +9,7 @@ tests/
 tools/
 dist/
 AGENTS.md
+design-qa.md
 assets/**/*.md
 assets/**/*.json
 
@@ -16,6 +17,7 @@ server/
 scripts/bootstrap-admin.mjs
 scripts/backup-service.mjs
 scripts/reset-service-password.mjs
+scripts/dev-mobile-qa.mjs
 docs/operations/
 .firebase/
 firebase.json
