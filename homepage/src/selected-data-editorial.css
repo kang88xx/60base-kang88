@@ -52,7 +52,7 @@
 }
 
 #main .section-data.data-catalog.data-editorial .editorial-film:is(:hover, :focus-visible) .editorial-play {
-  background-color: #ff5d17;
+  background-color: #0024FF;
   -webkit-mask-image: url('/assets/icons/selected-data-play-fill.svg');
   mask-image: url('/assets/icons/selected-data-play-fill.svg');
 }

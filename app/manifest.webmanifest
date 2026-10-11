@@ -7,8 +7,8 @@
   "start_url": "/app/",
   "scope": "/app/",
   "display": "standalone",
-  "background_color": "#f3f6fd",
-  "theme_color": "#f3f6fd",
+  "background_color": "#0024ff",
+  "theme_color": "#0024ff",
   "orientation": "any",
   "categories": [
     "productivity"

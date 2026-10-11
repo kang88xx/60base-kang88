@@ -34,6 +34,14 @@
           "after": "const CACHE='60base-app-20261011-ego-reference-blue-v7';"
         },
         {
+          "before": "const CACHE='60base-app-20261011-ego-reference-blue-v7';",
+          "after": "const CACHE='60base-app-20261011-ego-electric-blue-b02-s02-g02-v8';"
+        },
+        {
+          "before": "  \"/app/icons/symbol.svg\",",
+          "after": "  \"/app/icons/symbol.svg\",\n  \"/app/icons/favicon.svg\","
+        },
+        {
           "before": "  \"/app/ego-experience.css\",",
           "after": "  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\","
         }
@@ -49,6 +57,24 @@
         {
           "before": "    // Auth entry routes delegate session-CSRF validation to its existing csrf() guard.\n    const authEntry = req.method === 'POST' && AUTH_ENTRY_PATHS.has(operationPath);\n    if (!isAllowedOrigin(req) || !cookies || (!authEntry && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });",
           "after": "    // Login and possession-authorized receipt reads delegate active-session CSRF validation to the backend.\n    const sessionIndependent = req.method === 'POST' && SESSION_INDEPENDENT_POST_PATHS.has(operationPath);\n    if (!isAllowedOrigin(req) || !cookies || (!sessionIndependent && !csrfValid(req, cookies))) return json(res, 403, { ok: false, error: 'forbidden' });"
+        }
+      ]
+    },
+    {
+      "file": "studio/privacy.html",
+      "replacements": [
+        {
+          "before": "<link rel=\"icon\" href=\"../assets/brand/60base-logo3-20260914/service-favicon.png\" type=\"image/png\">",
+          "after": "<link rel=\"icon\" href=\"../app/icons/favicon-32.png\" type=\"image/png\" sizes=\"32x32\"><link rel=\"icon\" href=\"../app/icons/favicon.svg\" type=\"image/svg+xml\" sizes=\"any\">"
+        }
+      ]
+    },
+    {
+      "file": "studio/delete-account.html",
+      "replacements": [
+        {
+          "before": "<title>계정과 데이터 삭제 | 에고 · 60BASE</title>",
+          "after": "<title>계정과 데이터 삭제 | 에고 · 60BASE</title><link rel=\"icon\" href=\"../app/icons/favicon-32.png\" type=\"image/png\" sizes=\"32x32\"><link rel=\"icon\" href=\"../app/icons/favicon.svg\" type=\"image/svg+xml\" sizes=\"any\">"
         }
       ]
     }

@@ -32,7 +32,7 @@ try {
     const css = selector => getComputedStyle(document.querySelector(selector));
     return { background: css('#app-launch').backgroundColor, symbol: css('.app-launch-symbol').width, word: css('.app-launch-word').fontSize, weight: css('.app-launch-word').fontWeight, gap: css('.app-launch-word').marginTop, tag: css('.app-launch-tag').fontSize, tagGap: css('.app-launch-tag').marginTop };
   });
-  assert.deepEqual(style, { background: 'rgb(243, 246, 253)', symbol: '76px', word: '46px', weight: '800', gap: '16px', tag: '14px', tagGap: '10px' });
+  assert.deepEqual(style, { background: 'rgb(0, 10, 102)', symbol: '76px', word: '46px', weight: '800', gap: '16px', tag: '14px', tagGap: '10px' });
   const started = Date.now();
   await normal.launch.waitFor({ state: 'hidden', timeout: 4000 });
   assert.ok(Date.now() - started > 1500, 'normal entry completes its motion before leaving');

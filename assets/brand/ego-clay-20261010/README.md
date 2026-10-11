@@ -1,6 +1,6 @@
-# EGO clay artwork
+# EGO selected artwork and historical clay archive
 
-Latest owner selection: installed app icons, in-app imagery and favicons all use `ego-symbol-original.svg`, the byte-exact transparent `app_simbol.svg` (868 bytes, SHA-256 `c622e4c73fb21a7ab244e47b67bf900cf0b1b87a38346ea752f873ba168e2774`, viewBox `0 0 320 336.7`). Matching application paths are `/app/icons/symbol.svg` and `/app/icons/icon.svg`; the 192/512 PNGs are transparent square renditions preserving the full viewBox and geometry. The earlier clay card remains historical artwork only.
+Latest owner correction (2026-10-11): runtime imagery uses the byte-exact updated **926-byte supplied rounded-body symbol**, with the historical consumer filename `ego-symbol-original.svg` retained. It has solid `#0024ff`, supplied eyes/pupils, transparent margins and full viewBox `0 0 320 336.7`. Runtime SHA-256: `ad92319c81fa71b16dbbb4bfee107ecf9038d0082110d930b4929015086a160f`; the matching runtime path is `/app/icons/symbol.svg`. Browser favicons now use a separate blue rounded square with two white eyes at `/app/icons/favicon.svg`. Installed artwork `/app/icons/icon.svg`, PWA 192/512 and native icon PNGs remain the existing **S02 gradient** unchanged. The original orange source is archived at workspace `brand/husuabi-clay-20261010/ego-symbol-original.svg` (SHA-256 `c622e4c73fb21a7ab244e47b67bf900cf0b1b87a38346ea752f873ba168e2774`).
 
 `ego-clay-original.svg` is the owner's exact selected `04_clay.svg`, preserved byte for byte. It is EGO participant-app artwork, separate from the 60BASE company and Studio logos.
 
@@ -11,4 +11,4 @@ Latest owner selection: installed app icons, in-app imagery and favicons all use
 
 Preserve the whole artwork's aspect ratio and existing SVG filters. Use `object-fit: contain` when its layout box is square. The accompanying PWA and favicon PNGs are under `/app/icons/`.
 
-Source provenance, renderer, dimensions, validation and native masters are recorded in the workspace archive `brand/husuabi-clay-20261010/EGO-ASSETS-20261011.md`. Store uploads and submissions remain deferred.
+Current runtime-symbol/favicon provenance, renderer and validation are in workspace `brand/ego-symbol-favicon-20261011/README.md` and `render-report.json`. Unchanged installed-icon preparation is in `brand/ego-electric-blue-20261011/README.md`. Prepared opaque native canvases retain selected G02: `linear-gradient(160deg,#0024FF 0%,#001BCC 56%,#000A66 100%)`. Store uploads and submissions remain deferred.

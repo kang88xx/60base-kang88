@@ -1,14 +1,14 @@
 @font-face{font-family:"Ego Intro Inter Tight";font-style:normal;font-weight:100 900;font-display:swap;src:url('../fonts/inter-tight/inter-tight-latin-variable.woff2') format('woff2')}
-.app-launch{position:fixed;inset:0;z-index:60;overflow:hidden;background:#f3f6fd;color:#0a0a0a;--launch-cx:50%;--launch-cy:47%}
+.app-launch{position:fixed;inset:0;z-index:60;overflow:hidden;background:linear-gradient(160deg,#0024ff 0%,#001bcc 56%,#000a66 100%) #000a66;color:#fff;--launch-cx:50%;--launch-cy:47%}
 .app-launch[hidden]{display:none}
 .app-launch-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateY(-3vh)}
-.app-launch-symbol{display:block;width:76px;height:auto;overflow:visible;flex:none}
+.app-launch-symbol{display:block;width:76px;height:auto;overflow:visible;flex:none;filter:drop-shadow(0 2px 8px #ffffff38)}
 .app-launch-blob{transform-box:fill-box;transform-origin:60% 70%}
 .app-launch-eyes{transform-box:fill-box;transform-origin:50% 50%}
 .app-launch-word{margin:16px -.04em 0 0;font-family:"Ego Intro Inter Tight",Pretendard,sans-serif;font-size:46px;font-weight:800;letter-spacing:.04em;line-height:1}
-.app-launch-tag{margin:10px 0 0;font-family:Pretendard,sans-serif;font-size:14px;font-weight:500;color:#6a6865;letter-spacing:-.01em;line-height:normal}
-.app-launch-flood{position:absolute;inset:0;z-index:1;background:#2f86f4;clip-path:circle(150% at var(--launch-cx) var(--launch-cy))}
-.app-launch-continue{position:absolute;z-index:2;right:calc(20px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));min-height:44px;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#0a0a0a;font:500 12px/1.5 Pretendard,sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.app-launch-tag{margin:10px 0 0;font-family:Pretendard,sans-serif;font-size:14px;font-weight:500;color:#dce3ff;letter-spacing:-.01em;line-height:normal}
+.app-launch-flood{position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,#0024ff 0%,#001bcc 56%,#000a66 100%);clip-path:circle(150% at var(--launch-cx) var(--launch-cy))}
+.app-launch-continue{position:absolute;z-index:2;right:calc(20px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));min-height:44px;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:#fff;font:500 12px/1.5 Pretendard,sans-serif;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .app-launch-continue:focus-visible{outline:2px solid currentColor;outline-offset:2px}
 .app-launch.is-playing .app-launch-flood{animation:ego-intro-shrink .8s cubic-bezier(.75,0,.2,1) .45s forwards}
 .app-launch.is-playing .app-launch-blob{transform:scale(0);animation:ego-intro-born .7s cubic-bezier(.3,1.6,.5,1) 1.05s forwards}

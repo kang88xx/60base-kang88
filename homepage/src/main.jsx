@@ -11,6 +11,7 @@ import "./about-refinements.css";
 import "./section-system.css";
 import "./typography-system.css";
 import "./hero-reference.css";
+import "./selected-brand.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

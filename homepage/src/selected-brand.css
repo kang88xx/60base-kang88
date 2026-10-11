@@ -1,0 +1,53 @@
+/* Owner selection, 2026-10-11: #0024FF accents and B02 primary buttons.
+   Keep the established company canvas, responsive geometry and motion. */
+:root {
+  --brand-accent: #0024FF;
+  --brand-button: linear-gradient(135deg, #4265FF, #0024FF 55%, #001BCC);
+  --brand-button-shadow: 0 8px 20px #0024ff28;
+}
+
+.button,
+.section-contact .contact-submit,
+.site-nav .nav-contact,
+.site-nav .nav-mobile-menu a[href="#contact"] {
+  background: var(--brand-button);
+  color: #fff;
+  box-shadow: var(--brand-button-shadow);
+  transition: box-shadow .2s ease, opacity .2s ease;
+}
+
+.button:not(:disabled):is(:hover, :focus-visible, :active),
+.section-contact .contact-submit:not(:disabled):is(:hover, :focus-visible, :active),
+.site-nav .nav-contact:is(:hover, :focus, :active),
+.site-nav .nav-mobile-menu a[href="#contact"]:is(:hover, :focus, :active) {
+  background: var(--brand-button);
+  color: #fff;
+  box-shadow: 0 10px 24px #0024ff40;
+}
+
+.button:focus-visible,
+.site-nav .nav-contact:focus-visible,
+.site-nav .nav-mobile-menu a[href="#contact"]:focus-visible {
+  outline: 2px solid #8296ff;
+  outline-offset: 3px;
+}
+
+.button:disabled {
+  opacity: .55;
+  box-shadow: none;
+}
+
+.site-nav .nav-mobile-menu a[href="#contact"] {
+  border: 0;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .section-contact .contact-submit,
+  .site-nav .nav-contact,
+  .site-nav .nav-mobile-menu a[href="#contact"] {
+    transition: none;
+  }
+}

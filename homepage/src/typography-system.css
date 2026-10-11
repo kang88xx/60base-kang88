@@ -120,10 +120,10 @@
 
 #main .section-contact .field-error {
   font: 400 12px/1.5 var(--body);
-  color: #ffac8f;
+  color: #ff9eac;
 }
 #main .section-contact .contact-form :is(input, textarea)[aria-invalid="true"] {
-  border-bottom-color: #ff5d17;
+  border-bottom-color: #ff7d91;
 }
 #main .section-contact .contact-form-status {
   margin: 0;

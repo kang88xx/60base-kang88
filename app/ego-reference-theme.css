@@ -1,14 +1,17 @@
-/* Reference surface treatment. Load after the existing participant styles.
-   Keep layout, artwork, launch animation and semantic status colors intact. */
+/* Selected B02 controls, owner-supplied runtime artwork and G02 canvas. Load after participant styles.
+   Preserve layout, launch motion, native/session behavior and semantic states. */
 body:has(#app-shell) {
-  --ego-canvas: #f3f6fd;
+  --ego-canvas: #000a66;
+  --ego-background: linear-gradient(160deg, #0024ff 0%, #001bcc 56%, #000a66 100%);
+  --ego-on-canvas: #fff;
+  --ego-on-canvas-muted: #dce3ff;
   --ego-ink: #242932;
   --ego-muted: #69717e;
-  --ego-blue: #2f86f4;
+  --ego-blue: #0024ff;
   /* Existing components consume these legacy names; all UI accents are blue. */
   --ego-orange: var(--ego-blue);
-  --ego-orange-soft: #edf5ff;
-  --app-blue: #176cc7;
+  --ego-orange-soft: #eef1ff;
+  --app-blue: var(--ego-blue);
   --app-lime: var(--ego-blue);
   --app-canvas: var(--ego-canvas);
   --app-line: #e8ecf1;
@@ -18,37 +21,36 @@ body:has(#app-shell) {
   --ego-surface: #fff;
   --ego-surface-muted: #f0f3f7;
   --ego-border: #e8ecf1;
-  --ego-accent-ink: #165fb7;
+  --ego-accent-ink: #0024ff;
   --ego-action-ink: #fff;
-  --ego-action: linear-gradient(180deg, #4a97fd 0%, #338bea 8%, #176fd6 24%, #0964ce 100%);
-  --ego-action-hover: linear-gradient(180deg, #579cf0 0%, #267edf 8%, #1267cc 24%, #075cbe 100%);
-  --ego-action-pressed: linear-gradient(180deg, #176dce, #075cbe);
+  --ego-action: linear-gradient(135deg, #4265ff, #0024ff 55%, #001bcc);
+  --ego-action-hover: linear-gradient(135deg, #3659f3, #0020e6 55%, #0018b8);
+  --ego-action-pressed: linear-gradient(135deg, #294bdc, #001bcc 55%, #00149e);
   --ego-card-shadow: 0 3px 14px rgb(32 47 70 / 4%);
-  --ego-action-shadow: inset 0 1px 0 rgb(255 255 255 / 24%), 0 3px 9px rgb(27 103 198 / 12%);
-  background: #e8edf3;
+  --ego-action-shadow: 0 8px 20px #0024ff28;
+  background: #e8ecf8;
   color: var(--ego-ink);
 }
 
 #app-shell,
-#app-shell[data-screen=home],
-#app-shell .ego-welcome,
-#app-shell .app-loading {
-  background: var(--ego-canvas);
-  color: var(--ego-ink);
+#app-shell[data-screen=home] {
+  background: var(--ego-background) var(--ego-canvas);
+  color: var(--ego-on-canvas);
 }
 
-#app-shell .app-header { background: var(--ego-canvas); }
-#app-shell .screen-footer { background: rgb(243 246 253 / 96%); border-color: var(--ego-border); }
+#app-shell :is(.app-header, .ego-welcome, .app-loading) { background: transparent; color: var(--ego-on-canvas); }
+#app-shell .screen-footer { background: rgb(0 10 102 / 96%); border-color: rgb(255 255 255 / 18%); }
 #app-shell :is(.app-connection, .app-alert) { background: #edf5ff; border-color: #d6e5f8; color: #165fb7; }
 #app-shell :is(.welcome-error, .review-reason) { color: #b4232c; }
 #app-shell .status-pill.rejected { background: #fff1f2; color: #b4232c; }
 #app-shell .prep-question button.is-wrong { background: #fff1f2; border-color: #f2c5cc; color: #b4232c; }
 
-/* White cards sit lightly above the cool canvas; blue stays local. */
+/* White cards provide readable content over the selected full blue canvas. */
 #app-shell :is(
   .feature-card, .ego-mission-row, .ego-total-card, .identity-card,
   .points-summary, .bank-coming, .submission-card, .local-card,
-  .settings-group, .task-card, .app-estimator, .profile-shortcuts a
+  .settings-group, .task-card, .app-estimator, .profile-shortcuts a,
+  .prep-panel, .prep-faq, .sample-row, .online-panel
 ),
 #app-shell .ledger-list > article,
 #app-shell .app-announcements details {
@@ -71,25 +73,23 @@ body:has(#app-shell) {
 }
 
 #app-shell :is(
-  .welcome-intro h1, .ego-home-intro h1, .feature-copy h2,
-  .screen-heading h1, .section-row h2, .ego-guide-banner h2,
+  .feature-copy h2, .ego-guide-banner h2,
   .ego-progress-card h2, .balance-card > strong, .ego-share-card h1,
-  .mission-row-copy h3, .identity-card strong, .app-empty h2
+  .mission-row-copy h3, .identity-card strong
 ) { color: var(--ego-ink); }
 
 #app-shell :is(
-  .welcome-description, .welcome-legal, .welcome-status,
   .feature-copy p, .feature-reward > span:first-child,
   .mission-kind, .mission-row-copy p, .reward-unavailable,
   .ego-guide-banner p, .ego-progress-card h2 small,
   .ego-progress-card .section-row > span:last-child, .progress-labels,
   .balance-card > span:first-child, .balance-card strong small, .balance-card > p,
   .ego-share-card > p, .profile-stat-grid span, .identity-meta,
-  .reward-panel > p, .muted-caption, .settings-row small,
-  .points-summary small, .points-summary span, .ranking-note
+  .reward-panel > p, .settings-row small,
+  .points-summary small, .points-summary span
 ) { color: var(--ego-muted); }
 
-#app-shell :is(.eyebrow, .blue-label, .welcome-eyebrow, .feature-category, .contributor-badge,
+#app-shell :is(.feature-category, .contributor-badge,
   .app-estimator output,
   .ego-guide-banner > div > span, .ledger-list article > strong,
   .ego-share-card > .section-row > .app-icon,
@@ -108,7 +108,8 @@ body:has(#app-shell) {
 
 #app-shell .app-search input { color: var(--ego-ink); }
 #app-shell .app-search input::placeholder { color: #757e8b; }
-#app-shell :is(.category-rail button, .profile-shortcuts a > .app-icon) { color: var(--ego-muted); }
+#app-shell .category-rail button { color: var(--ego-on-canvas-muted); }
+#app-shell .profile-shortcuts a > .app-icon { color: var(--ego-muted); }
 #app-shell :is(.category-icon, .on-blue .category-icon) {
   background: var(--ego-surface);
   border-color: var(--ego-border);
@@ -139,18 +140,18 @@ body:has(#app-shell) {
   color: var(--ego-accent-ink);
 }
 
-/* Subtle gradient and an inset highlight give primary controls depth. */
+/* B02 is the selected primary-control gradient and shadow. */
 #app-shell :is(.app-button.primary, .welcome-provider.primary),
 #app-shell .app-bottom-nav > a[aria-current],
 #app-shell .category-rail button[aria-pressed=true] .category-icon,
 #app-shell .review-filters [aria-pressed=true] {
   background: var(--ego-action);
-  border-color: #1b70d6;
+  border-color: #001bcc;
   color: var(--ego-action-ink);
   box-shadow: var(--ego-action-shadow);
 }
 
-#app-shell .category-rail button[aria-pressed=true] { color: var(--ego-accent-ink); }
+#app-shell .category-rail button[aria-pressed=true] { color: var(--ego-on-canvas); }
 #app-shell .point-mark,
 #app-shell .podium-person.is-first .podium-avatar > span:not(.app-icon) {
   background: var(--ego-action);
@@ -173,6 +174,48 @@ body:has(#app-shell) {
 
 #app-shell .app-bottom-nav > a { color: var(--ego-muted); }
 #app-shell .app-bottom-nav > a[aria-current] { color: var(--ego-action-ink); }
+
+/* Text outside cards belongs to the blue canvas, including every secondary route. */
+#app-shell :is(.app-brand, .header-title, .welcome-intro h1, .ego-home-intro h1,
+  .screen-heading h1, .settings-section > h2, .detail-section > h2,
+  .section-row > h2, .app-empty h2, .app-loading h1, .app-loading h2,
+  .guide-checks, .activity-steps, .settings-footer strong) { color: var(--ego-on-canvas); }
+#app-shell :is(.welcome-description, .welcome-legal, .welcome-status,
+  .welcome-eyebrow, .eyebrow, .blue-label, .screen-heading p,
+  .guide-explanation, .check-list li, .check-list .app-icon, .guide-checks .app-icon,
+  .app-filters label, .app-review-steps li, .result-count, .muted-caption,
+  .section-row > a, .section-row > .text-button, .section-row > p,
+  .ranking-note, .podium-person h3, .ranking-row small, .rank-number,
+  .settings-footer, .settings-footer a, .deletion-help,
+  .app-empty p, .empty-icon, .app-loading p) { color: var(--ego-on-canvas-muted); }
+#app-shell .muted-caption a { color: var(--ego-on-canvas); }
+#app-shell :is(.ego-guide-banner, .ego-progress-card, .ego-share-card) .section-row > h2,
+#app-shell .ranking-row.is-me { color: var(--ego-ink); }
+#app-shell .ego-progress-card .section-row > span:last-child,
+#app-shell .ranking-row.is-me :is(small, .rank-number) { color: var(--ego-muted); }
+#app-shell .rail-dots button[aria-pressed=true] span,
+#app-shell .step-dots [aria-current]::after { background: #fff; }
+#app-shell .rail-dots button:not([aria-pressed=true]) span { background: #ffffff69; }
+#app-shell .ranking-row:not(.is-me) { border-color: #ffffff30; }
+#app-shell .reward-panel > span:first-child { color: var(--ego-muted); }
+#app-shell .reward-mark { background: var(--ego-orange-soft); color: var(--ego-accent-ink); }
+#app-shell :is(.step-chip, .guide-visual figcaption) { background: var(--ego-orange-soft); color: var(--ego-accent-ink); }
+#app-shell .prep-activity-card.is-selected { background: var(--ego-orange-soft); border-color: var(--ego-blue); }
+#app-shell :is(.prep-save, .prep-activity-icon, .prep-activity-main small) { color: var(--ego-accent-ink); }
+#app-shell .prep-save[aria-pressed=true] { background: var(--ego-action); color: #fff; }
+#app-shell .prep-preflight input { accent-color: var(--ego-blue); }
+#app-shell .app-brand img,
+#app-shell .welcome-art img,
+#app-shell .app-loading > .app-loading-symbol { filter: drop-shadow(0 2px 6px #ffffff38); }
+#app-shell .welcome-error { color: #ffd7dc; }
+#app-shell #app-support { color: var(--ego-ink); }
+#app-shell #app-support :is(.online-toolbar, .online-toolbar p) { color: var(--ego-on-canvas-muted); }
+#app-shell #app-support .online-panel .online-toolbar { color: var(--ego-ink); }
+#app-shell #app-support :is(.online-empty, .button:not(.primary)) { background: var(--ego-surface); border-color: var(--ego-border); color: var(--ego-ink); }
+#app-shell #app-support .online-notice { background: var(--ego-orange-soft); border-color: var(--ego-border); color: var(--ego-accent-ink); }
+#app-shell #app-support .button.primary { background: var(--ego-action); border-color: #001bcc; color: #fff; box-shadow: var(--ego-action-shadow); }
+#app-shell #app-support .button.primary:hover:not(:disabled) { background: var(--ego-action-hover); }
+#app-shell #app-support .button.primary:active:not(:disabled) { background: var(--ego-action-pressed); }
 
 /* Dialog selectors require the participant shell, excluding admin previews. */
 body:has(#app-shell) :is(.online-dialog.ego-form-sheet, .ego-welcome-dialog) {
@@ -228,7 +271,7 @@ body:has(#app-shell) :is(.ego-welcome-eyebrow, .ego-file-choose,
   .ego-form-sheet .online-check a,
   .ego-form-sheet .online-upload-stages [aria-current=step]) { color: var(--ego-accent-ink); }
 
-body:has(#app-shell) .ego-form-sheet .online-check input { accent-color: #176cc7; }
+body:has(#app-shell) .ego-form-sheet .online-check input { accent-color: var(--ego-blue); }
 body:has(#app-shell) .ego-form-sheet :is(.online-status, .capture-status)[data-error=true] { color: #b4232c; }
 body:has(#app-shell) .ego-form-sheet .online-progress { background: #e9edf2; accent-color: var(--ego-blue); }
 body:has(#app-shell) .ego-form-sheet .online-progress::-webkit-progress-bar { background: #e9edf2; }
@@ -236,16 +279,18 @@ body:has(#app-shell) .ego-form-sheet .online-progress::-webkit-progress-value { 
 body:has(#app-shell) .ego-form-sheet .online-progress::-moz-progress-bar { background: var(--ego-action); }
 body:has(#app-shell) .ego-auth-sheet .cloud-registered .cloud-check { background: #edf7f0; color: #287548; }
 
+body:has(#app-shell) .online-dialog .button.primary,
 body:has(#app-shell) :is(.ego-form-sheet .button.primary, .ego-welcome-primary,
   .ego-auth-sheet .online-auth-tabs [aria-pressed=true]) {
   background: var(--ego-action);
-  border-color: #1b70d6;
+  border-color: #001bcc;
   color: var(--ego-action-ink);
   box-shadow: var(--ego-action-shadow);
 }
 
 @media (hover: hover) {
   #app-shell :is(.app-button.primary, .welcome-provider.primary):not(:disabled):not([aria-disabled=true]):hover,
+  body:has(#app-shell) .online-dialog .button.primary:not(:disabled):not([aria-disabled=true]):hover,
   body:has(#app-shell) :is(.ego-form-sheet .button.primary, .ego-welcome-primary):not(:disabled):not([aria-disabled=true]):hover {
     background: var(--ego-action-hover);
   }
@@ -267,6 +312,7 @@ body:has(#app-shell) :is(.ego-form-sheet .button.primary, .ego-welcome-primary,
 #app-shell :is(.app-button.primary, .welcome-provider.primary):not(:disabled):not([aria-disabled=true]):active,
 #app-shell .app-bottom-nav > a[aria-current]:active,
 #app-shell .category-rail button[aria-pressed=true]:active .category-icon,
+body:has(#app-shell) .online-dialog .button.primary:not(:disabled):not([aria-disabled=true]):active,
 body:has(#app-shell) :is(.ego-form-sheet .button.primary, .ego-welcome-primary):not(:disabled):not([aria-disabled=true]):active {
   background: var(--ego-action-pressed);
   color: var(--ego-action-ink);
@@ -291,13 +337,13 @@ body:has(#app-shell) .ego-welcome-actions button:disabled {
 #app-shell :is(a, button, input, select, textarea):focus-visible,
 body:has(#app-shell) .ego-form-sheet :is(a, button, input, select, textarea):focus-visible,
 body:has(#app-shell) .ego-welcome-actions button:focus-visible {
-  outline: 3px solid #1765bd;
+  outline: 3px solid #8fa7ff;
   outline-offset: 3px;
 }
 
 body:has(#app-shell) .ego-form-sheet .ego-file-drop:focus-within {
-  outline-color: #1765bd;
-  border-color: #1765bd;
+  outline-color: var(--ego-blue);
+  border-color: var(--ego-blue);
 }
 
 /* The prepared verification UI uses the same palette when mounted in the app. */
@@ -309,7 +355,7 @@ body:has(#app-shell) .verification-submit { background: var(--ego-action); color
 body:has(#app-shell) .verification-submit:hover:not(:disabled) { background: var(--ego-action-hover); }
 body:has(#app-shell) .verification-submit:active:not(:disabled) { background: var(--ego-action-pressed); }
 body:has(#app-shell) .verification-resend button { color: var(--ego-accent-ink); }
-body:has(#app-shell) .verification-card button:focus-visible { outline-color: #1765bd; }
+body:has(#app-shell) .verification-card button:focus-visible { outline-color: var(--ego-blue); }
 body:has(#app-shell) .verification-submit:disabled { background: #edf0f4; color: #717a87; box-shadow: none; }
 body:has(#app-shell) .verification-resend button:disabled { color: #717a87; }
 body:has(#app-shell) .verification-card[data-state=expired] .verification-cells span { background: var(--ego-surface-muted); color: #717a87; }
@@ -319,7 +365,7 @@ body:has(#app-shell) .verification-status[data-error=true] { color: #b4232c; }
 /* Recording stays dark for camera visibility; its app actions use the same blue. */
 body:has(#app-shell) .studio-camera-dialog .button.primary {
   background: var(--ego-action);
-  border-color: #1b70d6;
+  border-color: #001bcc;
   color: var(--ego-action-ink);
   box-shadow: var(--ego-action-shadow);
 }
@@ -332,12 +378,13 @@ body:has(#app-shell) .studio-camera-dialog .button.primary:disabled {
   box-shadow: none;
 }
 body:has(#app-shell) .studio-camera-dialog button:focus-visible,
-body:has(#app-shell) .studio-camera-dialog label:focus-within { outline-color: #2f86f4; }
+body:has(#app-shell) .studio-camera-dialog label:focus-within { outline-color: #8fa7ff; }
 
 /* Match primary-control specificity so disabled controls never keep gradients. */
 #app-shell .app-button.primary:is(:disabled, [aria-disabled=true]),
 #app-shell .welcome-provider.primary:is(:disabled, [aria-disabled=true]),
 body:has(#app-shell) .ego-form-sheet .button.primary:is(:disabled, [aria-disabled=true]),
+body:has(#app-shell) .online-dialog .button.primary:is(:disabled, [aria-disabled=true]),
 body:has(#app-shell) .ego-welcome-actions .ego-welcome-primary:is(:disabled, [aria-disabled=true]),
 body:has(#app-shell) .ego-auth-sheet .online-auth-tabs button[aria-pressed=true]:is(:disabled, [aria-disabled=true]),
 body:has(#app-shell) .verification-card .verification-submit:is(:disabled, [aria-disabled=true]),

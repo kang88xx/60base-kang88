@@ -1,13 +1,13 @@
 // Original 60BASE process artwork, copied from:
 // base60-kang88/assets/opalhaus-requested/process-diagrams.js
 // Geometry, easing and finite 4,800ms timeline are unchanged. Only neutral
-// colors vary for the white renewal section; orange remains the source color.
+// colors vary for the white renewal section; accent follows the selected blue.
 export const PROCESS_DURATION = 4800;
 
 export function createProcessRenderer(drawing, step, theme = 'dark') {
   const document = drawing.ownerDocument || globalThis.document;
   const NS = 'http://www.w3.org/2000/svg';
-  const ORANGE = '#ff5d17';
+  const ACCENT = '#0024FF';
   const WHITE = theme === 'light' ? '#303030' : '#dedede';
   const LINE = '#777';
   const MUTED = theme === 'light' ? '#666' : '#999';
@@ -40,10 +40,10 @@ export function createProcessRenderer(drawing, step, theme = 'dark') {
       const dx = Math.cos(angle), dy = Math.sin(angle);
       const line = element('line', { x1: 250, y1: 230, x2: 250 + dx * 190, y2: 230 + dy * 190, stroke: LINE, 'stroke-width': .9 });
       const end = square(250 + dx * 190, 230 + dy * 190, 9);
-      const packet = square(250 + dx * 96, 230 + dy * 96, 9, ORANGE);
+      const packet = square(250 + dx * 96, 230 + dy * 96, 9, ACCENT);
       return { dx, dy, line, end, packet };
     });
-    const hub = square(250, 230, 29, ORANGE);
+    const hub = square(250, 230, 29, ACCENT);
     return t => {
       const seconds = t / 1000;
       spokes.forEach(({ dx, dy, line, end, packet }, i) => {
@@ -68,10 +68,10 @@ export function createProcessRenderer(drawing, step, theme = 'dark') {
       const angle = i * 2.399;
       const startX = 250 + Math.cos(angle) * (145 + i % 3 * 12);
       const startY = 230 + Math.sin(angle) * (145 + i % 3 * 12);
-      const node = square(x, y, 43, i === 4 ? ORANGE : WHITE);
+      const node = square(x, y, 43, i === 4 ? ACCENT : WHITE);
       return { x, y, startX, startY, node };
     });
-    const outline = element('rect', { x: 217, y: 197, width: 66, height: 66, fill: 'none', stroke: ORANGE, 'stroke-width': 1, opacity: 0 });
+    const outline = element('rect', { x: 217, y: 197, width: 66, height: 66, fill: 'none', stroke: ACCENT, 'stroke-width': 1, opacity: 0 });
     return t => {
       const seconds = t / 1000;
       nodes.forEach(({ x, y, startX, startY, node }, i) => {
@@ -90,8 +90,8 @@ export function createProcessRenderer(drawing, step, theme = 'dark') {
       diamond(250, cy, 330, 155, group, index === 0 ? WHITE : MUTED);
       return { group, cy, index };
     });
-    const marker = diamond(250, 165, 25, 13, drawing, ORANGE);
-    marker.setAttribute('fill', ORANGE);
+    const marker = diamond(250, 165, 25, 13, drawing, ACCENT);
+    marker.setAttribute('fill', ACCENT);
     return t => {
       const seconds = t / 1000;
       layers.forEach(({ group, index }) => {
@@ -113,8 +113,8 @@ export function createProcessRenderer(drawing, step, theme = 'dark') {
       element('line', { x1: 122 + i * 64, y1: 102, x2: 122 + i * 64, y2: 358, stroke: MUTED, 'stroke-width': 1 });
       element('line', { x1: 122, y1: 102 + i * 64, x2: 378, y2: 102 + i * 64, stroke: MUTED, 'stroke-width': 1 });
     }
-    const scan = element('line', { x1: 118, y1: 102, x2: 382, y2: 102, stroke: ORANGE, 'stroke-width': 1.7 });
-    const completed = element('rect', { x: 315, y: 103, width: 62, height: 62, fill: ORANGE, opacity: 0 });
+    const scan = element('line', { x1: 118, y1: 102, x2: 382, y2: 102, stroke: ACCENT, 'stroke-width': 1.7 });
+    const completed = element('rect', { x: 315, y: 103, width: 62, height: 62, fill: ACCENT, opacity: 0 });
     return t => {
       const seconds = t / 1000;
       const progress = smooth((seconds - .4) / 2.8);

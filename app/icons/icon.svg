@@ -2,9 +2,14 @@
 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 320 336.7">
   <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
   <defs>
+    <linearGradient id="ego-s02-body" x1="0" y1="0" x2=".6" y2="1">
+      <stop offset="0%" stop-color="#4265FF"/>
+      <stop offset="52%" stop-color="#0024FF"/>
+      <stop offset="100%" stop-color="#001BCC"/>
+    </linearGradient>
     <style>
       .st0 {
-        fill: #2f86f4;
+        fill: url(#ego-s02-body);
       }
 
       .st1 {

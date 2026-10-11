@@ -1,5 +1,13 @@
 # 60BASE web release
 
+## Separate favicon, installed icon and runtime symbol · 2026-10-11 16:20
+
+The owner supplied screenshot `스크린샷 2026-10-11 162015.png` and a newly edited `C:/Users/kslee/Desktop/app_simbol.svg`. Keep the 60base.ai company homepage favicon unchanged. Other active pages use the comparison-page favicon: #0024FF rounded square with two white circular eyes. Keep the current installed/PWA/native app icon artwork unchanged. Use the supplied new SVG byte-for-byte for runtime app symbols everywhere, including the homepage EGO entry; the animated intro uses its exact body and eye geometry. The supplied rounded body and solid #0024FF supersede S02 for runtime symbols only. Keep B02 buttons and G02 backgrounds. Never regenerate installed icon PNGs from the new runtime symbol or the favicon.
+
+## Selected electric-blue styles · 2026-10-11
+
+The owner selected button B02, symbol S02 and app background G02 from the electric-blue comparison, and explicitly changed the company website's orange accents to #0024FF with B02 buttons. This supersedes the earlier sky-blue/light-canvas direction below. B02 is linear-gradient(135deg,#4265ff,#0024ff 55%,#001bcc), with white text and the selected blue shadow. S02 retains the original symbol paths/eyes/transparency with #4265FF → #0024FF at 52% → #001BCC. G02 is linear-gradient(160deg,#0024ff 0%,#001bcc 56%,#000a66 100%) on the app canvas, with readable white cards and appropriate foreground text. The company homepage keeps its layout and company mark geometry. Preserve semantic status colors and all behavior, auth, backend and account boundaries. Mirror the reviewed appearance in the private iOS overlay; store submission remains deferred.
+
 ## Latest reference-blue interface direction · 2026-10-11
 
 The owner's latest correction is “주황색말고 그냥 내가 방금 준 이미지 색상으로 앱에 적용해줘”, referring to `스크린샷 2026-10-11 005624.png`, followed explicitly by “아이콘 및 심볼도 색상을 해당 참고 이미지를 참고해서 색상 바꿔줘 (이제 주황색 컬러를 쓰지 않을거야)”. This supersedes ALL older orange/byte-exact appearance constraints for app branding: use sky-blue/blue gradients, cool light-gray canvas, white rounded cards, dark titles and gray secondary text. Keep the final interface presentation in `app/ego-reference-theme.css`. Derive blue symbol/icon/favicon/PWA/native/store-prepared artwork while preserving geometry, eyes and intended transparency; archive the orange master. The Claude D intro keeps its geometry, timing and typography but its flood/blob also becomes blue. Company 60BASE branding is separate and unchanged. Apply the same reviewed theme and blue artwork to the private iOS overlay; no store submission.

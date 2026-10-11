@@ -7,7 +7,7 @@
 .process-step > button { display: grid; grid-template-columns: 30px 1fr 20px; align-items: center; gap: 16px; width: 100%; text-align: left; background: transparent; padding: 0; min-height: 36px; }
 .process-step > button .arrow { opacity: 0; transform: translateX(-5px); transition: opacity .3s, transform .3s; }
 .process-step.is-active > button .arrow, .process-step > button:hover .arrow, .process-step > button:focus-visible .arrow { opacity: 1; transform: none; }
-.process-step.is-active .step-number { color: #da3f10; }
+.process-step.is-active .step-number { color: #001BCC; }
 .process-motion-layout .process-step p { margin-top: 12px; padding-left: 46px; }
 .section-quality .quality-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 28px; }
 .quality-item .original-quality-motion { width: 100%; max-width: 240px; margin: 0 auto 28px; }
@@ -368,7 +368,7 @@ html, body { overflow-x: clip; }
   padding: 14px 0;
   font-size: 16px;
   line-height: 1.4;
-  caret-color: #ff5d17;
+  caret-color: #0024FF;
   transition: border-color .3s ease;
 }
 
@@ -411,8 +411,8 @@ html, body { overflow-x: clip; }
   min-height: 52px;
   padding: 14px 20px;
   border-radius: 6px;
-  background: #ff5d17;
-  color: #111;
+  background: #0024FF;
+  color: #fff;
   font-family: var(--body);
   font-size: 15px;
   font-weight: 600;
@@ -420,7 +420,7 @@ html, body { overflow-x: clip; }
 }
 
 .section-contact .contact-submit:is(:hover, :focus-visible) {
-  background: #ff793f;
+  background: #4265FF;
 }
 
 .section-contact .contact-direct-email {

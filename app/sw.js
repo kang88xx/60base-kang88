@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-reference-blue-v7';
+const CACHE='60base-app-20261011-ego-electric-blue-b02-s02-g02-v8';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -26,6 +26,7 @@ const SHELL=[
   "/app/manifest.webmanifest",
   "/app/icons/icon.svg",
   "/app/icons/symbol.svg",
+  "/app/icons/favicon.svg",
   "/app/icons/favicon-32.png",
   "/app/icons/icon-192.png",
   "/app/icons/icon-512.png",

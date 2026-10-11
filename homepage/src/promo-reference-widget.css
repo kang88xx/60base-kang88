@@ -14,12 +14,12 @@
 .opal-promo-label-alt {top:-16px;left:12px}
 .opal-promo-disc {position:absolute;right:11px;top:50%;transform:translateY(-50%);height:17px;width:17px;border-radius:50%;background:white;transition:width .4s cubic-bezier(.2,.85,.25,1.1),height .4s cubic-bezier(.2,.85,.25,1.1),right .4s cubic-bezier(.2,.85,.25,1.1),background .4s}
 .opal-promo-bolt {position:absolute;right:14px;top:12.5px;width:11px;height:11px;fill:#222;transition:width .4s,height .4s,right .4s,top .4s,fill .4s;z-index:1}
-.opal-promo-buy:is(:hover,:focus-visible),.opal-promo-buy[data-hover="true"] {background:#dd453d}
+.opal-promo-buy:is(:hover,:focus-visible),.opal-promo-buy[data-hover="true"] {background:#0024FF}
 .opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-main,.opal-promo-buy[data-hover="true"] .opal-promo-label-main {top:39px;left:12px;color:#222}
 .opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-alt,.opal-promo-buy[data-hover="true"] .opal-promo-label-alt {top:11px;left:13px}
-.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-disc,.opal-promo-buy[data-hover="true"] .opal-promo-disc {width:279px;height:279px;right:-113px;background:#dd453d}
+.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-disc,.opal-promo-buy[data-hover="true"] .opal-promo-disc {width:279px;height:279px;right:-113px;background:#0024FF}
 .opal-promo-buy:is(:hover,:focus-visible) .opal-promo-bolt,.opal-promo-buy[data-hover="true"] .opal-promo-bolt {width:16px;height:16px;right:9px;top:9.5px;fill:white}
-.opal-promo a:focus-visible {outline:2px solid #f86330;outline-offset:3px}
+.opal-promo a:focus-visible {outline:2px solid #0024FF;outline-offset:3px}
 .opal-promo[data-fixed="true"] {position:fixed;right:20px;bottom:63px;z-index:20}
 @media(prefers-reduced-motion:reduce){.opal-promo *{transition:none!important;animation:none!important}}
 html[data-reduced-motion="true"] .opal-promo *{transition:none!important;animation:none!important}
