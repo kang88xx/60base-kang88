@@ -230,7 +230,7 @@ export function App() {
 
         <section className="section-about section-pad" id="about" aria-labelledby="about-title">
           <SectionLabel>{t.aboutLabel}</SectionLabel>
-          <div className="about-content" data-reveal><h2 id="about-title"><Multiline text={t.aboutTitle} /></h2><div className="about-bottom"><p>{t.aboutCopy}</p><div className="about-links"><a className="text-link" href="https://huggingface.co/60base" target="_blank" rel="noreferrer"><span className="about-huggingface-label"><img className="about-huggingface-logo" src="/assets/brand/huggingface-logo.svg" alt="" aria-hidden="true" width="20" height="20" />HUGGING FACE</span><Arrow diagonal /></a><a className="text-link" href="https://60base.ai/docs/60BASE-Company-Profile-KO.pdf" target="_blank" rel="noopener noreferrer" aria-label={language === 'en' ? 'Company profile (Korean PDF, opens in a new tab)' : '회사소개서 (PDF, 새 창)'}>{t.profile}<Arrow diagonal /></a></div></div></div>
+          <div className="about-content" data-reveal><h2 id="about-title"><Multiline text={t.aboutTitle} /></h2><div className="about-bottom"><p>{t.aboutCopy}</p><div className="about-links"><a className="text-link" href="https://huggingface.co/60base" target="_blank" rel="noreferrer"><span className="about-huggingface-label"><img className="about-huggingface-logo" src="/assets/brand/huggingface-logo.svg" alt="" aria-hidden="true" width="20" height="20" />HUGGING FACE</span><Arrow diagonal /></a><button className="text-link" type="button" disabled>{t.profile}<Arrow diagonal /></button></div></div></div>
         </section>
 
         <SelectedData t={t} samples={samples.slice(0, 4)} localeIndex={localeIndex} onOpenFilm={openFilm} filmOpen={Boolean(film)} />

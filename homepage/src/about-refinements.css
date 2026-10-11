@@ -39,6 +39,10 @@
   flex-shrink: 0;
 }
 
+.section-about .about-links .text-link:disabled .arrow {
+  transform: none;
+}
+
 /* Official colored logomark from https://huggingface.co/brand, retrieved 2026-10-09.
    Original SVG: https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg */
 .section-about .about-links .about-huggingface-label {

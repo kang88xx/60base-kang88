@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Disable the company profile action · 2026-10-11 22:33
+
+The owner requested disabling the visible COMPANY PROFILE / 회사소개서 action in the ABOUT section, as shown in `스크린샷 2026-10-11 223345.png`. Keep its position, text and arrow, but use a native disabled button without a PDF href, download, navigation or keyboard activation. Retain the existing disabled appearance and suppress its arrow hover motion. Keep the adjacent Hugging Face link active. This supersedes the older request to activate the profile PDF link; do not delete the PDF asset. Publish through the established checked GitHub/Vercel workflow.
+
 ## Two-scene Android promo loop · 2026-10-11 21:40
 
 The owner requested removing the plain `ego APP / ANDROID` scene shown in `스크린샷 2026-10-11 214032.png` and rotating only the other two scenes. The matching `android-01.svg` and `android-03.svg` are identical, so remove both from `FixedPromo`'s slide list. Retain `android-02.svg` and `android-04.svg` in that order with the existing loop timing and motion. Keep Android disabled, App Store active, the contributor card hidden, and the compact dock placement. Publish through the established checked GitHub/Vercel workflow.
