@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Two-scene Android promo loop · 2026-10-11 21:40
+
+The owner requested removing the plain `ego APP / ANDROID` scene shown in `스크린샷 2026-10-11 214032.png` and rotating only the other two scenes. The matching `android-01.svg` and `android-03.svg` are identical, so remove both from `FixedPromo`'s slide list. Retain `android-02.svg` and `android-04.svg` in that order with the existing loop timing and motion. Keep Android disabled, App Store active, the contributor card hidden, and the compact dock placement. Publish through the established checked GitHub/Vercel workflow.
+
 ## Temporarily hide the contributor card · 2026-10-11 21:33
 
 The owner requested hiding the white EGO CONTRIBUTOR APP card shown in `스크린샷 2026-10-11 213348.png` and moving the two store badges down into the vacated space. Keep the disabled card available in source but remove it from layout and accessibility with `display:none`. The desktop dock is now 101px tall (60px Android + 5px gap + 36px App Store), retaining its previous bottom edge so both visible badges move down 49px. Mobile uses two compact columns with no empty third slot and retains its safe-area bottom alignment. Preserve the active App Store URL/B02 styling and disabled Android behavior. This supersedes the earlier instruction to keep the white card visible. The established checked GitHub/Vercel publication remains authorized.

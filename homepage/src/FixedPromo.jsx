@@ -6,9 +6,7 @@ import './fixed-promo.css';
 // Sources: /assets/opalhaus-promo/{promo-widget,60base-promo}.js.
 const APP_STORE_URL = 'https://apps.apple.com/kr/app/id6813374012';
 const slides = [
-  ['android-01.svg', 'ego APP · Android'],
   ['android-02.svg', 'ego APP · Android · Physical AI Studio'],
-  ['android-03.svg', 'ego APP · Android'],
   ['android-04.svg', 'ego APP · Physical AI Studio · Android'],
 ].map(([file, alt]) => ({ src: `/assets/promo/${file}`, alt }));
 
