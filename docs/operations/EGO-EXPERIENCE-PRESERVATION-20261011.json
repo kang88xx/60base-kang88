@@ -104,6 +104,11 @@
           "before": "const CACHE='60base-app-20261011-ego-compact-ui-v10';",
           "after": "const CACHE='60base-app-20261011-ego-selected-ui-v11';",
           "review": "selected-ui-n03-c01-p01-20261011"
+        },
+        {
+          "before": "const CACHE='60base-app-20261011-ego-selected-ui-v11';",
+          "after": "const CACHE='60base-app-20261011-ego-apple-asset-v12';",
+          "review": "app-store-native-asset-20261011"
         }
       ]
     },

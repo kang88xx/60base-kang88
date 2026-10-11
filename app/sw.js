@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-selected-ui-v11';
+const CACHE='60base-app-20261011-ego-apple-asset-v12';
 const SHELL=[
   "/app/",
   "/app/index.html",

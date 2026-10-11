@@ -16,7 +16,7 @@ export function welcomeScreen(state, { icon }) {
       ${checking ? '<p class="welcome-status" role="status">계정을 확인하고 있어요…</p>' : ''}
       ${error ? `<p class="welcome-error" role="alert">${esc(error)}</p>` : ''}
       ${state.access === 'registrationRequired' ? '<button class="welcome-provider primary" data-app-action="login">회원가입 완료하기</button>' : ''}
-      ${appleSignInEnabled ? `<button class="welcome-provider" data-app-action="login" data-provider="apple" ${checking ? 'disabled' : ''}><img src="../assets/promo/platform-apple.svg" width="23" height="25" alt="">Apple로 계속하기</button>` : ''}
+      ${appleSignInEnabled ? `<button class="welcome-provider" data-app-action="login" data-provider="apple" ${checking ? 'disabled' : ''}><img src="../assets/icons/platform-apple.svg" width="23" height="25" alt="">Apple로 계속하기</button>` : ''}
       <button class="welcome-provider" data-app-action="login" data-provider="google" ${checking ? 'disabled' : ''}><img src="../assets/brand/google-signin-g.png" width="23" height="23" alt="">Google로 계속하기</button>
       <button class="welcome-provider primary" data-app-action="login" data-provider="email" ${checking ? 'disabled' : ''}>${icon('envelope')}이메일로 계속하기</button>
       <p class="welcome-legal"><a href="../studio/terms.html">이용약관</a><span>·</span><a href="../studio/privacy.html">개인정보 처리방침</a></p>

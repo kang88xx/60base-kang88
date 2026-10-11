@@ -34,18 +34,6 @@ export function FixedPromo({ language = 'en' }) {
       demo: false, part: 'combined', scale: 1, fixed: false,
     });
     const banner = disableStoreLink(host.querySelector('.opal-promo-banner'), 'Android');
-    const appBrand = document.createElement('span');
-    appBrand.className = 'base60-promo-app-brand';
-    appBrand.setAttribute('aria-hidden', 'true');
-    const appSymbol = document.createElement('img');
-    appSymbol.src = '/app/icons/symbol.svg';
-    appSymbol.alt = '';
-    appSymbol.width = 20;
-    appSymbol.height = 20;
-    const appName = document.createElement('span');
-    appName.textContent = 'ego APP';
-    appBrand.append(appSymbol, appName);
-    banner.querySelector('.opal-promo-viewport').append(appBrand);
     const buy = host.querySelector('.opal-promo-buy');
     buy.title = language === 'en' ? 'Download ego APP on the App Store' : 'App Store에서 ego APP 다운로드';
     buy.querySelector('.opal-promo-label-main').textContent = 'App Store';
@@ -57,10 +45,12 @@ export function FixedPromo({ language = 'en' }) {
     apple.setAttribute('aria-hidden', 'true');
     buy.querySelector('.opal-promo-bolt').replaceWith(apple);
 
-    const badge = document.createElement('a');
+    const badge = document.createElement('button');
     badge.className = 'base60-training-badge';
-    badge.href = '/app/#home';
-    badge.setAttribute('aria-label', language === 'en' ? 'EGO · Open the contributor app' : '에고 EGO · 촬영 참여 앱 열기');
+    badge.type = 'button';
+    badge.disabled = true;
+    badge.title = language === 'en' ? 'EGO contributor app — coming soon' : '에고 EGO · 촬영 참여 앱 준비 중';
+    badge.setAttribute('aria-label', badge.title);
     const symbol = document.createElement('img');
     symbol.src = '/app/icons/symbol.svg';
     symbol.alt = '';
