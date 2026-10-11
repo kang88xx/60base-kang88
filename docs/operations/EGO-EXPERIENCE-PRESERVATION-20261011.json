@@ -94,6 +94,11 @@
           "before": "  \"/app/icons/phosphor/sign-out.svg\",\n  \"/app/icons/phosphor/squares-four.svg\",\n  \"/app/icons/phosphor/t-shirt.svg\",\n  \"/app/icons/phosphor/trophy.svg\",\n  \"/app/icons/phosphor/upload-simple.svg\",\n  \"/app/icons/phosphor/user.svg\",\n  \"/app/icons/phosphor/video-camera.svg\",\n  \"/app/icons/phosphor/wallet.svg\",\n",
           "after": "  \"/app/icons/phosphor/sign-out.svg\",\n  \"/app/icons/phosphor/squares-four.svg\",\n  \"/app/icons/phosphor/t-shirt.svg\",\n  \"/app/icons/phosphor/trophy.svg\",\n  \"/app/icons/phosphor/bell.svg\",\n  \"/app/icons/phosphor/upload-simple.svg\",\n  \"/app/icons/phosphor/user.svg\",\n  \"/app/icons/phosphor/video-camera.svg\",\n  \"/app/icons/phosphor/wallet.svg\",\n",
           "review": "qa-review-implementation-20261011"
+        },
+        {
+          "before": "const CACHE='60base-app-20261011-ego-review-improvements-v9';",
+          "after": "const CACHE='60base-app-20261011-ego-compact-ui-v10';",
+          "review": "compact-member-ui-20261011"
         }
       ]
     },

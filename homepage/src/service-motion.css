@@ -60,10 +60,14 @@
 .service-motion .scene-canvas .variation-track-group { position: absolute; inset: 0; }
 .service-motion .scene-canvas .variation-track { position: absolute; box-sizing: border-box; border: 1px solid var(--line); background: var(--ground); }
 .service-motion .scene-canvas .variation-sync-scan { position: absolute; border-left: 1px solid var(--ink); width: 5px; background: var(--chip); z-index: 2; }
-.service-motion .scene-canvas .variation-sync-scan::before { content: ''; position: absolute; top: -4px; left: -4px; width: 7px; height: 7px; background: var(--ink); }
 .service-motion .scene-canvas .variation-packet { position: absolute; box-sizing: border-box; border: 1px solid var(--ink); background: var(--ground); }
 .service-motion .scene-canvas .variation-packet-title { font-size: 17px; letter-spacing: -.04em; }
 
 /* Keep the selected motion artwork without another brand's study headings. */
 .service-motion .scene-canvas .variation-eyebrow { visibility: hidden; }
+
+/* Owner-selected accents: recording ink, timeline cursor and scan line only. */
+.service-motion[data-source-scene='2'] .variation-rec { color: #0024ff; }
+.service-motion[data-source-scene='1'] .variation-cursor { background: #0024ff; }
+.service-motion[data-source-scene='4'] .variation-sync-scan { border-left-color: #0024ff; background: transparent; }
 

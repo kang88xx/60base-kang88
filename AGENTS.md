@@ -1,5 +1,11 @@
 # 60BASE web release
 
+## Compact member UI and interaction studies · 2026-10-11 17:05
+
+The owner requested shorter scrolling, removal of the detached activity-save strip and white image outlines, improved typography, and a brighter member canvas so the exact blue runtime symbol is visible. Use a light #F4F6FF member canvas while keeping the existing intro and login/welcome G02 backgrounds unchanged. Preserve B02 actions, all content/reward approval conditions, navigation labels and behavior. Provide four working alternatives each for bottom navigation, activity cards and point display in the isolated QA comparison Site; do not silently select a new variant for production. The existing GitHub/Vercel and private iOS presentation-sync workflow is authorized. No store submission.
+
+For company homepage Services illustrations, change only the first scene's REC text and dot to #0024FF; the second scene's small horizontal timeline cursor to #0024FF; and the third scene's moving vertical scan line to #0024FF, removing its top square. Preserve the illustration geometry, monochrome linework, timing and reduced-motion behavior.
+
 ## Apply the complete QA review · 2026-10-11
 
 The owner explicitly requested all improvements in the published `/review/` report. Implement its eight findings: current administrator instructions in app activities, preparation for dynamically published tasks, persistent bottom navigation labels, readable secondary typography/contrast, administrator decision preflight/focus feedback, pending-queue links and truthful connection copy, consistent announcements and larger carousel controls, and popup repeat-display/image-alternative guidance. Keep authentication, permissions, recording/upload consent, three review stages, reward rules, deletion and native identity boundaries. These targeted fixes and the remaining QUALITY & RIGHTS orange artwork recoloring are authorized for the existing checked GitHub/Vercel release workflow. Update the isolated QA preview and report with verified results, and mirror app changes into the private iOS overlay without store submission.

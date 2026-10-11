@@ -1,5 +1,5 @@
-/* Selected B02 controls, owner-supplied runtime artwork and G02 canvas. Load after participant styles.
-   Preserve layout, launch motion, native/session behavior and semantic states. */
+/* Selected B02 controls, owner-supplied runtime artwork and G02 entry canvas.
+   Compact member screens below use a light canvas; welcome and launch stay G02. */
 body:has(#app-shell) {
   --ego-canvas: #000a66;
   --ego-background: linear-gradient(160deg, #0024ff 0%, #001bcc 56%, #000a66 100%);
@@ -381,6 +381,141 @@ body:has(#app-shell) .ego-welcome-actions button:disabled {
   color: #717a87;
   box-shadow: none;
   opacity: 1;
+}
+
+/* Compact participant workspace. Entry/authentication and launch retain G02. */
+#app-shell:not([data-screen=welcome]) {
+  --ego-canvas: #f4f6ff;
+  --ego-background: none;
+  --ego-on-canvas: #242932;
+  --ego-on-canvas-muted: #596273;
+  background: var(--ego-canvas);
+  color: var(--ego-ink);
+}
+#app-shell:not([data-screen=welcome]) .app-header {
+  min-height: calc(76px + env(safe-area-inset-top));
+  padding: calc(14px + env(safe-area-inset-top)) 20px 10px;
+}
+#app-shell:not([data-screen=welcome]) #app-main {
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 16px calc(100px + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+}
+#app-shell:not([data-screen=welcome]) .app-brand img { filter: none; }
+#app-shell:not([data-screen=welcome]) .screen-footer { background: rgb(244 246 255 / 97%); border-color: #dfe5f2; padding-top: 10px; }
+#app-shell:not([data-screen=welcome]) .screen-footer > .app-button { min-height: 50px; }
+#app-shell:not([data-screen=welcome]) .app-bottom-nav { min-height: 66px; padding: 5px; bottom: calc(14px + env(safe-area-inset-bottom)); }
+#app-shell:not([data-screen=welcome]) .app-bottom-nav > a { min-height: 54px; }
+#app-shell:not([data-screen=welcome]) .rail-dots button[aria-pressed=true] span,
+#app-shell:not([data-screen=welcome]) .step-dots [aria-current]::after { background: var(--ego-blue); }
+#app-shell:not([data-screen=welcome]) .rail-dots button:not([aria-pressed=true]) span { background: #a8b2cc; }
+#app-shell:not([data-screen=welcome]) .ranking-row:not(.is-me) { border-color: #dfe5f2; }
+
+/* Shorter, borderless featured cards keep their description and reward condition. */
+#app-shell .ego-home-intro { margin: 3px 0 16px; }
+#app-shell .ego-home-intro h1 { font-size: 26px; line-height: 1.3; font-weight: 650; }
+#app-shell .ego-home-intro .eyebrow { margin-bottom: 7px; font-size: 11px; }
+#app-shell .ego-home-intro .round-button { margin-top: 15px; }
+#app-shell .ego-featured { margin: 0 -16px 8px; }
+#app-shell .ego-featured .feature-rail { padding: 0 16px 4px; scroll-padding-left: 16px; gap: 12px; }
+#app-shell .ego-featured .feature-card { flex-basis: 88%; border: 0; border-radius: 22px; box-shadow: 0 3px 12px #20304b08; }
+#app-shell .feature-card .task-media { aspect-ratio: 2.25; }
+#app-shell .feature-copy { padding: 14px 16px; }
+#app-shell .feature-copy h2 { font-size: 21px; line-height: 1.3; font-weight: 700; margin: 5px 0 6px; }
+#app-shell .feature-copy p { min-height: 0; font-size: 14px; line-height: 1.5; margin: 0; }
+#app-shell .feature-reward { margin-top: 12px; padding-top: 10px; }
+#app-shell .ego-guide-banner { padding: 12px 16px; border-radius: 21px; margin-bottom: 18px; }
+#app-shell .ego-guide-banner h2 { font-size: 18px; line-height: 1.25; margin: 4px 0; }
+#app-shell .ego-guide-banner > img { width: 58px; height: 62px; transform: translateY(-5px); }
+#app-shell .ego-activity-section > .section-row { margin: 0 0 8px; }
+#app-shell .category-rail { gap: 13px; margin: 4px -2px 8px; padding: 3px 2px 5px; }
+#app-shell .category-rail > button { gap: 4px; }
+#app-shell .category-icon { width: 44px; height: 44px; border-radius: 15px; }
+#app-shell .ego-mission-list { grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+#app-shell .ego-mission-row { min-width: 0; padding: 11px 13px 13px; border-radius: 19px; }
+#app-shell .mission-kind { padding-bottom: 7px; margin-bottom: 9px; }
+#app-shell .mission-row-content { gap: 10px; }
+#app-shell .mission-row-copy h3 { overflow-wrap: anywhere; }
+
+/* The link and save control share one card, with no nested interactive controls. */
+#app-shell .task-list { gap: 12px; margin-bottom: 16px; }
+#app-shell .task-with-save { background: #fff; border: 1px solid #e4e9f3; border-radius: 20px; overflow: hidden; color: var(--ego-ink); box-shadow: var(--ego-card-shadow); }
+#app-shell .task-with-save .task-card { grid-template-columns: 76px minmax(0, 1fr); gap: 12px; min-height: 0; padding: 12px 12px 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+#app-shell .task-with-save .task-media,
+#app-shell .task-with-save .task-icon-media { width: 76px; height: 88px; min-height: 0; border-radius: 13px; overflow: hidden; }
+#app-shell .task-with-save .task-icon-media > span:not(.app-icon) { display: none; }
+#app-shell .task-with-save .task-icon-media > .app-icon { width: 30px; height: 30px; flex-basis: 30px; }
+#app-shell .task-card-copy { padding: 1px 0; min-width: 0; }
+#app-shell .task-card-copy > span { font-size: 12px; color: var(--ego-muted); }
+#app-shell .task-card-copy h2 { font-size: 17px; line-height: 1.35; font-weight: 700; margin: 5px 0; overflow-wrap: anywhere; }
+#app-shell .task-card-copy p { margin: 0; font-size: 13px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#app-shell .task-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 12px 10px; }
+#app-shell .task-card-reward { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+#app-shell .task-card-reward > small { font-size: 12px; color: var(--ego-muted); }
+#app-shell .task-with-save .task-save { width: auto; flex: none; min-width: 83px; min-height: 44px; padding: 8px 10px; border: 0; border-radius: 12px; background: #f2f4fb; color: #4f5d72; font-size: 12px; font-weight: 600; }
+#app-shell .task-with-save .task-save[aria-pressed=true] { background: var(--ego-orange-soft); color: var(--ego-blue); }
+#app-shell .task-with-save .task-save .app-icon { width: 16px; height: 16px; flex-basis: 16px; }
+#app-shell .task-with-save .task-card:focus-visible { outline-offset: -3px; }
+
+/* Reduce repeated space while keeping body copy readable across member routes. */
+#app-shell:not([data-screen=welcome]) .screen-heading { margin: 3px 0 12px; }
+#app-shell:not([data-screen=welcome]) .screen-heading h1 { font-size: 26px; font-weight: 650; }
+#app-shell:not([data-screen=welcome]) .screen-heading p { margin-top: 8px; font-size: 14px; }
+#app-shell .section-row h2 { font-size: 17px; font-weight: 650; }
+#app-shell .app-search { margin: 8px 0; min-height: 46px; }
+#app-shell .app-search input { min-height: 44px; }
+#app-shell .review-filters { margin: 4px 0; }
+#app-shell .result-count { margin-bottom: 4px; }
+#app-shell .ego-progress-card,
+#app-shell .ego-total-card { padding: 19px; margin-bottom: 16px; border-radius: 23px; }
+#app-shell .ego-progress-card h2 { margin: 16px 0 12px; font-size: 42px; }
+#app-shell .progress-labels { margin-bottom: 12px; }
+#app-shell .ego-progress-card > p { padding: 10px 11px; }
+#app-shell .ego-total-card strong { font-size: 30px; }
+#app-shell .ranking-podium { padding: 18px 0 23px; }
+#app-shell .ranking-row { padding-top: 13px; padding-bottom: 13px; }
+#app-shell .balance-card { padding: 22px; margin-bottom: 14px; border-radius: 23px; }
+#app-shell .balance-card > strong { margin: 10px 0 12px; font-size: 44px; }
+#app-shell .bank-coming { margin-bottom: 18px; }
+#app-shell .ledger-list > article { padding: 15px; border-radius: 18px; }
+#app-shell .identity-card { padding: 15px; margin-bottom: 14px; border-radius: 21px; }
+#app-shell .ego-share-card { padding: 20px; margin-bottom: 14px; border-radius: 23px; }
+#app-shell .ego-share-card h1 { margin: 15px 0 10px; font-size: 26px; }
+#app-shell .profile-stat-grid { margin: 16px 0; }
+#app-shell .profile-stat-grid > div { min-height: 68px; border-radius: 15px; }
+#app-shell .profile-shortcuts { gap: 8px; margin-bottom: 20px; }
+#app-shell .profile-shortcuts a { padding: 13px 10px; }
+#app-shell .settings-section { margin-bottom: 22px; }
+#app-shell .settings-row { padding-top: 13px; padding-bottom: 13px; }
+#app-shell .submission-card { padding: 15px; border-radius: 20px; }
+#app-shell .reward-panel { padding: 19px; margin-bottom: 19px; border-radius: 22px; }
+#app-shell .reward-panel > strong { font-size: 34px; }
+#app-shell .detail-sample { margin-bottom: 19px; }
+#app-shell .detail-section { margin: 20px 0; }
+#app-shell .detail-section h2 { margin-bottom: 11px; }
+#app-shell .app-education { gap: 16px; }
+#app-shell .prep-panel { padding: 16px; border-radius: 21px; }
+#app-shell .prep-panel-head { margin-bottom: 12px; }
+#app-shell .prep-activity-list { gap: 9px; }
+#app-shell .prep-activity-main { grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding-right: 54px; }
+#app-shell .prep-activity-main img,
+#app-shell .prep-activity-icon { width: 64px; }
+#app-shell .prep-save { width: 44px; height: 44px; right: 6px; top: 7px; }
+#app-shell .prep-status { padding: 15px; border-radius: 21px; }
+
+@media(max-width:359px) {
+  #app-shell .task-with-save .task-card { grid-template-columns: 64px minmax(0,1fr); gap: 10px; }
+  #app-shell .task-with-save .task-media,
+  #app-shell .task-with-save .task-icon-media { width: 64px; height: 84px; }
+  #app-shell .task-card-footer { gap: 6px; }
+  #app-shell .task-card-reward { gap: 4px; }
+  #app-shell .task-with-save .task-save { min-width: 76px; padding-left: 8px; padding-right: 8px; }
+  #app-shell .feature-copy { padding: 13px 14px; }
+  #app-shell .feature-copy h2 { font-size: 20px; }
+  #app-shell .ego-guide-banner { padding: 12px 15px; }
+  #app-shell .ego-share-card { padding: 18px; }
+  #app-shell .profile-shortcuts a { font-size: 12px; padding: 12px 8px; }
 }
 
 /* Focus stays visible without changing tap targets or motion preferences. */
