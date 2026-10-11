@@ -99,6 +99,11 @@
           "before": "const CACHE='60base-app-20261011-ego-review-improvements-v9';",
           "after": "const CACHE='60base-app-20261011-ego-compact-ui-v10';",
           "review": "compact-member-ui-20261011"
+        },
+        {
+          "before": "const CACHE='60base-app-20261011-ego-compact-ui-v10';",
+          "after": "const CACHE='60base-app-20261011-ego-selected-ui-v11';",
+          "review": "selected-ui-n03-c01-p01-20261011"
         }
       ]
     },

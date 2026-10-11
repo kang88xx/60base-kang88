@@ -24,16 +24,16 @@ export function welcomeScreen(state, { icon }) {
   </section>`;
 }
 
-export function homeScreen(state, { tasks, taskMedia, rewardPill, categoryRail, icon, ui }) {
+export function homeScreen(state, { tasks, activityCard, categoryRail, icon, ui }) {
   const items = tasks();
   const featured = items.filter(task => task.exampleId).slice(0, 5);
   if (!featured.length) featured.push(...items.slice(0, 4));
   const selected = items.filter(task => ui.category === '전체' || task.category === ui.category);
   return `<section class="ego-home-intro"><div><p class="eyebrow">MY EVERYDAY, OUR AI</p><h1>오늘은 어떤 일상을<br>담아볼까요?</h1></div><a class="round-button" href="#announcements" aria-label="공지사항">${icon('bell')}</a></section>
-    <section class="ego-featured" aria-label="추천 촬영 활동"><div class="feature-rail">${featured.map((task, index) => `<a class="feature-card" href="#activity/${encodeURIComponent(task.id)}">${taskMedia(task, { hero: index === 0 })}<div class="feature-copy"><span class="feature-category">${esc(task.category)} · 영상 촬영</span><h2>${esc(task.title)}</h2><p>${esc(task.description)}</p><div class="feature-reward"><span>검수 승인 시</span>${rewardPill(task)}</div></div></a>`).join('')}</div><div class="rail-dots" role="group" aria-label="추천 활동 선택">${featured.map((task, index) => `<button type="button" data-app-action="feature" data-index="${index}" aria-label="${index + 1}번째 ${esc(task.title)} 보기" aria-pressed="${ui.feature === index}"><span></span></button>`).join('')}</div></section>
+    <section class="ego-featured" aria-label="추천 촬영 활동"><div class="feature-rail">${featured.map(task => activityCard(task, { featured: true })).join('')}</div><div class="rail-dots" role="group" aria-label="추천 활동 선택">${featured.map((task, index) => `<button type="button" data-app-action="feature" data-index="${index}" aria-label="${index + 1}번째 ${esc(task.title)} 보기" aria-pressed="${ui.feature === index}"><span></span></button>`).join('')}</div></section>
     <a class="ego-guide-banner" href="#education"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src="icons/symbol.svg" width="80" height="85" alt=""></a>
     <section class="ego-activity-section"><div class="section-row"><h2>카테고리</h2><a href="#missions">전체 보기 ${icon('caret-right')}</a></div>${categoryRail()}
-    <div class="ego-mission-list">${selected.map(task => `<a class="ego-mission-row" href="#activity/${encodeURIComponent(task.id)}"><div class="mission-kind">${icon('video-camera')} 영상</div><div class="mission-row-content">${taskMedia(task)}<div class="mission-row-copy"><h3>${esc(task.title)}</h3><p>${esc(task.description)}</p></div>${rewardPill(task, 'small')}</div></a>`).join('') || '<p class="muted-caption">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;
+    <div class="ego-mission-list">${selected.map(task => activityCard(task, { homeRow: true })).join('') || '<p class="muted-caption">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;
 }
 
 function progressCard(me, icon) {

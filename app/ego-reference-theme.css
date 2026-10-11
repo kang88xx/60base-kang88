@@ -580,3 +580,107 @@ body:has(#app-shell) .studio-camera-dialog .button.primary:is(:disabled, [aria-d
   box-shadow: none;
   opacity: 1;
 }
+
+/* Owner-selected N03: keep the actual links mounted so flex motion can run. */
+#app-shell:not([data-screen=welcome]) .app-bottom-nav { gap: 2px; border-radius: 21px; }
+#app-shell .app-bottom-nav > a {
+  flex: 1;
+  min-width: 44px;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 15px;
+  transition: color .25s, flex .38s cubic-bezier(.2,.8,.2,1), background .25s;
+}
+#app-shell .app-bottom-nav > a[aria-current] {
+  flex: 1.75;
+  flex-direction: row;
+  gap: 7px;
+  padding-left: 7px;
+  padding-right: 7px;
+  background: var(--ego-action);
+  color: #fff;
+}
+#app-shell .app-bottom-nav > a > .app-icon { width: 22px; height: 22px; flex-basis: 22px; transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+#app-shell .app-bottom-nav > a[aria-current] > .app-icon { transform: scale(1.04); }
+#app-shell .app-bottom-nav > a > span:not(.app-icon) { display: block; font-size: 12px; white-space: nowrap; }
+
+/* P01: the value is primary; its unit stays readable without a circular badge. */
+#app-shell :is(.point-pill, .header-points .point-pill) {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ego-blue);
+  box-shadow: none;
+  font-family: "Ego Satoshi", Pretendard, sans-serif;
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -.025em;
+  white-space: nowrap;
+  max-width: 100%;
+}
+#app-shell .point-pill .point-unit { font-size: 12px; font-weight: 650; letter-spacing: 0; }
+#app-shell .header-points { display: inline-flex; align-items: center; min-height: 44px; }
+#app-shell .header-points .point-pill { min-height: 0; font-size: 21px; }
+#app-shell .reward-mark { display: none; }
+#app-shell :is(.reward-panel > strong, .balance-card > strong, .points-summary strong, .profile-stat-grid strong) { color: var(--ego-blue); }
+#app-shell .reward-panel strong small { font-size: 14px; }
+
+/* C01: image, current task information and conditional reward form one row. */
+#app-shell .ego-choice-card.task-with-save {
+  position: relative;
+  border: 0;
+  border-radius: 16px;
+  padding: 0;
+  background: #fff;
+  box-shadow: 0 6px 20px #203a7f06;
+  overflow: hidden;
+  min-width: 0;
+}
+#app-shell .ego-choice-card .c01-link {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 13px;
+  align-items: center;
+  padding: 13px;
+  min-height: 138px;
+  color: var(--ego-ink);
+}
+#app-shell .ego-choice-card .c01-link:focus-visible { outline: 3px solid var(--ego-blue); outline-offset: -3px; border-radius: 16px; }
+#app-shell .ego-choice-card :is(.task-media, .task-icon-media) { width: 92px; height: 112px; min-height: 0; aspect-ratio: auto; border-radius: 11px; overflow: hidden; }
+#app-shell .ego-choice-card .task-media img { display: block; width: 100%; height: 100%; object-fit: cover; border: 0; }
+#app-shell .ego-choice-card .media-label { display: none; }
+#app-shell .ego-choice-card .task-card-copy { padding: 0; }
+#app-shell .ego-choice-card .task-card-copy > span { display: block; font-size: 12px; font-weight: 550; line-height: 1.5; padding-right: 32px; }
+#app-shell .ego-choice-card .task-card-copy h2 { font-size: 18px; line-height: 1.3; font-weight: 750; margin: 5px 0 7px; padding-right: 30px; overflow-wrap: anywhere; }
+#app-shell .ego-choice-card .c01-reward { display: flex; align-items: baseline; justify-content: space-between; gap: 3px 8px; flex-wrap: wrap; margin-top: 12px; }
+#app-shell .ego-choice-card .c01-reward > small { color: var(--ego-muted); font-size: 12px; white-space: nowrap; }
+#app-shell .ego-choice-card .point-pill { font-size: 20px; }
+#app-shell .ego-choice-card .task-save { position: absolute; right: 4px; top: 9px; width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 12px; background: transparent; z-index: 2; }
+#app-shell .ego-choice-card .task-save .app-icon { width: 19px; height: 19px; flex-basis: 19px; }
+#app-shell .ego-choice-card .task-save[aria-pressed=true] { background: #e9eeff; color: var(--ego-blue); }
+#app-shell .ego-choice-card .task-save:focus-visible { outline-color: var(--ego-blue); outline-offset: -3px; }
+#app-shell .ego-featured .ego-choice-card.feature-card { flex: 0 0 94%; max-width: 450px; display: block; border: 0; }
+/* Home's secondary rows use the same layout with a shorter image to retain its scroll length. */
+#app-shell .ego-choice-card.ego-mission-row .c01-link { grid-template-columns: 80px minmax(0, 1fr); min-height: 112px; padding: 10px 12px; gap: 12px; }
+#app-shell .ego-choice-card.ego-mission-row :is(.task-media, .task-icon-media) { width: 80px; height: 92px; }
+#app-shell .ego-choice-card.ego-mission-row .task-card-copy h2 { font-size: 17px; }
+#app-shell .ego-choice-card.ego-mission-row .c01-reward { margin-top: 8px; }
+
+@media(max-width:359px) {
+  #app-shell .app-bottom-nav > a[aria-current] { flex: 1.55; gap: 4px; }
+  #app-shell .ego-choice-card .c01-link { grid-template-columns: 73px minmax(0,1fr); gap: 9px; padding: 11px; min-height: 126px; }
+  #app-shell .ego-choice-card :is(.task-media, .task-icon-media) { width: 73px; height: 104px; }
+  #app-shell .ego-choice-card .task-card-copy h2 { font-size: 17px; }
+  #app-shell .ego-choice-card.ego-mission-row .c01-link { grid-template-columns: 68px minmax(0,1fr); gap: 9px; }
+  #app-shell .ego-choice-card.ego-mission-row :is(.task-media, .task-icon-media) { width: 68px; height: 92px; }
+  #app-shell .ego-choice-card .point-pill { font-size: 19px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #app-shell .app-bottom-nav > a,
+  #app-shell .app-bottom-nav > a > .app-icon { transition: none; }
+}

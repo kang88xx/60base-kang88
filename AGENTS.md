@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Selected compact UI: N03 / C01 / P01 · 2026-10-11
+
+The owner explicitly selected the published comparison combination N03 (expanding capsule navigation), C01 (horizontal photo/info activity card), and P01 (plain numeric points with a P suffix). Apply these selected presentation patterns to the real participant app and isolated QA copy, and sync the private iOS overlay. Navigation must retain all four labels, touch targets and reduced-motion behavior; its nodes should survive route changes so the expansion animates. Keep independent save controls, recommendation swiping/dots, complete activity details, authoritative points and approval conditions. Preserve the light #F4F6FF member canvas, G02 intro/login, B02 actions, chosen symbols/favicon/install artwork and all existing business/native boundaries. Update the comparison's confirmed/default selection. The established GitHub/Vercel and owner-private Sites deployment workflow remains authorized; no store submission.
+
 ## Compact member UI and interaction studies · 2026-10-11 17:05
 
 The owner requested shorter scrolling, removal of the detached activity-save strip and white image outlines, improved typography, and a brighter member canvas so the exact blue runtime symbol is visible. Use a light #F4F6FF member canvas while keeping the existing intro and login/welcome G02 backgrounds unchanged. Preserve B02 actions, all content/reward approval conditions, navigation labels and behavior. Provide four working alternatives each for bottom navigation, activity cards and point display in the isolated QA comparison Site; do not silently select a new variant for production. The existing GitHub/Vercel and private iOS presentation-sync workflow is authorized. No store submission.
