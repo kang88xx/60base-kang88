@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261011-ego-electric-blue-b02-s02-g02-v8';
+const CACHE='60base-app-20261011-ego-review-improvements-v9';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -83,6 +83,7 @@ const SHELL=[
   "/app/icons/phosphor/squares-four.svg",
   "/app/icons/phosphor/t-shirt.svg",
   "/app/icons/phosphor/trophy.svg",
+  "/app/icons/phosphor/bell.svg",
   "/app/icons/phosphor/upload-simple.svg",
   "/app/icons/phosphor/user.svg",
   "/app/icons/phosphor/video-camera.svg",

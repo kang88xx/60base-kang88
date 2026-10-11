@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Apply the complete QA review · 2026-10-11
+
+The owner explicitly requested all improvements in the published `/review/` report. Implement its eight findings: current administrator instructions in app activities, preparation for dynamically published tasks, persistent bottom navigation labels, readable secondary typography/contrast, administrator decision preflight/focus feedback, pending-queue links and truthful connection copy, consistent announcements and larger carousel controls, and popup repeat-display/image-alternative guidance. Keep authentication, permissions, recording/upload consent, three review stages, reward rules, deletion and native identity boundaries. These targeted fixes and the remaining QUALITY & RIGHTS orange artwork recoloring are authorized for the existing checked GitHub/Vercel release workflow. Update the isolated QA preview and report with verified results, and mirror app changes into the private iOS overlay without store submission.
+
 ## Separate favicon, installed icon and runtime symbol · 2026-10-11 16:20
 
 The owner supplied screenshot `스크린샷 2026-10-11 162015.png` and a newly edited `C:/Users/kslee/Desktop/app_simbol.svg`. Keep the 60base.ai company homepage favicon unchanged. Other active pages use the comparison-page favicon: #0024FF rounded square with two white circular eyes. Keep the current installed/PWA/native app icon artwork unchanged. Use the supplied new SVG byte-for-byte for runtime app symbols everywhere, including the homepage EGO entry; the animated intro uses its exact body and eye geometry. The supplied rounded body and solid #0024FF supersede S02 for runtime symbols only. Keep B02 buttons and G02 backgrounds. Never regenerate installed icon PNGs from the new runtime symbol or the favicon.

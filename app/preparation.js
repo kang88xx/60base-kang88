@@ -1,4 +1,4 @@
-import { activities, examples, exampleFor, activityFor } from './catalog.js';
+import { activities, examples, exampleFor } from './catalog.js';
 
 const capturePlanKey = 'momjit-studio-capture-plan-v1';
 const capturePlanVersion = 1;
@@ -12,7 +12,10 @@ const trainingOptions = {
   q3: ['natural', 'acting'],
 };
 const listeners = new Set();
-const knownActivityIds = new Set(activities.map(item => item.id));
+let currentActivities = activities;
+let knownActivityIds = new Set(activities.map(item => item.id));
+let catalogReady = false;
+let catalogNotice = '';
 const knownExampleIds = new Set(examples.map(item => item.id));
 
 let memoryPlan = defaultPlan();
@@ -43,9 +46,8 @@ function parsePlan(raw) {
     !parsed ||
     parsed.version !== capturePlanVersion ||
     !Array.isArray(parsed.saved) ||
-    parsed.saved.some(id => typeof id !== 'string' || !knownActivityIds.has(id)) ||
-    typeof parsed.selected !== 'string' ||
-    (parsed.selected !== '' && !knownActivityIds.has(parsed.selected))
+    parsed.saved.some(id => typeof id !== 'string' || !id || id.length > 100) ||
+    typeof parsed.selected !== 'string' || parsed.selected.length > 100
   ) throw new Error('Invalid capture plan');
   return {
     version: capturePlanVersion,
@@ -160,18 +162,18 @@ function preflightCount(training = readTraining()) {
 }
 
 function selectedActivity(plan = readPlan()) {
-  return activityFor(plan.selected) || null;
+  return currentActivities.find(item => item.id === plan.selected) || null;
 }
 
 function exampleIdForActivity(id, fallback = readTraining().example) {
-  return exampleFor(activityFor(id))?.id || fallback;
+  return exampleFor(currentActivities.find(item => item.id === id))?.id || fallback;
 }
 
 function noticeText() {
   if (planBroken && trainingBroken) return '촬영 준비 저장값을 읽지 못해 현재 화면에서만 유지돼요. 기존 저장값은 변경하지 않아요.';
   if (planBroken) return '활동 저장값을 읽지 못해 현재 화면에서만 유지돼요. 기존 저장값은 변경하지 않아요.';
   if (trainingBroken) return '촬영 교육 저장값을 읽지 못해 현재 화면에서만 유지돼요. 기존 저장값은 변경하지 않아요.';
-  return '';
+  return catalogNotice;
 }
 
 function fallbackEsc(value) {
@@ -266,8 +268,32 @@ export function subscribePreparation(fn) {
   return () => listeners.delete(fn);
 }
 
+// Only a successfully loaded published catalog can remove saved IDs. On a
+// reload, keep dynamically-created IDs intact while the catalog is in flight.
+export function setPublishedActivities(items) {
+  catalogReady = Array.isArray(items);
+  if (!catalogReady) return;
+  currentActivities = items.filter(item => typeof item?.id === 'string' && item.id && item.published !== 0 && item.published !== false);
+  knownActivityIds = new Set(currentActivities.map(item => item.id));
+  const plan = readPlan();
+  const saved = plan.saved.filter(id => knownActivityIds.has(id));
+  const selected = knownActivityIds.has(plan.selected) ? plan.selected : '';
+  if (saved.length !== plan.saved.length || selected !== plan.selected) {
+    writePlan({ saved, selected });
+    if (plan.selected && !selected) writeTraining({ preflight: {} });
+    catalogNotice = '공개가 종료된 활동을 저장·준비 목록에서 제외했어요. 현재 활동을 다시 골라주세요.';
+  }
+}
+
+export function preparationActivityError(id) {
+  if (!catalogReady) return '현재 공개된 활동을 확인하지 못했어요. 인터넷 연결을 확인하고 다시 불러와주세요.';
+  if (!knownActivityIds.has(id)) return '현재 공개되지 않은 활동이에요. 활동 목록에서 다시 골라주세요.';
+  return '';
+}
+
 export function toggleSavedActivity(id) {
-  if (!knownActivityIds.has(id)) return false;
+  if (preparationActivityError(id)) return false;
+  catalogNotice = '';
   const plan = readPlan();
   const saved = plan.saved.includes(id) ? plan.saved.filter(item => item !== id) : [...plan.saved, id];
   writePlan({ saved });
@@ -276,7 +302,8 @@ export function toggleSavedActivity(id) {
 }
 
 export function selectPreparationActivity(id) {
-  if (!knownActivityIds.has(id)) return false;
+  if (preparationActivityError(id)) return false;
+  catalogNotice = '';
   writePlan({ selected: id });
   writeTraining({ example: exampleIdForActivity(id), preflight: {} });
   notify();
@@ -303,7 +330,7 @@ export function renderEducation(options = {}) {
     </section>
     <section class="prep-panel" aria-labelledby="prep-activity-title">
       <div class="prep-panel-head"><span class="row-icon lavender">${icon('squares-four')}</span><div><h2 id="prep-activity-title">촬영 활동 준비</h2><p>선택하면 해당 예시로 교육 화면이 맞춰지고 촬영 전 체크가 새로 시작돼요.</p></div></div>
-      <div class="prep-activity-list">${activities.map(item => activityCard(item, state.plan, icon, esc)).join('')}</div>
+      <div class="prep-activity-list">${currentActivities.map(item => activityCard(item, state.plan, icon, esc)).join('') || '<p>현재 공개된 촬영 활동이 없어요. 새 활동이 올라오면 이곳에서 선택할 수 있어요.</p>'}</div>
     </section>
     <section class="prep-panel" aria-labelledby="prep-example-title">
       <div class="prep-panel-head"><span class="row-icon peach">${icon('play')}</span><div><h2 id="prep-example-title">예시 영상으로 구도 확인</h2><p>${esc(activeExample.title)} · ${esc(activeExample.note)}</p></div></div>
@@ -326,8 +353,8 @@ export function handlePreparationClick(target) {
   if (!actionTarget) return { handled: false };
   const action = actionTarget.dataset.prepAction;
   let handled = true;
-  if (action === 'save') toggleSavedActivity(actionTarget.dataset.prepId);
-  else if (action === 'select') selectPreparationActivity(actionTarget.dataset.prepId);
+  if (action === 'save') { if (!toggleSavedActivity(actionTarget.dataset.prepId)) return { handled: true, message: preparationActivityError(actionTarget.dataset.prepId) }; }
+  else if (action === 'select') { if (!selectPreparationActivity(actionTarget.dataset.prepId)) return { handled: true, message: preparationActivityError(actionTarget.dataset.prepId) }; }
   else if (action === 'example') {
     const id = actionTarget.dataset.prepExample;
     if (!knownExampleIds.has(id)) return { handled: true, message: '예시 영상을 찾지 못했어요.' };

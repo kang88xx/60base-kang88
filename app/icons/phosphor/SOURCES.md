@@ -5,6 +5,7 @@ official [Phosphor Icons core repository](https://github.com/phosphor-icons/core
 retrieved 2026-09-17.
 
 `trophy.svg` was added from the same official Regular source on 2026-10-11.
+`bell.svg` was added from the same official Regular source on 2026-10-11 for the announcements entry.
 
 - Asset path: `https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/<icon>.svg`
 - Source repository and asset structure: <https://github.com/phosphor-icons/core>

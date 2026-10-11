@@ -105,14 +105,27 @@ export function QualityMotion({ index = 0, language = 'en' }) {
   return <span ref={art} className="original-quality-motion" data-diagram={item.name} data-quality-motion={item.mode} aria-hidden="true">
     <svg className="original-quality-filter-definitions" width="0" height="0" aria-hidden="true" focusable="false">
       <defs>
-        {/* Keep the original pixels; key only the pale paper/grid into transparency.
-            A 222–236 luminance ramp preserves the dark artwork's soft edges. */}
+        {/* Keep the original geometry and neutral linework. Key the pale paper/grid
+            with its original 222–236 luminance ramp, then map the raster's orange
+            accents (including the moving image crop) to the selected brand blue. */}
         <filter id={backgroundFilterId} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
           <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.2126 0.7152 0.0722 0 0" result="paper-luminance" />
           <feComponentTransfer in="paper-luminance" result="artwork-mask">
             <feFuncA type="linear" slope="-18.2142857143" intercept="16.8571428571" />
           </feComponentTransfer>
-          <feComposite in="SourceGraphic" in2="artwork-mask" operator="in" />
+          {/* Swapping red/blue and correcting green preserves every neutral gray
+              and makes compressed, antialiased orange edges blue as well. */}
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 1 0 0  -0.2 1 0.2 0 0  1 0 0 0 0  0 0 0 1 0" result="blue-artwork" />
+          {/* Saturated orange interiors use the exact #0024FF, while the soft
+              edge colors above retain the source artwork's antialiasing. */}
+          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 -1 0 0" result="accent-chroma" />
+          <feComponentTransfer in="accent-chroma" result="accent-mask">
+            <feFuncA type="linear" slope="4" intercept="-0.08" />
+          </feComponentTransfer>
+          <feFlood floodColor="#0024FF" result="brand-blue" />
+          <feComposite in="brand-blue" in2="accent-mask" operator="in" result="blue-accent" />
+          <feComposite in="blue-accent" in2="blue-artwork" operator="over" result="recolored-artwork" />
+          <feComposite in="recolored-artwork" in2="artwork-mask" operator="in" />
         </filter>
       </defs>
     </svg>

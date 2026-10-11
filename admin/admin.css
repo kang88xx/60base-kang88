@@ -293,3 +293,12 @@
  .admin-body .admin-recent .button{min-height:32px;padding:5px 10px}
  .admin-recent-search{min-height:32px}.admin-recent-search input{min-height:30px}
 }
+
+/* Review feedback stays available after the dialog closes and list refreshes. */
+.admin-review-feedback{margin:0 0 20px;padding:16px 18px;border:1px solid #bfd0ee;border-radius:10px;background:#f1f5ff;color:#243f84}
+.admin-review-feedback p{margin:0 0 12px;line-height:1.65;overflow-wrap:anywhere}
+.admin-review-feedback>div{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.admin-review-feedback span{font-size:13px}
+.admin-review-field-help{font-size:13px;line-height:1.65;color:#565b66;margin:0 0 12px}
+.admin-review-decision [aria-invalid="true"]{outline:2px solid #ad322a;outline-offset:2px}
+.admin-review-feedback [tabindex="-1"]:focus{outline:2px solid #0024ff;outline-offset:4px}

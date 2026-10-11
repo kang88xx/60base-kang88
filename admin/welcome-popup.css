@@ -5,5 +5,8 @@
 .admin-popup-field-row label{min-width:0}
 .admin-popup-actions{display:flex;flex-wrap:wrap;gap:10px}
 .admin-welcome-popup .admin-info-line{line-height:1.7;color:#69716d}
-.admin-welcome-popup .button.primary{background:#ff5d17;border-color:#ff5d17;color:#fff}
-.admin-welcome-popup input:focus-visible,.admin-welcome-popup textarea:focus-visible,.admin-welcome-popup select:focus-visible{outline:2px solid #ff5d17;outline-offset:2px}
+.admin-welcome-popup .button.primary{background:linear-gradient(135deg,#4265ff,#0024ff 55%,#001bcc);border-color:#0024ff;color:#fff;box-shadow:0 8px 20px #0024ff28}
+.admin-welcome-popup input:focus-visible,.admin-welcome-popup textarea:focus-visible,.admin-welcome-popup select:focus-visible{outline:2px solid #0024ff;outline-offset:2px}
+
+.admin-popup-save-note{font-size:13px;line-height:1.7;color:#243f84;background:#eef2ff;border-left:3px solid #0024ff;padding:12px 14px;margin:4px 0 0}
+.admin-welcome-popup input[aria-invalid="true"]{border-color:#ad322a}

@@ -6,7 +6,7 @@ body:has(#app-shell) {
   --ego-on-canvas: #fff;
   --ego-on-canvas-muted: #dce3ff;
   --ego-ink: #242932;
-  --ego-muted: #69717e;
+  --ego-muted: #596273;
   --ego-blue: #0024ff;
   /* Existing components consume these legacy names; all UI accents are blue. */
   --ego-orange: var(--ego-blue);
@@ -175,6 +175,55 @@ body:has(#app-shell) {
 #app-shell .app-bottom-nav > a { color: var(--ego-muted); }
 #app-shell .app-bottom-nav > a[aria-current] { color: var(--ego-action-ink); }
 
+/* Keep all four destinations readable, including unselected tabs. */
+#app-shell .app-bottom-nav > a,
+#app-shell .app-bottom-nav > a[aria-current] {
+  flex: 1;
+  flex-direction: column;
+  min-height: 58px;
+  gap: 3px;
+  padding: 5px 4px;
+  border-radius: 27px;
+}
+#app-shell .app-bottom-nav > a > span:not(.app-icon) { display: block; font-size: 12px; line-height: 1.4; }
+
+/* The visible dot stays small; the complete button is a 44px touch target. */
+#app-shell .rail-dots { height: 44px; gap: 2px; }
+#app-shell .rail-dots button,
+#app-shell .step-dots a { width: 44px; min-width: 44px; height: 44px; min-height: 44px; }
+
+/* Server-authored guidance is plain text, with its intentional line breaks. */
+#app-shell .activity-instructions { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.8; color: var(--ego-on-canvas); }
+#app-shell .activity-example-heading { font-size: 14px; font-weight: 650; margin: 20px 0 13px; color: var(--ego-on-canvas-muted); }
+
+/* Small auxiliary text needs its own readable size, independent of the font. */
+#app-shell :is(.profile-stat-grid span, .identity-card small, .identity-meta,
+  .ranking-row small, .ranking-note, .podium-person h3, .contributor-badge,
+  .ego-progress-card .section-row > span:last-child, .progress-labels,
+  .ego-progress-card > p, .ego-total-card p, .ego-total-card div > span,
+  .feature-category, .feature-reward > span:first-child, .reward-unavailable,
+  .mission-kind, .mission-row-copy p, .mission-row-content > .reward-unavailable,
+  .category-rail button > span:last-child, .media-label,
+  .ego-guide-banner > div > span, .ego-guide-banner p,
+  .task-card-copy > span, .task-card-copy small, .reward-panel p,
+  .muted-caption, .guide-visual figcaption, .clip-open small, .status-pill,
+  .submission-summary p, .submission-points small, .settings-row small,
+  .balance-card > p, .bank-coming p, .ledger-list small, .welcome-legal,
+  .app-connection, .eyebrow) { font-size: 12px; }
+#app-shell :is(.profile-shortcuts a, .review-filters button, .submission-actions > .app-button,
+  .app-empty p, .prep-panel p, .prep-faq p, .prep-activity-main em) { font-size: 13px; }
+#app-shell :is(.task-card-copy p, .feature-copy p, .ego-share-card > p, .prep-preflight label) { font-size: 14px; }
+#app-shell :is(.prep-activity-main small, .prep-example-card small, .prep-example-card > b) { font-size: 12px; }
+#app-shell :is(.mission-row-copy h3, .ranking-row h3, .guide-checks p, .check-list li) { font-size: 14px; }
+#app-shell .sample-row small { font-size: 12px !important; }
+#app-shell .review-filters button { min-height: 44px; }
+#app-shell .profile-stat-grid > div { min-width: 0; }
+#app-shell .profile-stat-grid span { text-align: center; word-break: keep-all; }
+#app-shell :is(.ego-progress-card, .ego-total-card, .ego-share-card) .section-row { flex-wrap: wrap; }
+#app-shell .ego-progress-card h2 small { display: inline-block; }
+#app-shell :is(.identity-card small, .ego-total-card p, .ego-total-card div > span,
+  .task-card-copy > span, .bank-coming p, .ledger-list small) { color: var(--ego-muted); }
+
 /* Text outside cards belongs to the blue canvas, including every secondary route. */
 #app-shell :is(.app-brand, .header-title, .welcome-intro h1, .ego-home-intro h1,
   .screen-heading h1, .settings-section > h2, .detail-section > h2,
@@ -203,6 +252,7 @@ body:has(#app-shell) {
 #app-shell .prep-activity-card.is-selected { background: var(--ego-orange-soft); border-color: var(--ego-blue); }
 #app-shell :is(.prep-save, .prep-activity-icon, .prep-activity-main small) { color: var(--ego-accent-ink); }
 #app-shell .prep-save[aria-pressed=true] { background: var(--ego-action); color: #fff; }
+#app-shell .prep-panel .muted-caption { color: var(--ego-muted); }
 #app-shell .prep-preflight input { accent-color: var(--ego-blue); }
 #app-shell .app-brand img,
 #app-shell .welcome-art img,
