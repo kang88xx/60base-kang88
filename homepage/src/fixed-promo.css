@@ -12,13 +12,8 @@
 #fixed-promo-host .base60-training-badge>img{width:32px;height:32px;flex:none;object-fit:contain}
 #fixed-promo-host .base60-training-badge>span{display:flex;flex-direction:column;gap:2px;font:600 10px/1.1 'Promo Inter Tight',Pretendard,Arial,sans-serif;letter-spacing:-.025em;white-space:nowrap}
 #fixed-promo-host .opal-promo-label{font-family:'Promo Inter Tight',Pretendard,Arial,sans-serif}
-#fixed-promo-host button.opal-promo-banner,#fixed-promo-host button.opal-promo-buy{border:0;font:inherit;text-align:left;cursor:default;opacity:.45}
-#fixed-promo-host button.opal-promo-buy{padding:0}
-#fixed-promo-host button.opal-promo-buy:disabled:hover{background:#0a0a0a}
-#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-label-main{top:11px;left:13px;color:#fff}
-#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-label-alt{top:-16px;left:12px}
-#fixed-promo-host button.opal-promo-buy:disabled:hover .opal-promo-disc{width:17px;height:17px;right:11px;background:#fff}
-#fixed-promo-host button.opal-promo-buy:disabled:hover .base60-apple-icon{width:11px;height:11px;right:14px;top:12.5px;filter:brightness(0)}
+#fixed-promo-host button.opal-promo-banner{border:0;font:inherit;text-align:left;cursor:default;opacity:1}
+#fixed-promo-host button.opal-promo-banner .opal-promo-track{opacity:.45}
 #fixed-promo-host .base60-training-badge:focus-visible{outline:2px solid #0024FF;outline-offset:3px}
 
 @media(max-width:1199px),(max-height:500px){
@@ -32,9 +27,9 @@
  #fixed-promo-host .opal-promo-slide{object-fit:contain}
  #fixed-promo-host .opal-promo-buy{height:36px;min-height:36px}
  #fixed-promo-host .base60-training-badge{height:44px;min-height:44px}
- #fixed-promo-host button.opal-promo-buy:disabled .opal-promo-label-main{left:9px;top:12px;font-size:12px;line-height:12px}
- #fixed-promo-host button.opal-promo-buy:disabled .opal-promo-disc{right:8px}
- #fixed-promo-host button.opal-promo-buy:disabled .base60-apple-icon{right:11px;top:12.5px}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-label-main{left:9px;top:12px;font-size:12px;line-height:12px}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-disc{right:8px}
+ #fixed-promo-host a.opal-promo-buy .base60-apple-icon{right:11px;top:12.5px}
  #fixed-promo-host .base60-training-badge>img{width:24px;height:24px}
  #fixed-promo-host .base60-training-badge>span{font-size:9px}
  #main :is(input,textarea,button,a,summary){scroll-margin-bottom:calc(var(--promo-dock-height) + 16px)}
@@ -42,10 +37,31 @@
 @media(max-width:359px){
  #fixed-promo-host .opal-promo-inner{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 116px;gap:6px}
  #fixed-promo-host .opal-promo-banner{height:46px;min-height:46px}
- #fixed-promo-host button.opal-promo-buy:disabled .opal-promo-label-main{left:6px;font-size:11px;letter-spacing:-.04em}
- #fixed-promo-host button.opal-promo-buy:disabled .opal-promo-disc{right:5px;width:15px;height:15px}
- #fixed-promo-host button.opal-promo-buy:disabled .base60-apple-icon{right:7px;width:11px}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-label-main{left:6px;font-size:11px;letter-spacing:-.04em}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-disc{right:5px;width:15px;height:15px}
+ #fixed-promo-host a.opal-promo-buy .base60-apple-icon{right:7px;width:11px}
  #fixed-promo-host .base60-training-badge{padding-inline:5px;gap:3px}
  #fixed-promo-host .base60-training-badge>img{width:22px;height:22px}
  #fixed-promo-host .base60-training-badge>span{font-size:8.5px}
 }
+
+/* The app identity is a live image of the supplied runtime symbol, independent of slide artwork. */
+#fixed-promo-host .base60-promo-app-brand{position:absolute;top:1px;left:7px;z-index:1;display:flex;align-items:center;gap:4px;color:#fff;font:650 12px/1 'Promo Inter Tight',Pretendard,Arial,sans-serif;letter-spacing:-.015em;white-space:nowrap;pointer-events:none}
+#fixed-promo-host .base60-promo-app-brand>img{width:20px;height:20px;object-fit:contain;flex:none}
+#fixed-promo-host a.opal-promo-buy{background:var(--brand-button,linear-gradient(135deg,#4265ff,#0024ff 55%,#001bcc));color:#fff;box-shadow:var(--brand-button-shadow,0 8px 20px #0024ff28)}
+#fixed-promo-host a.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-disc{background:var(--brand-button,linear-gradient(135deg,#4265ff,#0024ff 55%,#001bcc))}
+#fixed-promo-host a.opal-promo-buy:is(:hover,:focus-visible) .base60-apple-icon{filter:brightness(0) invert(1)}
+#fixed-promo-host a.opal-promo-buy:focus-visible{outline:2px solid #8296ff;outline-offset:3px}
+@media(max-width:1199px),(max-height:500px){
+ #fixed-promo-host .base60-promo-app-brand{left:4px;top:1px;gap:3px;font-size:11px}
+ #fixed-promo-host .base60-promo-app-brand>img{width:16px;height:16px}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-label-alt{font-size:12px;left:9px;line-height:12px}
+ #fixed-promo-host a.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-alt{top:12px;left:9px}
+}
+@media(max-width:359px){
+ #fixed-promo-host .base60-promo-app-brand{left:2px;gap:2px;font-size:10px}
+ #fixed-promo-host .base60-promo-app-brand>img{width:15px;height:15px}
+ #fixed-promo-host a.opal-promo-buy .opal-promo-label-alt{font-size:11px;left:6px}
+ #fixed-promo-host a.opal-promo-buy:is(:hover,:focus-visible) .opal-promo-label-alt{left:6px}
+}
+@media(prefers-reduced-motion:reduce){#fixed-promo-host :is(.opal-promo-buy,.opal-promo-label,.opal-promo-disc,.base60-apple-icon){transition:none}}

@@ -2,13 +2,14 @@ import { useEffect, useRef } from 'react';
 import './promo-reference-widget.js';
 import './fixed-promo.css';
 
-// Production artwork, spring and unpublished-store behavior.
+// Keep Android's unpublished-store behavior; iOS has a verified public listing.
 // Sources: /assets/opalhaus-promo/{promo-widget,60base-promo}.js.
+const APP_STORE_URL = 'https://apps.apple.com/kr/app/id6813374012';
 const slides = [
-  ['android-01.svg', 'Android · 60BASE'],
-  ['android-02.svg', 'Android App · Physical AI Studio'],
-  ['android-03.svg', '60BASE · Android'],
-  ['android-04.svg', 'Physical AI Studio · Android'],
+  ['android-01.svg', 'ego APP · Android'],
+  ['android-02.svg', 'ego APP · Android · Physical AI Studio'],
+  ['android-03.svg', 'ego APP · Android'],
+  ['android-04.svg', 'ego APP · Physical AI Studio · Android'],
 ].map(([file, alt]) => ({ src: `/assets/promo/${file}`, alt }));
 
 function disableStoreLink(link, platform) {
@@ -29,13 +30,26 @@ export function FixedPromo({ language = 'en' }) {
     const host = hostRef.current;
     if (!host) return;
     const controller = window.OpalPromo.mount(host, {
-      slides, href: '#app-download-dialog', bannerHref: '#app-download-dialog',
+      slides, href: APP_STORE_URL, bannerHref: '#app-download-dialog',
       demo: false, part: 'combined', scale: 1, fixed: false,
     });
     const banner = disableStoreLink(host.querySelector('.opal-promo-banner'), 'Android');
-    const buy = disableStoreLink(host.querySelector('.opal-promo-buy'), 'iOS');
+    const appBrand = document.createElement('span');
+    appBrand.className = 'base60-promo-app-brand';
+    appBrand.setAttribute('aria-hidden', 'true');
+    const appSymbol = document.createElement('img');
+    appSymbol.src = '/app/icons/symbol.svg';
+    appSymbol.alt = '';
+    appSymbol.width = 20;
+    appSymbol.height = 20;
+    const appName = document.createElement('span');
+    appName.textContent = 'ego APP';
+    appBrand.append(appSymbol, appName);
+    banner.querySelector('.opal-promo-viewport').append(appBrand);
+    const buy = host.querySelector('.opal-promo-buy');
+    buy.title = language === 'en' ? 'Download ego APP on the App Store' : 'App Store에서 ego APP 다운로드';
     buy.querySelector('.opal-promo-label-main').textContent = 'App Store';
-    buy.querySelector('.opal-promo-label-alt').textContent = 'iOS App';
+    buy.querySelector('.opal-promo-label-alt').textContent = language === 'en' ? 'Download' : '다운로드';
     const apple = document.createElement('img');
     apple.className = 'opal-promo-bolt base60-apple-icon';
     apple.src = '/assets/promo/platform-apple.svg';
@@ -61,8 +75,8 @@ export function FixedPromo({ language = 'en' }) {
 
     function syncLabels() {
       const index = Number(controller.element.dataset.slide) || 0;
-      banner.setAttribute('aria-label', `${slides[index].alt} — Android app coming soon`);
-      buy.setAttribute('aria-label', 'App Store — iOS app coming soon');
+      banner.setAttribute('aria-label', language === 'en' ? `${slides[index].alt} — Android app coming soon` : 'ego APP · Android 앱 출시 예정');
+      buy.setAttribute('aria-label', language === 'en' ? 'ego APP · Download on the App Store (opens in a new tab)' : 'ego APP · App Store에서 다운로드 (새 탭)');
     }
     const observer = new MutationObserver(syncLabels);
     observer.observe(controller.element, { attributes: true, attributeFilter: ['data-slide'] });

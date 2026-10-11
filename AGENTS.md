@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## Homepage ego APP download badge · 2026-10-11 20:42
+
+The owner requested replacing the old 60Base identity in the fixed Android/app promo badge with exact `ego APP`, preceded by the supplied runtime `/app/icons/symbol.svg`. Keep company logos and the other homepage sections unchanged. Android remains a disabled coming-soon control. Activate the App Store control as a real link to `https://apps.apple.com/kr/app/id6813374012`, retaining the platform mark and B02 styling. Apple product-page and lookup checks confirmed HTTP 200, track ID 6813374012 and bundle ID kr.base60.app; the public listing still used the earlier name at verification time. Homepage work does not change or submit App Store metadata or native builds; those are managed separately under the owner's newer explicit request. Preserve the responsive three-badge geometry, safe-area spacing, promo motion and contributor web-app link.
+
 ## Selected compact UI: N03 / C01 / P01 · 2026-10-11
 
 The owner explicitly selected the published comparison combination N03 (expanding capsule navigation), C01 (horizontal photo/info activity card), and P01 (plain numeric points with a P suffix). Apply these selected presentation patterns to the real participant app and isolated QA copy, and sync the private iOS overlay. Navigation must retain all four labels, touch targets and reduced-motion behavior; its nodes should survive route changes so the expansion animates. Keep independent save controls, recommendation swiping/dots, complete activity details, authoritative points and approval conditions. Preserve the light #F4F6FF member canvas, G02 intro/login, B02 actions, chosen symbols/favicon/install artwork and all existing business/native boundaries. Update the comparison's confirmed/default selection. The established GitHub/Vercel and owner-private Sites deployment workflow remains authorized; no store submission.
