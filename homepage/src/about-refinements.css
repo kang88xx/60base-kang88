@@ -43,6 +43,36 @@
   transform: none;
 }
 
+/* Match the left-to-right underline motion of the sample links below. */
+.section-about .about-links a.text-link {
+  position: relative;
+  border-bottom-color: transparent;
+}
+
+.section-about .about-links a.text-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: currentColor;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s ease;
+}
+
+.section-about .about-links a.text-link:is(:hover, :focus-visible)::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-about .about-links a.text-link::after {
+    transition: none;
+  }
+}
+
 /* Official colored logomark from https://huggingface.co/brand, retrieved 2026-10-09.
    Original SVG: https://huggingface.co/datasets/huggingface/brand-assets/resolve/main/hf-logo.svg */
 .section-about .about-links .about-huggingface-label {

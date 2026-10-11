@@ -1,5 +1,9 @@
 # 60BASE web release
 
+## ABOUT Hugging Face underline motion · 2026-10-11 22:40
+
+The owner requested a left-to-right underline reveal on the ABOUT Hugging Face action in `스크린샷 2026-10-11 224009.png`, matching the sample links below. Replace that active link's permanent bottom rule with a same-position 1px current-color underline using left-origin scaleX(0→1), .3s ease on hover and keyboard focus. Preserve its layout and URL. Respect reduced motion. The disabled company profile button retains its static appearance and remains inactive. Publish through the established checked GitHub/Vercel workflow.
+
 ## Disable the company profile action · 2026-10-11 22:33
 
 The owner requested disabling the visible COMPANY PROFILE / 회사소개서 action in the ABOUT section, as shown in `스크린샷 2026-10-11 223345.png`. Keep its position, text and arrow, but use a native disabled button without a PDF href, download, navigation or keyboard activation. Retain the existing disabled appearance and suppress its arrow hover motion. Keep the adjacent Hugging Face link active. This supersedes the older request to activate the profile PDF link; do not delete the PDF asset. Publish through the established checked GitHub/Vercel workflow.
