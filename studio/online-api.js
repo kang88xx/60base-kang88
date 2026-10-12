@@ -11,10 +11,32 @@ export const labels={deleting:'삭제 처리 중',deleted:'삭제됨',uploaded:'
 export const badge=status=>`<span class="online-badge status-${esc(status)}">${esc(labels[status]||status)}</span>`;
 export async function api(path,{method='GET',body,raw,signal}={}){
  const requestUserId=session.user?.id,requestEpoch=sessionEpoch;
- const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});
- let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}
+ const {response,result}=await requestJson(path,{method,body,raw,signal});
  if(response.status===401&&requestUserId&&session.user?.id===requestUserId&&sessionEpoch===requestEpoch&&path!=='/session')await refreshSession({expectedUserId:requestUserId,expectedEpoch:requestEpoch});
  if(!response.ok){const error=Error(result.error||'요청을 처리하지 못했습니다.');error.status=response.status;throw error;}return result;
+}
+async function requestJson(path,{method,body,raw,signal}){
+ // Bound authentication waits, including response bodies and uncancellable native transports.
+ const bounded=path==='/session'||path.startsWith('/auth/');
+ if(signal?.aborted)throw new DOMException('Request aborted','AbortError');
+ const controller=new AbortController();
+ let timer,onAbort;
+ const cancelled=new Promise((_,reject)=>{
+  onAbort=()=>{controller.abort();reject(new DOMException('Request aborted','AbortError'));};
+  signal?.addEventListener('abort',onAbort,{once:true});
+  if(bounded)timer=setTimeout(()=>{
+   const error=Object.assign(Error('계정 서비스 응답이 늦어지고 있어요. 연결을 확인한 뒤 다시 시도해주세요.'),{code:'service/request-timeout'});
+   reject(error);controller.abort();
+  },15000);
+ });
+ try{
+  const request=(async()=>{
+   const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal:controller.signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal:controller.signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});
+   let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}
+   return {response,result};
+  })();
+  return await Promise.race([request,cancelled]);
+ }finally{clearTimeout(timer);signal?.removeEventListener('abort',onAbort);}
 }
 export async function refreshSession({expectedUserId=session.user?.id,expectedEpoch=sessionEpoch}={}){
  const isCurrent=()=>session.user?.id===expectedUserId&&sessionEpoch===expectedEpoch;

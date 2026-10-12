@@ -1,7 +1,6 @@
-// Selected D intro: once per tab session, 2.7s maximum, never replayed by routing
-// or account refresh. It decorates startup; it does not grant member access.
+// Selected D intro: each cold document entry, at least 3s after artwork/font
+// readiness. Routing and account refresh never restart it or grant member access.
 const launch = document.querySelector('#app-launch');
-const seenKey = 'ego.intro-d.20261011';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const previousInert = new Map();
 let dismissed = true, fallback, dialogs;
@@ -25,7 +24,6 @@ function dismissLaunch() {
   for (const [node, inert] of previousInert) node.inert = inert;
   document.removeEventListener('visibilitychange', hiddenPage);
   window.removeEventListener('hashchange', dismissLaunch);
-  window.removeEventListener('offline', dismissLaunch);
   window.removeEventListener('pagehide', dismissLaunch);
   window.removeEventListener('resize', fitFlood);
   reduced.removeEventListener('change', dismissLaunch);
@@ -35,15 +33,14 @@ function dismissLaunch() {
 function hiddenPage() { if (document.hidden) dismissLaunch(); }
 
 export function updateLaunch(state) {
-  if (state.error || state.catalogError || state.accountConnectionError || !navigator.onLine || document.querySelector('dialog[open]')) dismissLaunch();
+  if (document.querySelector('dialog[open]')) dismissLaunch();
 }
 
 if (launch) {
-  let seen = false;
-  try { seen = sessionStorage.getItem(seenKey) === 'seen'; sessionStorage.setItem(seenKey, 'seen'); } catch { /* Disabled storage still permits bounded startup. */ }
   const homeEntry = !location.hash || location.hash === '#home';
   const restored = performance.getEntriesByType('navigation')[0]?.type === 'back_forward';
-  if (!seen && !restored && homeEntry && navigator.onLine && !document.hidden && !document.querySelector('dialog[open]')) {
+  const callback = ['code', 'state', 'error', 'oauth_callback'].some(key => new URLSearchParams(location.search).has(key));
+  if (!callback && !restored && homeEntry && !document.hidden && !document.querySelector('dialog[open]')) {
     dismissed = false;
     for (const node of [...launch.parentElement.children, ...document.querySelectorAll('.skip-link')]) {
       if (node === launch) continue;
@@ -51,18 +48,30 @@ if (launch) {
     }
     launch.hidden = false;
     fitFlood();
-    launch.classList.add('is-playing');
     launch.querySelector('.app-launch-continue').addEventListener('click', dismissLaunch, { once: true });
     document.addEventListener('visibilitychange', hiddenPage);
     window.addEventListener('hashchange', dismissLaunch);
-    window.addEventListener('offline', dismissLaunch);
     window.addEventListener('pagehide', dismissLaunch);
     window.addEventListener('resize', fitFlood);
     reduced.addEventListener('change', dismissLaunch);
     dialogs = new MutationObserver(() => { if (document.querySelector('dialog[open]')) dismissLaunch(); });
     dialogs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open'] });
-    document.fonts.ready.then(fitFlood);
-    // Reduced motion shows the final static lockup briefly, without the flood.
-    fallback = setTimeout(dismissLaunch, reduced.matches ? 450 : 2700);
+    const assets = Promise.allSettled([
+      document.fonts.load('800 46px "Ego Intro Inter Tight"'),
+      document.fonts.ready,
+      ...[...launch.querySelectorAll('img')].map(image => image.decode()),
+    ]);
+    // Failed/stalled downloads cannot trap startup; the skip remains available.
+    const readyLimit = new Promise(resolve => { fallback = setTimeout(resolve, 8000); });
+    Promise.race([assets, readyLimit]).then(() => {
+      if (dismissed) return;
+      clearTimeout(fallback);
+      fitFlood();
+      launch.classList.add('is-playing');
+      // Start the visible minimum on a painted frame, including reduced motion.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!dismissed) fallback = setTimeout(dismissLaunch, 3000);
+      }));
+    });
   }
 }

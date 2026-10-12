@@ -26,7 +26,7 @@ const persistence = createHfState({ storage, directory, encryptionKey: required(
 const restored = await persistence.restore();
 const media = createHfMedia({ storage, checkpoint: store => persistence.checkpoint(store), assertCurrent: () => persistence.assertCurrent() });
 const projectId = required('PUBLIC_FIREBASE_PROJECT_ID');
-const service = createService({ directory, origin, allowRegistration: false, persistence, media, gatewayKey,
+const service = createService({ directory, origin, allowRegistration: true, persistence, media, gatewayKey,
   verifyFirebase: createFirebaseVerifier({ projectId }), mobileServicesFactory: store => mobileServicesFromEnv({ store, copiesEraser: createHfCopiesEraser({ storage, directory }) }) });
 try {
   if (!restored) {

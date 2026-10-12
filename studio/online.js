@@ -22,6 +22,22 @@ export function getAccountConnectionState(){
 function notifyAccountConnection(){window.dispatchEvent(new Event('service-account-connection'));}
 export async function showAccountEntry({returnTo,provider}={}){
  await sessionReady;
+ if(!session.online)await refreshSession();
+ if(!session.online){
+  const element=dialog('계정 연결 확인','<p class="ego-form-intro">계정 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해주세요.</p><p class="online-status" role="status" aria-live="polite"></p><button type="button" class="button primary" data-account-retry>다시 연결하기</button>');
+  if(document.querySelector('#app-shell'))element.classList.add('ego-form-sheet','ego-auth-sheet');
+  const retry=element.querySelector('[data-account-retry]'),status=element.querySelector('[role="status"]');
+  retry.onclick=async()=>{
+   retry.disabled=true;retry.setAttribute('aria-busy','true');status.textContent='계정 서비스에 다시 연결하고 있습니다.';
+   try{
+    await refreshSession();
+    if(!element.isConnected)return;
+    if(!session.online){status.textContent='계정 서비스에 연결하지 못했습니다. 잠시 후 다시 시도해주세요.';return;}
+    element.close();await showAccountEntry({returnTo,provider});
+   }finally{retry.disabled=false;retry.setAttribute('aria-busy','false');}
+  };
+  return element;
+ }
  if(session.online&&session.user)return showAccount({onSignOut:signOutAccount});
  if(provider==='email'){
   const existing=new Set(document.querySelectorAll('.online-dialog'));
@@ -29,8 +45,7 @@ export async function showAccountEntry({returnTo,provider}={}){
   const element=[...document.querySelectorAll('.online-dialog')].find(item=>!existing.has(item));
   if(element&&document.querySelector('#app-shell')){
    element.classList.add('ego-form-sheet','ego-auth-sheet');
-   if(session.online)element.querySelector('.online-dialog-body').insertAdjacentHTML('afterbegin','<p class="ego-form-intro">이메일과 비밀번호로 에고를 시작하세요.</p>');
-   else element.querySelector('.online-dialog-body').innerHTML='<p class="ego-form-intro">계정 서비스에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 로그인해주세요.</p>';
+   element.querySelector('.online-dialog-body').insertAdjacentHTML('afterbegin','<p class="ego-form-intro">이메일과 비밀번호로 에고를 시작하세요.</p>');
   }
   return element;
  }

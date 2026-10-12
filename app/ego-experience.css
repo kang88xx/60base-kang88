@@ -22,8 +22,9 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline-color:#c5420b}.
 #app-shell .app-bottom-nav>a[aria-current]>span:not(.app-icon){display:inline}
 #app-shell .app-bottom-nav>a:active{background:var(--ego-orange-soft);color:#92360f}
 /* Welcome is the only entry surface until the server session is verified. */
-#app-shell[data-screen=welcome] #app-main{padding:0;min-height:100dvh}
-.ego-welcome{position:relative;display:flex;flex-direction:column;min-height:100dvh;padding:calc(34px + env(safe-area-inset-top)) 28px calc(22px + env(safe-area-inset-bottom));overflow:hidden;background:#f9fafb}
+#app-shell[data-screen=welcome] #app-main{padding:0;min-height:0;display:flex;flex-direction:column;overscroll-behavior-y:none}
+.ego-welcome{position:relative;display:flex;flex-direction:column;flex:1 0 auto;min-height:100%;padding:calc(34px + env(safe-area-inset-top)) 28px calc(22px + env(safe-area-inset-bottom));overflow:hidden;background:#f9fafb}
+.ego-welcome>div{flex-shrink:0}
 .welcome-brand{margin-bottom:34px}.welcome-brand .app-brand{width:max-content}.welcome-brand .app-brand>span{font-size:35px}.welcome-brand .app-brand img{width:38px;height:40px;transform:translateY(-5.2px)}
 .welcome-eyebrow{font-size:13px;font-weight:650;color:#bb400f;margin-bottom:18px}
 .welcome-intro h1{font-size:clamp(35px,10.6vw,46px);line-height:1.2;font-weight:550;letter-spacing:-.06em;color:#242929;margin:0}
