@@ -1,5 +1,7 @@
 # 60BASE web release
 
+**Homepage store dock · 2026-10-13:** Both store controls are 140×36px in a 77px vertical dock at the lower right on desktop and mobile, with a 5px gap and mobile safe-area spacing. The Android loop retains its two scenes and original motion, with a 4500ms interval and 2250ms transition (1.5× the previous durations). Android remains disabled, App Store keeps its existing active URL and B02 styling, and the contributor card stays hidden. This supersedes the older dock dimensions, mobile columns and loop timing below. See the [homepage source guide](homepage/README.md).
+
 ## ABOUT Hugging Face underline motion · 2026-10-11 22:40
 
 The owner requested a left-to-right underline reveal on the ABOUT Hugging Face action in `스크린샷 2026-10-11 224009.png`, matching the sample links below. Replace that active link's permanent bottom rule with a same-position 1px current-color underline using left-origin scaleX(0→1), .3s ease on hover and keyboard focus. Preserve its layout and URL. Respect reduced motion. The disabled company profile button retains its static appearance and remains inactive. Publish through the established checked GitHub/Vercel workflow.
