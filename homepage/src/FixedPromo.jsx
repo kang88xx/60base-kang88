@@ -6,8 +6,8 @@ import './fixed-promo.css';
 // Sources: /assets/opalhaus-promo/{promo-widget,60base-promo}.js.
 const APP_STORE_URL = 'https://apps.apple.com/kr/app/id6813374012';
 const slides = [
-  ['android-02.svg', 'ego application · Android APP'],
-  ['android-04.svg', 'ego application · Android APP'],
+  ['android-02.svg', 'ego application'],
+  ['android-04.svg', 'Android APP'],
 ].map(([file, alt]) => ({ src: `/assets/promo/${file}`, alt }));
 
 function disableStoreLink(link, platform) {
@@ -63,7 +63,7 @@ export function FixedPromo({ language = 'en' }) {
 
     function syncLabels() {
       const index = Number(controller.element.dataset.slide) || 0;
-      banner.setAttribute('aria-label', language === 'en' ? `${slides[index].alt} — Android app coming soon` : 'ego application · Android 앱 출시 예정');
+      banner.setAttribute('aria-label', language === 'en' ? `${slides[index].alt} — Android app coming soon` : `${slides[index].alt} · Android 앱 출시 예정`);
       buy.setAttribute('aria-label', language === 'en' ? 'ego APP · Download on the App Store (opens in a new tab)' : 'ego APP · App Store에서 다운로드 (새 탭)');
     }
     const observer = new MutationObserver(syncLabels);
