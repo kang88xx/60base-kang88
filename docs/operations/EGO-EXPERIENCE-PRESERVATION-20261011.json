@@ -109,6 +109,11 @@
           "before": "const CACHE='60base-app-20261011-ego-selected-ui-v11';",
           "after": "const CACHE='60base-app-20261011-ego-apple-asset-v12';",
           "review": "app-store-native-asset-20261011"
+        },
+        {
+          "before": "const CACHE='60base-app-20261011-ego-apple-asset-v12';\n",
+          "after": "const CACHE='60base-app-20261012-auth-launch-v13';\n",
+          "review": "deployed-auth-launch-0063233-20261012"
         }
       ]
     },
@@ -150,6 +155,16 @@
           "before": " .admin-recent .admin-panel-heading{padding:6px 12px}\n .admin-body .admin-recent .button{min-height:32px;padding:5px 10px}\n .admin-recent-search{min-height:32px}.admin-recent-search input{min-height:30px}\n}\n",
           "after": " .admin-recent .admin-panel-heading{padding:6px 12px}\n .admin-body .admin-recent .button{min-height:32px;padding:5px 10px}\n .admin-recent-search{min-height:32px}.admin-recent-search input{min-height:30px}\n}\n\n/* Review feedback stays available after the dialog closes and list refreshes. */\n.admin-review-feedback{margin:0 0 20px;padding:16px 18px;border:1px solid #bfd0ee;border-radius:10px;background:#f1f5ff;color:#243f84}\n.admin-review-feedback p{margin:0 0 12px;line-height:1.65;overflow-wrap:anywhere}\n.admin-review-feedback>div{display:flex;align-items:center;flex-wrap:wrap;gap:10px}\n.admin-review-feedback span{font-size:13px}\n.admin-review-field-help{font-size:13px;line-height:1.65;color:#565b66;margin:0 0 12px}\n.admin-review-decision [aria-invalid=\"true\"]{outline:2px solid #ad322a;outline-offset:2px}\n.admin-review-feedback [tabindex=\"-1\"]:focus{outline:2px solid #0024ff;outline-offset:4px}\n",
           "review": "qa-review-implementation-20261011"
+        }
+      ]
+    },
+    {
+      "file": "studio/online-api.js",
+      "replacements": [
+        {
+          "before": " const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});\n let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}\n if(response.status===401&&requestUserId&&session.user?.id===requestUserId&&sessionEpoch===requestEpoch&&path!=='/session')await refreshSession({expectedUserId:requestUserId,expectedEpoch:requestEpoch});\n if(!response.ok){const error=Error(result.error||'요청을 처리하지 못했습니다.');error.status=response.status;throw error;}return result;\n",
+          "after": " const {response,result}=await requestJson(path,{method,body,raw,signal});\n if(response.status===401&&requestUserId&&session.user?.id===requestUserId&&sessionEpoch===requestEpoch&&path!=='/session')await refreshSession({expectedUserId:requestUserId,expectedEpoch:requestEpoch});\n if(!response.ok){const error=Error(result.error||'요청을 처리하지 못했습니다.');error.status=response.status;throw error;}return result;\n}\nasync function requestJson(path,{method,body,raw,signal}){\n // Bound authentication waits, including response bodies and uncancellable native transports.\n const bounded=path==='/session'||path.startsWith('/auth/');\n if(signal?.aborted)throw new DOMException('Request aborted','AbortError');\n const controller=new AbortController();\n let timer,onAbort;\n const cancelled=new Promise((_,reject)=>{\n  onAbort=()=>{controller.abort();reject(new DOMException('Request aborted','AbortError'));};\n  signal?.addEventListener('abort',onAbort,{once:true});\n  if(bounded)timer=setTimeout(()=>{\n   const error=Object.assign(Error('계정 서비스 응답이 늦어지고 있어요. 연결을 확인한 뒤 다시 시도해주세요.'),{code:'service/request-timeout'});\n   reject(error);controller.abort();\n  },15000);\n });\n try{\n  const request=(async()=>{\n   const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal:controller.signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal:controller.signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});\n   let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}\n   return {response,result};\n  })();\n  return await Promise.race([request,cancelled]);\n }finally{clearTimeout(timer);signal?.removeEventListener('abort',onAbort);}\n",
+          "review": "deployed-auth-launch-0063233-20261012"
         }
       ]
     }
