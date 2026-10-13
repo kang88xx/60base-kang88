@@ -1,6 +1,6 @@
 # 60BASE web release
 
-**Homepage store dock · 2026-10-13:** Both store controls are 140×36px in a 77px vertical dock at the lower right on desktop and mobile, with a 5px gap and mobile safe-area spacing. The Android loop retains its two scenes and original motion, with a 4500ms interval and 2250ms transition (1.5× the previous durations). Android remains disabled, App Store keeps its existing active URL and B02 styling, and the contributor card stays hidden. This supersedes the older dock dimensions, mobile columns and loop timing below. See the [homepage source guide](homepage/README.md).
+**Homepage store dock · 2026-10-13:** Both store controls are 140×36px in a 77px vertical dock at the lower right on desktop and mobile, with a 5px gap and mobile safe-area spacing. The Android loop retains its two scenes and original motion, with a 9000ms interval and 4500ms transition (2× the previously published durations). Both Android scenes show the existing logo followed by `ego application` and a second line `Android APP`; the spelling `application` corrects the owner’s `aprication` typo. Android remains disabled, App Store keeps its existing active URL and B02 styling, and the contributor card stays hidden. This supersedes the older dock dimensions, mobile columns and loop timing below. See the [homepage source guide](homepage/README.md).
 
 ## ABOUT Hugging Face underline motion · 2026-10-11 22:40
 
