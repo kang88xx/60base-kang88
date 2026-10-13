@@ -6,8 +6,8 @@ import './fixed-promo.css';
 // Sources: /assets/opalhaus-promo/{promo-widget,60base-promo}.js.
 const APP_STORE_URL = 'https://apps.apple.com/kr/app/id6813374012';
 const slides = [
-  ['android-02.svg', 'ego application'],
-  ['android-04.svg', 'Android APP'],
+  ['android-02.svg', 'Android APP'],
+  ['android-04.svg', 'COMING SOON'],
 ].map(([file, alt]) => ({ src: `/assets/promo/${file}`, alt }));
 
 function disableStoreLink(link, platform) {
