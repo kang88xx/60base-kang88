@@ -44,6 +44,7 @@ export function openDatabase(directory){
  db.exec("CREATE UNIQUE INDEX IF NOT EXISTS deletion_receipt_hash ON account_deletions(receiptTokenHash) WHERE receiptTokenHash!=''");
  const videoColumns=db.prepare('PRAGMA table_info(videos)').all();
  if(!videoColumns.some(c=>c.name==='captureTask'))db.exec("ALTER TABLE videos ADD COLUMN captureTask TEXT NOT NULL DEFAULT '{}'");
+ if(!videoColumns.some(c=>c.name==='reviewVersion'))db.exec("ALTER TABLE videos ADD COLUMN reviewVersion INTEGER NOT NULL DEFAULT 0");
  if(!videoColumns.some(c=>c.name==='reviewStage'))db.exec("ALTER TABLE videos ADD COLUMN reviewStage TEXT NOT NULL DEFAULT 'ai'");
  if(!db.prepare('PRAGMA table_info(reviews)').all().some(c=>c.name==='stage'))db.exec("ALTER TABLE reviews ADD COLUMN stage TEXT NOT NULL DEFAULT 'legacy'");
  db.exec("UPDATE videos SET reviewStage='complete' WHERE status='approved' AND reviewStage!='complete'");

@@ -1,3 +1,4 @@
+import {publicUploadError} from '../server/upload-errors.mjs';
 import { isIP } from 'node:net';
 
 const MAX_BODY_BYTES = 2_097_152;
@@ -98,7 +99,16 @@ export async function proxyOperations(req, res, { fetchImpl = globalThis.fetch, 
       return json(res, 502, { ok: false, error: 'upstream_redirect' });
     }
     if (response.status >= 400) {
+      let safeUpload=null;
+      if(response.status===400){
+        try{
+          const reader=response.body?.getReader();let length=0,text='';const decoder=new TextDecoder();
+          if(reader)try{while(true){const {done,value}=await reader.read();if(done)break;length+=value.byteLength;if(length>4096)break;text+=decoder.decode(value,{stream:true});}}finally{await reader.cancel().catch(()=>{});}
+          if(length<=4096)safeUpload=publicUploadError(operationPath,response.status,JSON.parse(text));
+        }catch{}
+      }
       clearTimeout(timeout);
+      if(safeUpload)return json(res,response.status,{ok:false,...safeUpload});
       const code = response.status === 401 ? 'unauthorized' : response.status === 403 ? 'forbidden' : 'upstream_rejected';
       const error = response.status === 409 && operationPath === '/api/auth/firebase'
         ? '기존 운영 계정이 있습니다. 계정 연결을 운영자에게 요청해주세요.'

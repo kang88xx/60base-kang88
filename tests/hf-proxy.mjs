@@ -323,4 +323,23 @@ async function call(options, { env = privateSpaceEnv, fetchImpl } = {}) {
   checks.push('upstream rejections provide static Korean messages and stable machine codes without backend details');
 }
 
+{
+ const {uploadErrors}=await import('../server/upload-errors.mjs');
+ for(const [code,error] of Object.entries(uploadErrors)){
+  const response=await call({url:'/api/operations?path=uploads'},{fetchImpl:async()=>new Response(JSON.stringify({code,error}),{status:400})});
+  assert.equal(response.json().error,error);assert.equal(response.json().code,code);
+ }
+ for(const payload of [{code:'upload_format',error:'private upstream data'},{code:'unknown',error:'private'}, {error:'private'}, {code:'toString',error:'private'}]){
+  const response=await call({url:'/api/operations?path=uploads'},{fetchImpl:async()=>new Response(JSON.stringify(payload),{status:400})});
+  assert.equal(response.json().error,'입력한 내용을 확인해주세요.');assert.equal(response.text().includes('private'),false);
+ }
+ for(const [url,status] of [['/api/operations?path=account',400],['/api/operations?path=uploads',500]]){
+  const response=await call({url},{fetchImpl:async()=>new Response(JSON.stringify({code:'upload_format',error:uploadErrors.upload_format}),{status})});
+  assert.notEqual(response.json().code,'upload_format');
+ }
+ const oversized=await call({url:'/api/operations?path=uploads'},{fetchImpl:async()=>new Response(' '.repeat(5000)+JSON.stringify({code:'upload_format',error:uploadErrors.upload_format}),{status:400})});
+ assert.equal(oversized.json().code,'upstream_rejected');
+ checks.push('bounded upload allowlist preserves exact public messages; arbitrary, mismatched, oversized and unrelated errors stay generic');
+}
+
 console.log(JSON.stringify({ status: 'passed', checks }, null, 2));

@@ -116,7 +116,7 @@ try{
  await admin.call('/auth/login',{method:'POST',body:{email:adminLogin.email,password:adminLogin.password}});
  const {payload:dataBefore}=await admin.call('/admin/data');
  const reviewVideo=dataBefore.videos.find(row=>row.id===videoId);
- for(const stage of ['ai','manual','client'])await admin.call(`/admin/videos/${videoId}/review`,{method:'POST',body:{stage,decision:'approved',revision:reviewVideo.revision,checks:{framing:true,hands:true,privacy:true,completion:true}}});
+ for(const stage of ['ai','manual','client'])await admin.call(`/admin/videos/${videoId}/review`,{method:'POST',body:{stage,decision:'approved',revision:reviewVideo.revision,reviewVersion:(await admin.call('/videos/'+videoId)).payload.video.reviewVersion,checks:{framing:true,hands:true,privacy:true,completion:true}}});
  const {payload:meAfterApproval}=await member.call('/me');
  assert.equal(meAfterApproval.wallet.earned,3000);
  const {payload:csvResult}=await admin.call('/admin/export?type=audit',{text:true});
