@@ -290,6 +290,27 @@ for(const mode of ['local','hf'])await test(`${mode}${productionAuth?' / product
    const reviewsBefore=(await details(witness)).reviews.length;await admin.call(`/admin/videos/${witness}/review`,{method:'POST',body:{stage:'ai',revision:2,decision:'reviewing',checks},status:409});assert.equal((await details(witness)).reviews.length,reviewsBefore);
   });
 
+  await t.test('legacy-only rejected videos remain resubmittable beside the same owners keyed video',async()=>{
+   const legacy=await upload(stranger,'mov','Legacy unkeyed resubmission');
+   const first=await stranger.call(`/videos/${legacy}/submit`,{method:'POST',body:consent});
+   assert.equal(first.receipt.revision,1);
+   await review(legacy,'ai',1,{body:{decision:'rejected',reason:'Legacy framing correction'}});
+   const before=await stranger.call('/me');assert.equal(before.ledger.length,0);
+   const next=await stranger.call(`/videos/${legacy}/submit`,{method:'POST',body:consent});
+   assert.equal(next.video.revision,2);assert.equal(next.video.status,'submitted');assert.equal(next.video.reviewStage,'ai');assert.equal(next.video.reason,'');assert.deepEqual(next.video.checks,{});
+   const replay=await stranger.call(`/videos/${legacy}/submit`,{method:'POST',body:consent});
+   assert.equal(replay.replayed,true);assert.equal(replay.video.revision,2);
+   await review(legacy,'ai',1,{status:409});
+   for(const stage of ['ai','manual']){await review(legacy,stage,2);assert.equal((await stranger.call('/me')).ledger.length,0);}
+   await review(legacy,'client',2);await review(legacy,'client',2,{status:409});
+   const credited=await stranger.call('/me');assert.equal(credited.ledger.length,1);assert.equal(credited.ledger[0].reference,legacy);assert.equal(credited.wallet.earned,originalTask.reward);
+   // The other video belongs to this same owner and has durable keys; legacy compatibility must not weaken its fence.
+   await review(witness,'ai',2,{body:{decision:'rejected',reason:'Keyed fence after legacy retry'}});
+   await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:consent,status:409});
+   const restored=await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:{...consent,idempotencyKey:'intentional-after-legacy-0003',expectedRevision:2}});
+   assert.equal(restored.video.revision,3);assert.equal(restored.video.status,'submitted');
+  });
+
   await t.test('REGRESSION: pending queue remains discoverable behind 1000 newer completed uploads',async()=>{
    // Seed only the scale boundary; the pending witness was uploaded/submitted/reviewed through real APIs.
    // No media bytes or ledger records are needed for completed list-only fixture rows.

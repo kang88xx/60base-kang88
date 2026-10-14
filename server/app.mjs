@@ -189,7 +189,7 @@ export function createService({directory,origin='http://localhost:4318',allowReg
       receipt={videoId:video.id,revision:current.revision,consent:normalized,submittedAt:current.submittedAt};replayed=true;
      }else{
       if(!['uploaded','rejected'].includes(current.status))fail(409,'제출할 수 없는 영상 상태입니다.');
-      if(current.status==='rejected'&&!hasKey)fail(409,'반려된 영상은 내역에서 확인한 뒤 다시 제출해주세요.');
+      if(current.status==='rejected'&&!hasKey&&one("SELECT 1 FROM requests WHERE userId=? AND kind='video.submit' AND json_extract(responseId,'$.videoId')=? LIMIT 1",user.id,video.id))fail(409,'반려된 영상은 내역에서 확인한 뒤 다시 제출해주세요.');
       if(hasKey&&b.expectedRevision!==current.revision)fail(409,'제출 회차가 변경되었습니다. 다시 확인해주세요.');
       if(!settings().intakeOpen)fail(409,'현재 접수가 중단되어 있습니다.');
       const at=now(),consent={...normalized,at};run("UPDATE videos SET status='submitted',reviewStage='ai',submittedAt=?,reviewedAt=NULL,revision=revision+1,reviewVersion=reviewVersion+1,reason='',checks='{}',consent=? WHERE id=?",at,JSON.stringify(consent),video.id);audit(user,'video.submit',video.id,{revision:current.revision+1,stage:'ai'});receipt={videoId:video.id,revision:current.revision+1,consent:normalized,submittedAt:at};
