@@ -16,13 +16,15 @@ function resource(value) {
 }
 
 async function artifacts(root, env) {
-  for (const folder of ['server', 'deploy', 'deploy/huggingface']) {
+  for (const folder of ['server', 'shared', 'deploy', 'deploy/huggingface']) {
     const info = await lstat(path.join(root, folder));
     if (!info.isDirectory() || info.isSymbolicLink()) fail('Deployment directories must be real directories');
   }
   const entries = await readdir(path.join(root, 'server'));
   const files = entries.filter(name => !name.startsWith('.') && name.endsWith('.mjs')).sort().map(name => ({ source: `server/${name}`, path: `server/${name}` }));
   if (!files.some(file => file.path === 'server/hf-index.mjs')) fail('Missing server entrypoint');
+  // This pure policy module is the only shared client/server runtime dependency.
+  files.push({ source: 'shared/video-policy.js', path: 'shared/video-policy.js' });
   files.push({ source: 'deploy/huggingface/Dockerfile', path: 'Dockerfile' }, { source: 'deploy/huggingface/README.md', path: 'README.md' });
   let total = 0;
   for (const file of files) {
@@ -78,7 +80,7 @@ export async function deploy({ env = process.env, root = ROOT, fetchImpl = globa
         await request(`${route}/secrets`, { method: 'POST', body: { key, value: env[key] } });
         report.secretsUpdated.push(key);
       }
-      const header = { summary: 'Keep hosted operations consistent with the current service contract', description: 'Constraint: Deploy only server sources and the Docker runtime definition.\nScope-risk: moderate', ...(metadata.sha ? { parentCommit: metadata.sha } : {}) };
+      const header = { summary: 'Keep hosted operations consistent with the current service contract', description: 'Constraint: Deploy server sources, the explicitly allowlisted shared video policy, and the Docker runtime definition.\nScope-risk: moderate', ...(metadata.sha ? { parentCommit: metadata.sha } : {}) };
       const body = [JSON.stringify({ key: 'header', value: header }), ...files.map(file => JSON.stringify({ key: 'file', value: { content: file.bytes.toString('base64'), path: file.path, encoding: 'base64' } }))].join('\n') + '\n';
       const result = await (await request(`${route}/commit/main`, { method: 'POST', body, ndjson: true })).json();
       report.committed = true;

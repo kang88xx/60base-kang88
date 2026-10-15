@@ -1,3 +1,4 @@
+import { assertVideoDuration, VIDEO_DURATION_HELP } from '../shared/video-policy.js';
 import { isNativeApp, shareNativeBlob } from '../app/native.js';
 import { getMission, formatDuration, formatBytes, statusLabel, reviewStatusLabel } from '../shared/data.js';
 import { getClip, saveClip, updateClip, deleteClip } from '../shared/store.js';
@@ -45,7 +46,7 @@ function assertVideoFile(file) {
   if (!declared && !VIDEO_EXTENSIONS.test(file.name || '')) throw new Error('MP4, WebM, MOV, M4V 영상 파일을 선택해주세요.');
 }
 
-function inspectVideo(blob, hint = 0) {
+function inspectVideo(blob) {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
     const url = URL.createObjectURL(blob);
@@ -61,7 +62,7 @@ function inspectVideo(blob, hint = 0) {
       error ? reject(error) : resolve(value);
     };
     const details = () => ({
-      duration: Number.isFinite(video.duration) && video.duration > 0 ? video.duration : hint,
+      duration: Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0,
       width: video.videoWidth,
       height: video.videoHeight,
     });
@@ -76,7 +77,7 @@ function inspectVideo(blob, hint = 0) {
         finish(new Error('화면이 없는 파일이에요. 재생 가능한 동영상을 선택해주세요.'));
         return;
       }
-      if (Number.isFinite(video.duration) || hint > 0) {
+      if (Number.isFinite(video.duration) && video.duration > 0) {
         finish(null, details());
         return;
       }
@@ -117,7 +118,7 @@ export function openLocalImport({ missionId } = {}) {
     <form id="local-import-form" class="online-form local-record-form">
       <label class="${inApp?'ego-file-drop':''}">${inApp?'<span class="ego-file-icon" aria-hidden="true">'+icon('upload',28)+'</span><strong>보관할 영상을 선택하세요</strong><span class="ego-file-choose">파일 선택</span>':'영상 파일'}
         <input name="file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" required aria-label="보관할 영상 파일 선택">
-        <small>최대 250 MB · MP4·WebM 권장. MOV·M4V는 브라우저에서 재생 가능한 경우에만 보관할 수 있습니다.</small>
+        <small>${VIDEO_DURATION_HELP}</small><small>최대 250 MB · MP4·WebM 권장. MOV·M4V는 브라우저에서 재생 가능한 경우에만 보관할 수 있습니다.</small>
       </label>
       ${inApp?'<div class="ego-file-card" data-file-card hidden><span class="ego-file-thumbnail" aria-hidden="true">'+icon('video',24)+'</span><div><strong data-file-name></strong><small data-file-size></small></div><button type="button" data-file-remove aria-label="선택한 영상 제외">×</button></div>':''}
       <div id="local-import-preview" class="local-record-preview" hidden>
@@ -195,6 +196,7 @@ export function openLocalImport({ missionId } = {}) {
       assertVideoFile(file);
       status(statusNode, '영상 정보를 확인하고 있어요...');
       const details = await inspectVideo(file);
+      assertVideoDuration(details.duration);
       if (!element.open || token !== readingToken) return;
       selectedFile = file;
       selectedMimeType = mimeTypeFor(file);

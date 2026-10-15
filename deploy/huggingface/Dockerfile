@@ -11,6 +11,7 @@ ENV HOST=0.0.0.0
 ENV DONGJAKSO_DATA_DIR=/data
 
 COPY --chown=1000:1000 server/ ./server/
+COPY --chown=1000:1000 shared/video-policy.js ./shared/video-policy.js
 # The public UI and its assets stay on Vercel. Only /api routes reach this Space.
 
 USER 1000:1000

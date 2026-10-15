@@ -3,8 +3,8 @@ import {api as requestApi,session,sessionReady,refreshSession,showAccount,dialog
 const pages=[['overview','대시보드','grid'],['members','회원 관리','user'],['videos','영상·심사','video'],['tasks','촬영 활동','book'],['data','데이터 현황','folder'],['finance','매출·비용','wallet'],['payouts','출금 관리','bank'],['commerce','상품·주문','package'],['tickets','문의 관리','help'],['notices','공지 관리','bell'],['audit','변경 기록','clock'],['settings','운영 설정','settings']];
 const videoStatuses=['pending','submitted','reviewing','approved','rejected','uploaded','deleting','deleted'];
 function routeFilters(){const [page,query]=location.hash.slice(1).split('?'),status=new URLSearchParams(query).get('status');return {query:'',status:page==='videos'&&videoStatuses.includes(status)?status:'all'};}
-const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null},main=document.querySelector('#admin-main');
-let sessionRecovery=null;
+const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null,videoPage:null,videoCursor:'',videoCursors:[]},main=document.querySelector('#admin-main');
+let sessionRecovery=null,videoSearchTimer;
 let cloudAccount=null,cloudInitialization=null,googlePending=false,googlePopup=false,googleBridge=false,adminSigningOut=false,googleMessage='';
 function syncAdminGoogle(){
  const cloud=cloudAccount?.getCloudAccount(),waiting=googlePending||googlePopup||googleBridge||cloud?.busy;
@@ -85,7 +85,7 @@ function closeAdminDialogs(){
   element.close();element.remove();
  });
 }
-function clearAdminData(){state.data=null;state.overview=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
+function clearAdminData(){clearTimeout(videoSearchTimer);state.videoPage=null;state.videoCursor='';state.videoCursors=[];state.data=null;state.overview=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
 function dialog(title,content,options){const element=baseDialog(title,content,options);element.dataset.adminPrivate='';return element;}
 function showLoadError(message){
  main.removeAttribute('aria-busy');
@@ -148,16 +148,17 @@ async function load(){
  if(state.loadedRoute!==route())main.innerHTML='<p role="status">운영 데이터를 불러오는 중입니다.</p>';
  main.setAttribute('aria-busy','true');
  try{
-  const [data,overview]=await Promise.all([api('/admin/data'),api('/admin/overview?days='+state.days)]);
+  const [data,overview,videoPage]=await Promise.all([api('/admin/data'),api('/admin/overview?days='+state.days),route()==='videos'?api(videoListPath()):null]);
   if(epoch!==state.epoch||!canManage())return;
-  Object.assign(state,{data,overview,loadedRoute:route()});render();
+  if(videoPage)data.videos=videoPage.videos;
+  Object.assign(state,{data,overview,videoPage,loadedRoute:route()});render();
   if(focusId&&main.querySelector('#'+CSS.escape(focusId)))main.querySelector('#'+CSS.escape(focusId)).focus({preventScroll:true});
   else if(refreshFocused)main.querySelector('[data-refresh]')?.focus({preventScroll:true});
   document.querySelector('#admin-last-update').textContent='마지막 확인 '+date(new Date());
  }catch(error){if(epoch!==state.epoch||error.name==='AbortError')return;clearAdminData();showLoadError(error.message);}
  finally{if(epoch===state.epoch)main.removeAttribute('aria-busy');}
 }
-window.addEventListener('hashchange',()=>{state.filters=routeFilters();state.sort={scope:null,index:null,direction:'asc'};setMenuOpen(false);closeAdminDialogs();navigation();void load();main.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});});
+window.addEventListener('hashchange',()=>{clearTimeout(videoSearchTimer);state.videoCursor='';state.videoCursors=[];state.filters=routeFilters();state.sort={scope:null,index:null,direction:'asc'};setMenuOpen(false);closeAdminDialogs();navigation();void load();main.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});});
 window.addEventListener('service-session',()=>{state.filters=routeFilters();state.sort={scope:null,index:null,direction:'asc'};state.accessVersion++;clearAdminData();closeAdminDialogs();main.removeAttribute('aria-busy');if(sessionRecovery){gate();return;}void load();});
 function heading(title,copy='',actions=''){return `<div class="online-toolbar"><div class="admin-page-title"><h1>${title}</h1>${copy?`<p>${copy}</p>`:''}</div><div class="online-toolbar-actions">${actions}<button type="button" class="button" data-refresh>새로고침</button></div></div>`;}
 const kpi=(label,value,sub='')=>`<article class="online-kpi"><span>${label}</span><strong>${value}</strong>${sub?`<small>${sub}</small>`:''}</article>`;
@@ -169,7 +170,7 @@ function renderReviewFeedback(){
  if(!state.reviewFeedback||!['videos','overview'].includes(route()))return;
  const feedback=state.reviewFeedback,pending=state.data.videos.filter(video=>['submitted','reviewing'].includes(video.status)),current=pending.find(video=>video.id===feedback.id),next=pending.find(video=>video.id===feedback.nextId)||pending.find(video=>video.id!==feedback.id);
  const panel=document.createElement('section');panel.className='admin-review-feedback';panel.setAttribute('aria-label','최근 검수 결과');
- panel.innerHTML=`<p role="status" aria-live="polite" tabindex="-1">${esc(feedback.message)}</p><div>${current?button('이 영상 다음 단계 확인','video',current.id):''}${next?button('다음 대기 영상 검수','video',next.id):'<span>다른 대기 영상이 없습니다.</span>'}<button type="button" class="button" data-dismiss-review-feedback>알림 닫기</button></div>`;
+ panel.innerHTML=`<p role="status" aria-live="polite" tabindex="-1">${esc(feedback.message)}</p><div>${current?button('이 영상 다음 단계 확인','video',current.id):''}${next?button('다음 대기 영상 검수','video',next.id):'<span>현재 목록에 다른 대기 영상이 없습니다.</span>'}<button type="button" class="button" data-dismiss-review-feedback>알림 닫기</button></div>`;
  main.querySelector('.online-toolbar').after(panel);panel.querySelector('[data-dismiss-review-feedback]').onclick=()=>{state.reviewFeedback=null;panel.remove();main.querySelector('[data-refresh]')?.focus();};
 }
 function trendChart(rows){
@@ -288,7 +289,34 @@ function reviewStageLabel(stage,status){
  return '1단계 · AI 심사';
 }
 function membersPage(){const items=state.data.members,rows=items=>items.map(u=>rowData([`<strong>${esc(u.name)}</strong><small>${esc(u.email)}</small>`,u.role==='admin'?'관리자':'참여자',badge(u.status),u.videoCount+'건',walletPoints(u),date(u.createdAt),button('상세·관리','member',u.id)],[u.name,u.role,u.status,u.videoCount,u.wallet?.available,u.createdAt,''])),search=searchable(items,rows,{placeholder:'이름 또는 이메일 검색',statuses:['active','suspended']});tableView('회원 관리','회원의 활동과 보유 포인트를 확인합니다.',['회원','권한','상태','영상','보유 포인트','가입일','관리'],rows(items),{actions:exportButton('members'),filters:search.filters});search.bind();}
-function videosPage(){const items=state.data.videos,rows=items=>items.map(v=>rowData([`<strong>${esc(v.title)}</strong><small>${esc(v.taskTitle)}</small>`,`<strong>${esc(v.memberName)}</strong><small>${esc(v.memberEmail)}</small>`,badge(v.status),`<span>${esc(reviewStageLabel(v.reviewStage,v.status))}</span>`,Math.round(v.duration)+'초 / '+size(v.size),date(v.submittedAt||v.createdAt),['deleting','deleted'].includes(v.status)?'<span>'+labels[v.status]+'</span>':button('검수 열기','video',v.id)],[v.title,v.memberName,v.status,reviewStageLabel(v.reviewStage,v.status),v.duration,v.submittedAt||v.createdAt,''])),search=searchable(items,rows,{placeholder:'영상, 회원, 촬영 활동 검색',statuses:videoStatuses});tableView('영상·심사','3단계 승인 절차로 원본과 촬영 기준을 확인합니다.',['영상','제출자','상태','심사 단계','길이·용량','접수일','검수'],rows(items),{actions:exportButton('videos'),filters:search.filters});search.bind();}
+function videoListPath(){
+ const query=new URLSearchParams({status:state.filters.status,q:state.filters.query.trim(),limit:'50'});
+ if(state.videoCursor)query.set('cursor',state.videoCursor);
+ return '/admin/videos?'+query;
+}
+function videosPage(){
+ const page=state.videoPage,items=page.videos;
+ const rows=items=>items.map(v=>rowData([`<strong>${esc(v.title)}</strong><small>${esc(v.taskTitle)}</small>`,`<strong>${esc(v.memberName)}</strong><small>${esc(v.memberEmail)}</small>`,badge(v.status),`<span>${esc(reviewStageLabel(v.reviewStage,v.status))}</span>`,Math.round(v.duration)+'초 / '+size(v.size),date(v.submittedAt||v.createdAt),['deleting','deleted'].includes(v.status)?'<span>'+labels[v.status]+'</span>':button('검수 열기','video',v.id)],[v.title,v.memberName,v.status,reviewStageLabel(v.reviewStage,v.status),v.duration,v.submittedAt||v.createdAt,'']));
+ const search=searchable(items,rows,{placeholder:'영상, 회원, 촬영 활동 검색',statuses:videoStatuses});
+ tableView('영상·심사','전체 영상에서 검색합니다. 열 정렬은 현재 페이지에 적용됩니다.',['영상','제출자','상태','심사 단계','길이·용량','접수일','검수'],rows(items),{actions:exportButton('videos'),filters:search.filters});
+ main.querySelector('.admin-count').textContent=`검색 결과 ${page.total.toLocaleString('ko-KR')}건 · 현재 ${items.length}건 · 전체 검수 대기 ${page.counts.pending.toLocaleString('ko-KR')}건`;
+ const controls=document.createElement('nav');controls.className='online-toolbar-actions';controls.setAttribute('aria-label','영상 목록 페이지');
+ controls.innerHTML=`<button type="button" class="button" data-video-prev ${state.videoCursors.length?'':'disabled'}>이전 페이지</button><span>${state.videoCursors.length+1}페이지</span><button type="button" class="button" data-video-next ${page.nextCursor?'':'disabled'}>다음 페이지</button>`;
+ main.append(controls);
+ controls.querySelector('[data-video-prev]').onclick=()=>{if(!state.videoCursors.length)return;state.videoCursor=state.videoCursors.pop();void load();};
+ controls.querySelector('[data-video-next]').onclick=()=>{if(!page.nextCursor)return;state.videoCursors.push(state.videoCursor);state.videoCursor=page.nextCursor;void load();};
+ const input=main.querySelector('#admin-search'),filter=main.querySelector('#admin-filter'),reset=main.querySelector('#admin-search-reset');
+ const update=(delay=0)=>{
+  clearTimeout(videoSearchTimer);state.filters={query:input.value,status:filter.value};state.videoCursor='';state.videoCursors=[];
+  history.replaceState(null,'',location.pathname+location.search+'#videos'+(filter.value==='all'?'':'?status='+encodeURIComponent(filter.value)));
+  const epoch=++state.epoch;
+  if(delay)videoSearchTimer=setTimeout(()=>{if(epoch===state.epoch&&route()==='videos'&&canManage())void load();},delay);
+  else void load();
+ };
+ input.oninput=()=>update(300);filter.onchange=()=>update();
+ reset.disabled=!input.value&&filter.value==='all';
+ reset.onclick=()=>{input.value='';filter.value='all';input.focus();update();};
+}
 function tasksPage(){tableView('촬영 활동','촬영 조건과 승인 포인트, 모집 공개 여부를 관리합니다.',['활동','분류','승인 포인트','공개 상태','관리'],state.data.tasks.map(t=>rowData([`<strong>${esc(t.title)}</strong><small>${esc(t.instructions.slice(0,85))}</small>`,esc(t.category),points(t.reward),t.published?'공개':'비공개',button('수정','task',t.id)],[t.title,t.category,t.reward,t.published,''])),{actions:button('활동 추가','task','')});}
 function dataPage(){const o=state.overview;main.innerHTML=heading('데이터 현황','누적 수집량과 촬영 분포, 심사 결과를 확인합니다.',exportButton('videos'))+`<div class="online-kpis">${kpi('누적 영상',o.videos+'건')}${kpi('촬영 시간',(o.seconds/3600).toFixed(2)+'시간')}${kpi('영상 저장량',size(o.bytes),`한도 ${size(o.settings.totalStorageBytes)}`)}${kpi('승인율',(o.approved+o.rejected?Math.round(o.approved/(o.approved+o.rejected)*100):0)+'%','승인 ÷ 결과가 확정된 영상')}</div><div class="admin-chart-grid"><section class="online-panel"><h3>촬영 활동 분포</h3>${breakdown(o.categories.map(r=>({label:r.category,count:r.count})),o.videos)}</section><section class="online-panel"><h3>심사 상태별 구성</h3>${breakdown(o.statuses.map(r=>({label:labels[r.status]||r.status,count:r.count})),o.videos)}</section></div><section class="online-panel"><h3>데이터 확인 기준</h3><div class="admin-columns-three"><div><strong>원본 파일</strong><p class="admin-info-line">서버에서 영상 길이와 해상도를 읽고, 파일 중복 여부를 확인합니다.</p></div><div><strong>검수 기록</strong><p class="admin-info-line">구도·손·개인정보·완료 여부를 확인한 결과와 심사 차수를 남깁니다.</p></div><div><strong>동의와 구간 라벨</strong><p class="admin-info-line">제출 시 확인한 이용 동의와 시간별 작업 라벨을 영상에 연결합니다.</p></div></div></section>`;}
 function financePage(){const o=state.overview,headers=['거래일','구분·항목','거래처','금액','증빙 번호'],rows=state.data.entries.map(e=>rowData([esc(e.date),`${e.kind==='income'?'매출':'비용'} · ${esc(e.category)}`,esc(e.party),money(e.amount),esc(e.reference)],[e.date,e.kind+' '+e.category,e.party,e.amount,e.reference]));main.innerHTML=heading('매출·비용','실제 확인된 거래를 증빙과 함께 기록합니다.',daysSelect()+button('거래 기록','entry','')+exportButton('entries'))+`<div class="online-kpis">${kpi('매출 기록',money(o.finance.recordedIncome),'데이터 판매 등 수기 거래')}${kpi('주문 매출',money(o.finance.orderSales),'입금 확인 − 환불 (거래일 기준)')}${kpi('비용 기록',money(o.finance.recordedExpenses),'수기 비용')}${kpi('참여자 지급',money(o.finance.payouts),'이체 확인 완료 건')}</div><section class="online-panel"><h3>거래 기록</h3>${rows.length?tableMarkup('거래 기록',headers,rows,{scope:'finance-entries',responsive:false,panel:false}):empty('등록된 거래가 없습니다.')}</section><p class="admin-data-legend">기존 적립금으로 결제한 순매출 ${money(o.finance.rewardSales)}은 별도 집계되며 현금 매출에 합산하지 않습니다.</p><p class="admin-data-legend">이 화면에 기록해도 결제·은행 이체는 실행되지 않습니다. 실제 확인한 거래만 입력해주세요. 주문 매출과 출금 지급은 자동 집계되므로 수기 거래에 중복 입력하지 않습니다.</p>`;bindDays();bindTableSort();}
@@ -339,7 +367,7 @@ function formDialog(title,fields,onSubmit,{wide=false,submit='저장'}={}){const
 async function perform(action,id){if(['product','payout','order'].includes(action))return;const version=state.accessVersion;try{
  if(action==='member'){const u=state.data.members.find(u=>u.id===id),w=u.wallet;formDialog('회원 관리',`<dl class="admin-detail-grid"><div><dt>이름</dt><dd>${esc(u.name)}</dd></div><div><dt>이메일</dt><dd>${esc(u.email)}</dd></div><div><dt>가입일</dt><dd>${date(u.createdAt)}</dd></div><div><dt>등록 영상</dt><dd>${u.videoCount}건</dd></div><div><dt>현재 보유 포인트</dt><dd>${w?points(w.available):'불러오기 필요'}</dd></div><div><dt>누적 적립 포인트</dt><dd>${w?points(w.earned):'불러오기 필요'}</dd></div></dl><label>계정 상태<select name="status"><option value="active" ${u.status==='active'?'selected':''}>이용 중</option><option value="suspended" ${u.status==='suspended'?'selected':''} ${u.role==='admin'?'disabled':''}>이용 정지</option></select></label>${field('운영 메모','notes',u.notes,'textarea','maxlength="2000"')}`,b=>api('/admin/members/'+id,{method:'PATCH',body:b}));}
  if(action==='video')await reviewDialog(id);
- if(action==='task'){const t=state.data.tasks.find(t=>t.id===id)||{};formDialog(id?'촬영 활동 수정':'촬영 활동 추가',field('활동명','title',t.title,'text','required maxlength="150"')+field('분류','category',t.category||'주방','text','required maxlength="60"')+field('촬영 안내','instructions',t.instructions,'textarea','required maxlength="6000"')+field('승인 포인트 (P)','reward',t.reward??3000,'number','required min="0" max="1000000"')+field('참여자에게 공개','published',t.published,'checkbox'),(b,form)=>api('/admin/tasks',{method:'POST',body:{...b,id:id||undefined,reward:Number(b.reward),published:form.elements.published.checked}}));}
+ if(action==='task'){const t=state.data.tasks.find(t=>t.id===id)||{};formDialog(id?'촬영 활동 수정':'촬영 활동 추가',field('활동명','title',t.title,'text','required maxlength="150"')+field('분류','category',t.category||'주방','text','required maxlength="60"')+field('촬영 안내','instructions',t.instructions,'textarea','required maxlength="6000"')+field('영상 최종 승인 포인트 (P)','reward',1000,'number','readonly aria-readonly="true"')+field('참여자에게 공개','published',t.published,'checkbox'),(b,form)=>api('/admin/tasks',{method:'POST',body:{...b,id:id||undefined,reward:Number(b.reward),published:form.elements.published.checked}}));}
  if(action==='notice'){const n=state.data.announcements.find(n=>n.id===id)||{};formDialog(id?'공지 수정':'공지 작성',field('제목','title',n.title,'text','required maxlength="150"')+field('공지 내용','body',n.body,'textarea','required maxlength="6000" rows="7"')+field('공지 공개','published',n.published,'checkbox'),(b,form)=>api('/admin/announcements',{method:'POST',body:{...b,id:id||undefined,published:form.elements.published.checked}}));}
  if(action==='ticket'){const t=state.data.tickets.find(t=>t.id===id);formDialog('문의 답변',`<div class="admin-ticket-layout"><section class="admin-ticket-context"><span class="admin-eyebrow">참여자 문의</span><h3>${esc(t.subject)}</h3><p class="admin-info-line">${esc(t.memberName)} · ${date(t.createdAt)}</p>${badge(t.status)}<div class="admin-ticket-message">${esc(t.message)}</div>${t.response?`<h3>기존 답변</h3><div class="admin-ticket-message is-response">${esc(t.response)}</div>`:'<p class="admin-info-line">아직 등록된 답변이 없습니다.</p>'}</section><section class="admin-ticket-compose"><h3>답변 작성</h3><p class="admin-info-line">저장한 답변은 참여자의 문의 내역에 표시됩니다.</p>${field('답변','response',t.response,'textarea','required maxlength="6000" rows="9"')}<label>처리 상태<select name="status"><option value="replied" ${t.status==='closed'?'':'selected'}>답변 완료</option><option value="closed" ${t.status==='closed'?'selected':''}>처리 완료</option></select></label></section></div>`,b=>api('/admin/tickets/'+id,{method:'PATCH',body:b}),{wide:true,submit:'답변 저장'});} 
  if(action==='entry')formDialog('확인된 거래 기록',`<p class="online-help">주문 결제와 출금 지급은 자동 집계됩니다. 그 외 실제 거래만 기록해주세요.</p><label>구분<select name="kind"><option value="income">매출</option><option value="expense">비용</option></select></label>${field('항목','category','데이터 판매','text','required maxlength="60"')}${field('금액 (원)','amount','','number','required min="1" max="1000000000"')}${field('거래일','date',new Date(Date.now()+9*3600000).toISOString().slice(0,10),'date','required')}${field('거래처','party','','text','maxlength="120"')}${field('증빙 번호','reference','','text','required minlength="3" maxlength="120"')}${field('메모','note','','textarea','maxlength="2000"')}`,b=>api('/admin/entries',{method:'POST',body:{...b,amount:Number(b.amount)}}));
@@ -403,7 +431,7 @@ async function reviewDialog(id){
    busy(review,true);reviewStatus.textContent='검수 결과를 저장하고 있습니다.';
    try{
     const nextChecks=Object.fromEntries(checkNames.map(key=>[key,review.elements[key]?.checked??checks[key]===true]));
-    const result=await api('/admin/videos/'+id+'/review',{method:'POST',body:{decision,stage,revision:v.revision,reason:reason.value,checks:nextChecks}});
+    const result=await api('/admin/videos/'+id+'/review',{method:'POST',body:{decision,stage,revision:v.revision,reviewVersion:v.reviewVersion,reason:reason.value,checks:nextChecks}});
     const message=decision==='rejected'?'반려 사유를 저장했습니다.':decision==='reviewing'?'검토 중으로 저장했습니다.':result.stage==='complete'?'최종 승인했습니다. 포인트 적립이 완료되었습니다.':`${stageInfo.title}를 승인했습니다. 다음은 ${reviewStageCopy[result.stage]?.title||'다음 심사 단계'}입니다.`;
     state.reviewFeedback={id,message:`${v.title} · ${message}`,nextId:ordered.find(nextId=>state.data.videos.some(video=>video.id===nextId&&['submitted','reviewing'].includes(video.status)))};
     d.close();await load();

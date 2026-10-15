@@ -4,7 +4,7 @@ const capturePlanKey = 'momjit-studio-capture-plan-v1';
 const capturePlanVersion = 1;
 const trainingKey = 'momjit-studio-training-v1';
 const trainingVersion = 1;
-const preflightKeys = ['headgear', 'landscape', 'fiveMinutes', 'privacy'];
+const preflightKeys = ['headgear', 'landscape', 'oneMinute', 'privacy'];
 const trainingAnswers = { q1: 'landscape', q2: 'privacy', q3: 'natural' };
 const trainingOptions = {
   q1: ['landscape', 'portrait'],
@@ -218,7 +218,7 @@ function preflightMarkup(training, activity, icon, esc) {
   const checks = [
     ['headgear', '카메라가 양손과 작업 대상을 함께 담는 위치에 있어요.'],
     ['landscape', '가로 화면으로 촬영할 준비가 됐어요.'],
-    ['fiveMinutes', '약 5분 동안 평소 속도로 촬영할 수 있어요.'],
+    ['oneMinute', '1분 동안 평소 속도로 촬영할 수 있어요.'],
     ['privacy', '얼굴, 주소, 문서, 차량번호 같은 개인정보를 치웠어요.'],
   ];
   const count = preflightCount(training);
@@ -342,7 +342,7 @@ export function renderEducation(options = {}) {
     <section class="prep-faq">
       <details><summary>촬영 활동을 고르면 바로 신청되나요?</summary><p>활동 선택은 촬영할 내용을 정하는 단계입니다. 저장한 영상은 동의 내용을 확인하고 심사 제출하기를 눌러야 접수됩니다.</p></details>
       <details><summary>영상은 어디에 저장되고, 어떻게 제출하나요?</summary><p>촬영하거나 가져온 영상은 현재 기기에 먼저 저장되며 자동 제출되지 않습니다. 보관함에서 영상을 확인한 뒤 직접 제출하세요.</p></details>
-      <details><summary>포인트는 어떻게 적립되나요?</summary><p>한국에서 촬영한 약 5분의 집안일 영상이 검수 기준을 통과하면 포인트가 적립됩니다. 제출만으로는 적립되지 않습니다.</p></details>
+      <details><summary>포인트는 어떻게 적립되나요?</summary><p>한국에서 촬영한 1분의 집안일 영상이 검수 기준을 통과하면 포인트가 적립됩니다. 제출만으로는 적립되지 않습니다.</p></details>
       <details><summary>촬영 전 체크가 제출 동의인가요?</summary><p>아니요. 체크는 촬영 품질을 위한 준비 상태입니다. 영상 제출과 데이터 이용 동의는 제출 단계에서 다시 확인해요.</p></details>
     </section>
   </section>`;

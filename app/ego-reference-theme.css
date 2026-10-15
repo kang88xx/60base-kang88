@@ -488,6 +488,20 @@ body:has(#app-shell) .ego-welcome-actions button:disabled {
 #app-shell .profile-shortcuts a { padding: 13px 10px; }
 #app-shell .settings-section { margin-bottom: 22px; }
 #app-shell .settings-row { padding-top: 13px; padding-bottom: 13px; }
+/* Settings: selected compact option 2 with an 18px icon-to-text gap. */
+#app-shell[data-screen=settings] #app-main { padding-bottom:20px; }
+#app-shell[data-screen=settings] .settings-section { margin-bottom:16px; }
+#app-shell[data-screen=settings] .settings-section > h2 { margin:12px 0 8px 6px; }
+#app-shell[data-screen=settings] .settings-group { border-radius:20px; }
+#app-shell[data-screen=settings] .settings-row { min-height:66px; padding:10px 14px; gap:10px; }
+#app-shell[data-screen=settings] .settings-row:not(:has(.row-copy > small)) { min-height:52px; }
+#app-shell[data-screen=settings] .row-icon { width:32px; height:32px; flex-basis:32px; border-radius:10px; margin-right:8px; }
+#app-shell[data-screen=settings] .row-icon > .app-icon { width:20px; height:20px; flex-basis:20px; }
+#app-shell[data-screen=settings] .settings-row small { margin-top:3px; }
+#app-shell[data-screen=settings] .settings-row + .settings-row::before { left:64px; right:14px; }
+#app-shell[data-screen=settings] .settings-footer { padding-top:12px; }
+#app-shell[data-screen=settings] #app-main > .muted-caption { margin:8px 4px; line-height:1.5; }
+#app-shell[data-screen=settings] .deletion-help { min-height:44px; border:0; background:transparent; padding:0 4px; margin-left:0; }
 #app-shell .submission-card { padding: 15px; border-radius: 20px; }
 #app-shell .reward-panel { padding: 19px; margin-bottom: 19px; border-radius: 22px; }
 #app-shell .reward-panel > strong { font-size: 34px; }
@@ -683,4 +697,102 @@ body:has(#app-shell) .studio-camera-dialog .button.primary:is(:disabled, [aria-d
 @media(prefers-reduced-motion:reduce) {
   #app-shell .app-bottom-nav > a,
   #app-shell .app-bottom-nav > a > .app-icon { transition: none; }
+}
+
+/* Activity introduction and three-step filming guide · 2026-10-15 */
+#app-shell :is(.activity-intro,.filming-guide){padding-top:8px}
+#app-shell .activity-intro .step-chip{display:inline-flex;align-items:center;gap:7px}
+#app-shell .activity-intro .screen-heading h1{font-size:32px;line-height:1.25;margin-top:12px}
+#app-shell .activity-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:26px 0 18px}
+#app-shell .activity-stats article{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:20px;border:1px solid #e3e7f1;border-radius:24px;background:#fff}
+#app-shell .activity-stats strong{font-size:24px;line-height:1.25;color:#17223c}
+#app-shell .activity-stats small{font-size:13px;color:#677287}
+#app-shell .activity-summary{padding:22px;border-radius:22px;background:#e7edff;color:#243866;font-size:16px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
+#app-shell .activity-intro .detail-section{margin-top:28px}
+#app-shell .activity-intro .detail-section h2{font-size:21px;margin-bottom:16px}
+#app-shell .activity-intro .detail-sample{width:100%;border-radius:22px;overflow:hidden}
+#app-shell .activity-intro .detail-sample .task-media{aspect-ratio:16/9}
+#app-shell .activity-checklist{padding:0;border:1px solid #e3e7f1;border-radius:22px;overflow:hidden;background:#fff}
+#app-shell .activity-checklist li{display:flex;align-items:flex-start;gap:12px;padding:20px;margin:0;border-bottom:1px solid #edf0f5;font-size:15px;line-height:1.65}
+#app-shell .activity-checklist li:last-child{border-bottom:0}
+#app-shell .activity-checklist .app-icon{flex:none;margin-top:3px;color:#0024ff}
+#app-shell .filming-guide{padding-top:0}
+#app-shell .filming-guide .guide-progress{margin-top:0}
+#app-shell .filming-guide .guide-heading{margin:10px 0 16px}
+#app-shell .filming-guide .guide-heading h1{font-size:25px;line-height:1.3;margin:6px 0 0;word-break:keep-all}
+#app-shell .filming-guide .guide-visual{border-radius:23px;overflow:hidden;margin:16px 0 12px;background:#e7edff}
+#app-shell .filming-guide .guide-visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}
+#app-shell .filming-guide .guide-visual figcaption{padding:8px;font-size:12px;text-align:center}
+#app-shell .filming-guide .guide-frame-hero{position:relative;margin:12px 0}
+#app-shell .filming-guide .guide-frame-hero img{height:170px;aspect-ratio:auto;object-fit:contain}
+#app-shell .filming-guide .guide-frame-hero figcaption{position:absolute;top:4px;left:0;right:0;padding:5px 8px;background:transparent;font-size:11px}
+#app-shell .filming-guide .guide-explanation{font-size:15px;line-height:1.55;margin:12px 0 16px}
+#app-shell .filming-guide .sample-row{border-radius:22px;margin-top:16px}
+#app-shell .filming-guide .framing-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+#app-shell .framing-comparison figure{min-width:0;margin:0}
+#app-shell .filming-guide .framing-comparison figure>div{position:relative;aspect-ratio:1;overflow:hidden;border-radius:22px;background:#e7edff;border:1px solid #dce3f3}
+#app-shell .framing-comparison img{width:100%;height:100%;object-fit:contain}
+#app-shell .framing-comparison .frame-bad img{object-fit:cover;transform:scale(1.9) translateX(32%)}
+#app-shell .framing-comparison figure>div>span{position:absolute;right:12px;top:12px;color:#0024ff;background:#fff;border-radius:50%;padding:5px;display:flex}
+#app-shell .framing-comparison .frame-bad span{color:#bf354a}
+#app-shell .filming-guide .framing-comparison figcaption{font-size:12px;text-align:center;margin-top:6px;line-height:1.4}
+#app-shell .filming-guide .quality-comparison{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+#app-shell .quality-comparison section{position:relative;border:1px solid #dfe5f0;border-radius:23px;background:#fff;padding:16px 14px;min-width:0}
+#app-shell .quality-comparison .quality-good{background:#e7edff}
+#app-shell .filming-guide .quality-comparison section>span{display:flex;margin-bottom:14px;color:#bf354a}
+#app-shell .quality-comparison .quality-good>span{color:#0024ff}
+#app-shell .filming-guide .quality-comparison h2{font-size:15px;line-height:1.4;margin:0 0 12px}
+#app-shell .filming-guide .quality-comparison ul{padding-left:17px;margin:0;display:grid;gap:9px;font-size:14px;line-height:1.5;word-break:keep-all}
+#app-shell .filming-guide .guide-education-link{display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:14px;color:#0024ff;margin-top:16px}
+#app-shell .filming-footer{display:flex;flex-wrap:wrap;gap:10px;padding:12px 24px calc(12px + env(safe-area-inset-bottom))}
+#app-shell .filming-footer>.app-button{flex:1;min-width:0;min-height:54px;border-radius:20px;font-size:16px}
+#app-shell .filming-footer p{flex-basis:100%;margin:0;text-align:center;color:#677287;font-size:11px;line-height:1.5}
+#app-shell:is([data-screen=activity],[data-screen=guide]) #app-main{padding-bottom:38px;margin-bottom:calc(140px + env(safe-area-inset-bottom))}
+@media(max-width:359px){#app-shell .activity-stats article{padding:16px}#app-shell .activity-stats strong{font-size:21px}#app-shell .guide-heading h1{font-size:25px}#app-shell .quality-comparison section{padding:16px 12px}#app-shell .quality-comparison ul{font-size:13px}#app-shell .filming-footer{padding-left:16px;padding-right:16px}}
+
+/* Phone landscape uses the screen width while keeping controls clear of the notch. */
+@media (orientation: landscape) and (max-height: 600px) and (pointer: coarse) {
+  :root { --app-width: 100%; }
+  body:has(#app-shell) { padding: 0; }
+  #app-shell {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  #app-shell #app-header {
+    min-height: calc(60px + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 8px calc(16px + env(safe-area-inset-left));
+  }
+  #app-shell[data-screen] #app-main {
+    padding-left: calc(16px + env(safe-area-inset-left));
+    padding-right: calc(16px + env(safe-area-inset-right));
+    padding-bottom: 24px;
+    margin-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+  #app-shell .app-connection {
+    padding-left: calc(16px + env(safe-area-inset-left));
+    padding-right: calc(16px + env(safe-area-inset-right));
+  }
+  #app-shell .screen-footer {
+    width: 100%;
+    bottom: 0;
+    border-radius: 0;
+    padding: 8px calc(16px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+  }
+  #app-shell .screen-footer > .app-button { min-height: 48px; }
+  #app-shell:is([data-screen=activity], [data-screen=guide]) #app-main {
+    margin-bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+  #app-shell:not([data-screen=welcome]) .app-bottom-nav {
+    left: calc(16px + env(safe-area-inset-left));
+    width: calc(100% - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+    transform: none;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    min-height: 56px;
+  }
+  #app-shell:not([data-screen=welcome]) .app-bottom-nav > a { min-height: 44px; }
 }
