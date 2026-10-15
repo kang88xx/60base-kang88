@@ -79,7 +79,7 @@ for(const mode of ['local','hf'])await test(`${mode}${productionAuth?' / product
  const fixtures={};
  async function upload(owner,extension,title){
   const bytes=fixtures[extension],mime=extension==='mov'?'video/quicktime':'video/mp4';
-  const session=await owner.call('/uploads',{method:'POST',status:201,body:{taskId:originalTask.id,title,filename:`fixture.${extension}`,mime,size:bytes.length,duration:1,width:64,height:48}});
+  const session=await owner.call('/uploads',{method:'POST',status:201,body:{taskId:originalTask.id,title,filename:`fixture.${extension}`,mime,size:bytes.length,duration:60,width:64,height:48}});
   for(let offset=0;offset<bytes.length;offset+=session.chunkSize)await owner.call(`/uploads/${session.id}?offset=${offset}`,{method:'PUT',raw:bytes.subarray(offset,offset+session.chunkSize)});
   const saved=await owner.call(`/uploads/${session.id}/complete`,{method:'POST',body:{},status:201});completedUploads.set(saved.id,session.id);
   if(storage){assert.deepEqual(storage.bytes('videos/'+saved.id),bytes);assert.equal(storage.keys().some(key=>key.startsWith('staging/'+session.id+'/')),false);}
@@ -105,7 +105,7 @@ for(const mode of ['local','hf'])await test(`${mode}${productionAuth?' / product
   await start(true);
   for(const [extension,color] of [['mov','blue'],['mp4','red']]){
    const file=path.join(temporary,'fixture.'+extension);
-   execFileSync(process.env.EGO_FFMPEG||'/opt/homebrew/bin/ffmpeg',['-v','error','-f','lavfi','-i',`color=c=${color}:s=64x48:r=10`,'-t','1','-c:v','libx264','-y',file]);
+   execFileSync(process.env.EGO_FFMPEG||'/opt/homebrew/bin/ffmpeg',['-v','error','-f','lavfi','-i',`color=c=${color}:s=64x48:r=10`,'-t','60','-c:v','libx264','-y',file]);
    fixtures[extension]=await readFile(file);
   }
   // Only bootstrap the privileged fixture directly; all member/review/ledger flows use APIs.
@@ -283,7 +283,7 @@ for(const mode of ['local','hf'])await test(`${mode}${productionAuth?' / product
    const replay=await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:requestBody});assert.deepEqual(replay.receipt,first.receipt);assert.equal(replay.video.status,'rejected');assert.equal(replay.video.revision,1);
    await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:consent,status:409});
    const again=await stranger.call(`/uploads/${up}/complete`,{method:'POST',body:{}});assert.equal(again.video.status,'rejected');assert.equal(again.id,witness);
-   const bytes=fixtures.mp4,duplicateUpload=await stranger.call('/uploads',{method:'POST',status:201,body:{taskId:originalTask.id,title:'Duplicate rejected witness',filename:'same.mp4',mime:'video/mp4',size:bytes.length,duration:1,width:64,height:48}});
+   const bytes=fixtures.mp4,duplicateUpload=await stranger.call('/uploads',{method:'POST',status:201,body:{taskId:originalTask.id,title:'Duplicate rejected witness',filename:'same.mp4',mime:'video/mp4',size:bytes.length,duration:60,width:64,height:48}});
    await stranger.call(`/uploads/${duplicateUpload.id}?offset=0`,{method:'PUT',raw:bytes});const duplicate=await stranger.call(`/uploads/${duplicateUpload.id}/complete`,{method:'POST',body:{}});assert.equal(duplicate.duplicate,true);assert.equal(duplicate.id,witness);assert.equal(duplicate.video.status,'rejected');assert.equal((await stranger.call(`/uploads/${duplicateUpload.id}/complete`,{method:'POST',body:{}})).id,witness);
    const next=await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:{...consent,idempotencyKey:'intentional-new-attempt-0002',expectedRevision:1}});assert.equal(next.video.revision,2);assert.equal(next.video.status,'submitted');
    const oldAgain=await stranger.call(`/videos/${witness}/submit`,{method:'POST',body:requestBody});assert.equal(oldAgain.receipt.revision,1);assert.equal(oldAgain.video.revision,2);

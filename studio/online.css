@@ -72,3 +72,70 @@
 .online-points-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.online-points-balance{border-color:#ff5d17;background:#fff8f4}.online-bank-planned h3{margin-top:10px}.online-bank-planned :disabled{opacity:1;background:#f2f3f5;color:#657184;cursor:not-allowed;border-color:#dce0e5}.online-bank-planned button:disabled{background:#e9ebee;color:#657184}.online-upload-stages{display:flex;gap:8px;list-style:none;padding:0;flex-wrap:wrap;margin:12px 0}.online-upload-stages[hidden]{display:none}.online-upload-stages li{padding:6px 10px;border:1px solid #e5e8ee;border-radius:8px;color:#657184}.online-upload-stages [aria-current="step"]{border-color:#ff5d17;color:#a93608;background:#fff8f4}.online-receipt h3{font-size:22px;margin:16px 0}.online-receipt dl{border-block:1px solid #e5e8ee;padding:8px 0}.online-receipt dl>div{display:flex;justify-content:space-between;gap:16px;padding:10px 0}.online-receipt dt{color:#657184}.online-receipt dd{margin:0;text-align:right;overflow-wrap:anywhere;min-width:0}.online-receipt p{color:#657184}.online-video-points{font-weight:600}@media(max-width:600px){.online-points-kpis{grid-template-columns:1fr}.online-receipt dl>div{flex-wrap:wrap}}
 
 .capture-studio .online-bank-planned .online-form :is(input,select):disabled{background:#f2f3f5;color:#657184;border-color:#dce0e5;opacity:1}
+
+/* Selected signup concept 2: blue account header and a rounded white form panel. */
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] {
+  width:min(460px,calc(100vw - 24px));max-width:460px;max-height:calc(100dvh - 32px);
+  padding:0;border:0;border-radius:26px;background:#245dff;color:#222c3d;overflow:auto;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head {
+  padding:22px 24px 0;border:0;background:transparent;gap:16px;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head h2 {
+  margin:0;color:#fff;font-size:20px;font-weight:750;line-height:1.4;letter-spacing:-.035em;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head [data-close] {
+  min-width:62px;min-height:44px;padding:7px 17px;border:1px solid #fff;border-radius:999px;
+  background:transparent;color:#fff;font-size:14px;font-weight:600;line-height:1.4;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-body {padding:0;background:transparent;}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-title {
+  margin:21px 24px 19px;text-align:left;color:#fff;font-size:36px;font-weight:750;line-height:1.25;letter-spacing:-.055em;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-panel {
+  padding:22px;border-radius:24px 24px 0 0;background:#fff;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-identity {
+  display:flex;align-items:center;flex-wrap:nowrap;gap:14px;margin:0 0 20px;padding:8px 19px;
+  min-height:60px;border:0;border-radius:14px;background:#eff5ff;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-identity .cloud-email {
+  flex:1;min-width:0;margin:0;color:#25324a;font-size:15px;font-weight:450;line-height:1.5;overflow-wrap:anywhere;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-switch {
+  flex:none;margin:0;min-height:44px;border:0;border-left:1px solid #d2dcea;border-radius:0;
+  padding:4px 0 4px 15px;background:transparent;color:#245dff;font-size:14px;font-weight:600;
+  text-decoration:underline;text-underline-offset:3px;line-height:1.4;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form {display:grid;gap:0;}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form > label:not(.online-check) {
+  display:grid;gap:8px;margin:0 0 18px;color:#222c3d;font-size:15px;font-weight:700;line-height:1.5;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form input[name=displayName] {
+  width:100%;min-height:50px;padding:12px 16px;border:1px solid #d7e0ed;border-radius:12px;
+  background:#fff;color:#222c3d;font-size:17px;font-weight:600;line-height:1.4;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check {
+  display:flex;position:relative;align-items:flex-start;gap:18px;padding:14px 3px;min-height:54px;
+  margin:0;border-top:1px solid #e4e8ef;color:#253044;font-size:15px;font-weight:450;line-height:1.5;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check input {
+  position:static;flex:0 0 22px;width:22px;height:22px;min-height:22px;padding:0;margin:0;accent-color:#245dff;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-check a {color:#245dff;text-decoration:underline;text-underline-offset:3px;}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit] {
+  width:100%;min-height:50px;margin:12px 0 0;padding:12px 16px;border:1px solid #245dff;
+  border-radius:999px;background:#245dff;color:#fff;font-size:17px;font-weight:700;line-height:1.4;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit]:disabled {
+  border-color:#dbe3ed;background:#e9eef5;color:#8490a0;opacity:1;cursor:not-allowed;
+}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] [data-cloud-error]:not(:empty) {margin:0;padding:0 22px 20px;background:#fff;}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] :focus-visible {outline-color:#245dff;}
+#cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head :focus-visible {outline-color:#fff;}
+@media (max-height:500px) and (orientation:landscape) and (pointer:coarse) {
+  #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] {
+    width:calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - 24px);
+    max-width:none;max-height:calc(100dvh - 16px);border-radius:20px;
+  }
+}

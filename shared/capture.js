@@ -1,3 +1,6 @@
+import { VIDEO_TARGET_SECONDS, assertVideoDuration, VIDEO_DURATION_HELP } from './video-policy.js';
+// Keep the final encoded frame beyond 60s without rounding or relaxing validation.
+const RECORDING_STOP_MS = VIDEO_TARGET_SECONDS * 1000 + 250;
 import { missions, getMission, formatDuration, formatBytes, statusLabel, formatMoney, reviewStatusLabel } from './data.js';
 import { getClip, saveClip, updateClip, deleteClip } from './store.js';
 import { getServiceState, submitClip } from './service-store.js';
@@ -25,12 +28,12 @@ function inspectVideo(blob, hint = 0) {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video'), url = URL.createObjectURL(blob); let settled = false;
     const finish = (err, value) => { if (settled) return; settled = true; clearTimeout(timer); video.onloadedmetadata = video.ondurationchange = video.ontimeupdate = video.onerror = null; video.removeAttribute('src'); video.load(); URL.revokeObjectURL(url); err ? reject(err) : resolve(value); };
-    const details = () => ({ duration: Number.isFinite(video.duration) ? video.duration : hint, width: video.videoWidth, height: video.videoHeight });
+    const details = () => ({ duration: Number.isFinite(video.duration) ? video.duration : 0, width: video.videoWidth, height: video.videoHeight });
     const timer = setTimeout(() => { if(video.videoWidth && video.videoHeight) finish(null,details()); else finish(new Error('영상을 읽는 데 시간이 오래 걸려요. 다른 영상이나 MP4 파일을 선택해주세요.')); }, 10000);
     video.preload = 'metadata'; video.muted = true;
     video.onloadedmetadata = () => {
       if (!video.videoWidth || !video.videoHeight) { finish(new Error('화면이 없는 파일이에요. 재생 가능한 동영상을 선택해주세요.')); return; }
-      if (Number.isFinite(video.duration) || hint > 0) { finish(null, details()); return; }
+      if (Number.isFinite(video.duration) && video.duration > 0) { finish(null, details()); return; }
       const durationReady = () => { if (Number.isFinite(video.duration) && video.duration > 0) finish(null,details()); };
       video.ondurationchange = video.ontimeupdate = durationReady;
       video.currentTime = 1e10;
@@ -43,7 +46,7 @@ function inspectVideo(blob, hint = 0) {
 export function openCapture({ mode = 'camera', missionId } = {}) {
   const selected = getMission(missionId);
   const dialog = modal('일상의 움직임을 담아볼까요?', `
-    <div class="capture-body">
+    <div class="capture-body"><p class="capture-hint">${VIDEO_DURATION_HELP}</p>
       <label class="capture-field">촬영 미션<select id="capture-mission">${missions.map(m => `<option value="${m.id}" ${m.id === selected.id ? 'selected' : ''}>${esc(m.title)}</option>`).join('')}</select></label>
       <div class="capture-tabs" aria-label="영상 추가 방법"><button type="button" data-mode="camera">${icon('camera')} 카메라로 촬영</button><button type="button" data-mode="upload">${icon('upload')} 영상 가져오기</button></div>
       <div id="capture-camera" class="capture-camera">
@@ -56,9 +59,9 @@ export function openCapture({ mode = 'camera', missionId } = {}) {
       <div class="local-notice">${icon('folder',16)}<span>영상은 이 브라우저에만 저장돼요. 서버로 전송되지 않아요.</span></div>
     </div>`, true);
   const $ = id => dialog.querySelector(`#${id}`);
-  let stream, recorder, chunks = [], blob, metadata, source, objectURL, timer, started, closed = false, generation = 0, busy = false, reading = false, readingVersion = 0;
+  let stream, recorder, chunks = [], blob, metadata, source, objectURL, timer, limitTimer, started, closed = false, generation = 0, busy = false, reading = false, readingVersion = 0;
   const status = (message, error = false) => { $('capture-status').textContent = message; $('capture-status').classList.toggle('is-error', error); };
-  const release = () => { generation++; if (recorder && recorder.state !== 'inactive') { recorder.onstop = null; recorder.stop(); } stream?.getTracks().forEach(track => track.stop()); stream = null; clearInterval(timer); $('camera-live').srcObject = null; };
+  const release = () => { generation++; if (recorder && recorder.state !== 'inactive') { recorder.onstop = null; recorder.stop(); } stream?.getTracks().forEach(track => track.stop()); stream = null; clearInterval(timer); clearTimeout(limitTimer); $('camera-live').srcObject = null; };
   function unload(event) { if (blob || recorder?.state === 'recording') { event.preventDefault(); event.returnValue = ''; } }
   addEventListener('beforeunload', unload);
   const leavePage = () => { release(); };
@@ -86,7 +89,8 @@ export function openCapture({ mode = 'camera', missionId } = {}) {
     if (candidate.size > MAX_SIZE) { status('250 MB 이하의 영상을 선택해주세요.', true); return; }
     reading = true; const version = ++readingVersion; status('영상 재생 정보를 확인하고 있어요…');
     try {
-      const info = await inspectVideo(candidate, hint);
+      const info = await inspectVideo(candidate);
+      assertVideoDuration(info.duration);
       if (closed || version !== readingVersion) return;
       blob = candidate; metadata = info; source = type;
       if (objectURL) URL.revokeObjectURL(objectURL); objectURL = URL.createObjectURL(blob);
@@ -112,7 +116,7 @@ export function openCapture({ mode = 'camera', missionId } = {}) {
       if (closed || token !== generation) { result.getTracks().forEach(track => track.stop()); return; }
       stream = result; $('camera-live').srcObject = stream; await $('camera-live').play();
       if (closed || token !== generation) return;
-      $('camera-placeholder').hidden = true; $('enable-camera').hidden = true; $('start-record').hidden = false; status('준비되면 녹화를 시작해주세요. 최대 10분까지 촬영할 수 있어요.');
+      $('camera-placeholder').hidden = true; $('enable-camera').hidden = true; $('start-record').hidden = false; status('준비되면 녹화를 시작해주세요. 1분 후 자동으로 녹화가 종료돼요.');
     } catch (error) { if (!closed && token === generation) { release(); status(errorMessage(error), true); $('enable-camera').disabled = false; $('enable-camera').textContent = '카메라 다시 켜기'; } }
   };
   $('start-record').onclick = () => {
@@ -120,11 +124,18 @@ export function openCapture({ mode = 'camera', missionId } = {}) {
       const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/mp4','video/webm'].find(type => MediaRecorder.isTypeSupported(type));
       recorder = new MediaRecorder(stream, mimeType ? {mimeType} : undefined); chunks = []; let total = 0;
       recorder.ondataavailable = event => { if (event.data.size) { chunks.push(event.data); total += event.data.size; if (total > MAX_SIZE && recorder.state === 'recording') recorder.stop(); } };
-      recorder.onstop = () => { const duration = (Date.now() - started) / 1000; const video = new Blob(chunks, { type: recorder.mimeType || mimeType || 'video/webm' }); release(); $('stop-record').hidden = true; $('start-record').hidden = false; $('enable-camera').hidden = false; $('enable-camera').disabled = false; $('enable-camera').textContent = '카메라 다시 켜기'; $('start-record').hidden = true; $('camera-placeholder').hidden = false; $('record-timer').hidden = true; void preview(video, 'camera', duration); };
+      recorder.onstop = () => { const duration = started === null ? 0 : (Date.now() - started) / 1000; const video = new Blob(chunks, { type: recorder.mimeType || mimeType || 'video/webm' }); release(); $('stop-record').hidden = true; $('start-record').hidden = false; $('enable-camera').hidden = false; $('enable-camera').disabled = false; $('enable-camera').textContent = '카메라 다시 켜기'; $('start-record').hidden = true; $('camera-placeholder').hidden = false; $('record-timer').hidden = true; void preview(video, 'camera', duration); };
       recorder.onerror = () => { release(); status('녹화가 중단됐어요. 카메라를 다시 켜서 시도해주세요.', true); $('enable-camera').hidden = false; $('enable-camera').disabled = false; $('start-record').hidden = true; $('stop-record').hidden = true; };
-      recorder.start(500); started = Date.now(); $('start-record').hidden = true; $('stop-record').hidden = false; $('stop-record').disabled = false; $('record-timer').hidden = false;
-      timer = setInterval(() => { const elapsed = (Date.now()-started)/1000; $('record-timer').querySelector('span').textContent = formatDuration(elapsed); if (elapsed >= 600 && recorder.state === 'recording') recorder.stop(); }, 200);
-      status('녹화 중이에요. 완료되면 녹화 마치기를 눌러주세요.');
+      started = null; $('start-record').hidden = true; $('stop-record').hidden = false; $('stop-record').disabled = false; $('record-timer').hidden = false;
+      const recording = recorder;
+      recorder.onstart = () => {
+        if (closed || recorder !== recording || recording.state !== 'recording') return;
+        started = Date.now();
+      limitTimer = setTimeout(() => { if (recorder?.state === 'recording') recorder.stop(); }, RECORDING_STOP_MS);
+      timer = setInterval(() => { const elapsed = (Date.now()-started)/1000; $('record-timer').querySelector('span').textContent = formatDuration(Math.min(elapsed, VIDEO_TARGET_SECONDS)); if (elapsed * 1000 >= RECORDING_STOP_MS && recorder.state === 'recording') recorder.stop(); }, 200);
+      };
+      recorder.start(500);
+      status('녹화 중이에요. 1분 후 자동으로 마쳐요.');
     } catch (error) { release(); status(errorMessage(error), true); $('enable-camera').hidden = false; $('enable-camera').disabled = false; $('start-record').hidden = true; }
   };
   $('stop-record').onclick = () => { if (recorder?.state === 'recording') { $('stop-record').disabled = true; recorder.stop(); } };

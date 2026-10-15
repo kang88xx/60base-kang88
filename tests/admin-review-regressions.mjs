@@ -48,9 +48,11 @@ try {
   await page.reload(); await page.locator('#admin-filter').waitFor();
   assert.equal(await page.locator('#admin-filter').inputValue(), 'pending');
   await page.locator('#admin-filter').selectOption('all');
+  await page.waitForFunction(() => document.querySelectorAll('tbody [data-admin-action=video]').length === 4);
   assert.equal(await page.locator('tbody [data-admin-action=video]').count(), 4);
   assert.equal(new URL(page.url()).hash, '#videos');
   await page.locator('#admin-filter').selectOption('pending');
+  await page.waitForFunction(() => document.querySelectorAll('tbody [data-admin-action=video]').length === 3);
   checks.push('Dashboard queue opens submitted/reviewing only; direct-link reload and all-status reset work.');
 
   await open('a');

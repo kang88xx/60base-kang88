@@ -44,30 +44,33 @@ try {
   const existingInstructions = '관리자가 수정한 촬영 안내\n양손과 작업 대상을 함께 담으세요.\n<img src=x onerror="window.reviewInjected=true">';
   const existing = { ...service.store.one('SELECT * FROM tasks WHERE id=?', 'dishwashing'), instructions: existingInstructions, published: true };
   await saveTask(existing);
-  const newTask = { title: 'QA 새 촬영 활동', category: '주방', instructions: '새 활동 첫 번째 촬영 안내\n두 번째 줄: 안전을 먼저 확인하세요.', reward: 3000, published: true };
+  const newTask = { title: 'QA 새 촬영 활동', category: '주방', instructions: '새 활동 첫 번째 촬영 안내\n두 번째 줄: 안전을 먼저 확인하세요.', reward: 1000, published: true };
   const newId = await saveTask(newTask);
   await page.goto(origin + '/app/#activity/dishwashing');
-  await page.locator('.activity-instructions').waitFor();
-  assert.equal(await page.locator('.activity-instructions').textContent(), existingInstructions);
-  assert.equal(await page.locator('.activity-instructions').evaluate(node => getComputedStyle(node).whiteSpace), 'pre-wrap');
-  assert.equal(await page.locator('.activity-instructions img').count(), 0);
+  await page.locator('.activity-summary').waitFor();
+  assert.equal(await page.locator('.activity-summary').textContent(), existingInstructions);
+  assert.equal(await page.locator('.activity-summary').evaluate(node => getComputedStyle(node).whiteSpace), 'pre-wrap');
+  assert.equal(await page.locator('.activity-summary img').count(), 0);
   assert.equal(await page.evaluate(() => window.reviewInjected), undefined);
   assert.ok(await page.locator('.activity-steps li').count() > 0, 'static examples remain supplementary');
   assert.equal(await page.locator('[data-app-action=sample]').count(), 1, 'existing sample remains available');
-  await page.locator('[data-app-action=save-activity]').click();
+  await navigate('missions');
+  await page.locator('[data-app-action=save-activity][data-id=dishwashing]').click();
   await navigate(`activity/${newId}`);
-  await page.waitForFunction(value => document.querySelector('.activity-instructions')?.textContent === value, newTask.instructions);
+  await page.waitForFunction(value => document.querySelector('.activity-summary')?.textContent === value, newTask.instructions);
   await page.screenshot({ path: path.join(output, 'new-activity-390.png'), fullPage: true });
-  await page.locator('[data-app-action=save-activity]').click();
+  await navigate('missions');
+  await page.locator(`[data-app-action=save-activity][data-id="${newId}"]`).click();
+  await navigate(`guide/${newId}/3`);
   await page.locator('[data-app-action=prepare-activity]').click();
-  await page.waitForURL('**/#education');
+  await page.waitForURL(/#education(?:\/.*)?$/);
   assert.equal((await plan()).plan.selected, newId);
   assert.deepEqual((await plan()).plan.saved.sort(), ['dishwashing', newId].sort());
   assert.match(await page.locator('.prep-status').innerText(), /QA 새 촬영 활동 준비 중/);
   assert.equal(await page.locator(`[data-prep-id="${newId}"][data-prep-action=select]`).getAttribute('aria-pressed'), 'true');
   for (const [question, answer] of Object.entries({ q1: 'landscape', q2: 'privacy', q3: 'natural' })) await page.locator(`[data-prep-question=${question}][data-prep-answer=${answer}]`).click();
   await page.locator('[data-prep-action=complete-training]').click();
-  for (const key of ['headgear', 'landscape', 'fiveMinutes', 'privacy']) await page.locator(`[data-prep-check=${key}]`).check();
+  for (const key of ['headgear', 'landscape', 'oneMinute', 'privacy']) await page.locator(`[data-prep-check=${key}]`).check();
   assert.equal((await plan()).training.completed, true);
   assert.match(await page.locator('.prep-status').innerText(), /촬영 준비 완료/);
   await page.reload({ waitUntil: 'networkidle' });
@@ -109,11 +112,11 @@ try {
         if (width < 400) await page.screenshot({ path: path.join(output, `${route}-${width}.png`), fullPage: true });
       }
       if (route === 'home') {
-        assert.equal(await page.locator('.feature-card').first().getAttribute('aria-label'), null, 'the natural link name includes the title, review condition and reward');
-        assert.match(await page.locator('.feature-card').first().ariaSnapshot(), /검수 승인 시/);
+        assert.equal(await page.locator('.task-card').first().getAttribute('aria-label'), null, 'the natural link name includes the title, review condition and reward');
+        assert.match(await page.locator('.task-card').first().ariaSnapshot(), /검수 승인 시/);
         assert.match(await page.locator('[aria-label="공지사항"] .app-icon').getAttribute('style'), /bell\.svg/);
         const targets = await page.locator('.rail-dots button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height }; }));
-        assert.ok(targets.length > 0 && targets.every(item => item.width >= 44 && item.height >= 44));
+        assert.equal(targets.length, 0, 'the removed top recommendation rail has no detached paging controls');
       }
       if (route === 'announcements') assert.equal(await page.locator('.header-title').textContent(), '공지사항');
       if (route === 'profile' || route === 'ranking') {

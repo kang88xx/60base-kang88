@@ -1,11 +1,16 @@
+import { VIDEO_TARGET_SECONDS, videoDurationError, assertVideoDuration } from '../shared/video-policy.js';
 import { isNativeApp, shareNativeBlob } from '../app/native.js';
 import { deleteClip, saveClip } from '../shared/store.js';
 import { formatBytes, formatDuration } from '../shared/data.js';
 import { escapeHTML as esc, icon } from '../shared/ui.js';
 
-const MAX_DURATION_MS = 10 * 60 * 1000;
+const TARGET_DURATION_MS = VIDEO_TARGET_SECONDS * 1000;
+// Allow the encoder's final frame to land beyond 60s; file validation stays exact.
+const ENCODER_FINAL_FRAME_MARGIN_MS = 250;
+const MAX_DURATION_MS = TARGET_DURATION_MS + ENCODER_FINAL_FRAME_MARGIN_MS;
 const MAX_SIZE = 250 * 1024 * 1024;
-const GUIDE_LINES = ['가로로 고정', '손과 작업 대상', '얼굴·개인정보 제외'];
+const ZOOM_TIMEOUT_MS = 1500;
+const GUIDE_LINES = ['1분 자동 종료', '가로로 고정', '손과 작업 대상', '얼굴·개인정보 제외'];
 const MP4_MIME_CANDIDATES = [
   'video/mp4;codecs=h264',
   'video/mp4',
@@ -50,7 +55,7 @@ function usefulError(error) {
   return error?.message || '카메라를 시작하지 못했어요. 잠시 뒤 다시 시도해주세요.';
 }
 
-function inspectVideo(blob, hint = {}) {
+function inspectVideo(blob) {
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
     const url = URL.createObjectURL(blob);
@@ -59,7 +64,7 @@ function inspectVideo(blob, hint = {}) {
       if (done) return;
       done = true;
       clearTimeout(timer);
-      video.onloadedmetadata = video.onerror = null;
+      video.onloadedmetadata = video.ondurationchange = video.ontimeupdate = video.onerror = null;
       video.removeAttribute('src');
       video.load();
       URL.revokeObjectURL(url);
@@ -69,11 +74,14 @@ function inspectVideo(blob, hint = {}) {
     video.preload = 'metadata';
     video.muted = true;
     video.playsInline = true;
-    video.onloadedmetadata = () => finish(null, {
-      duration: Number.isFinite(video.duration) && video.duration > 0 ? video.duration : hint.duration || 0,
-      width: video.videoWidth || hint.width || 0,
-      height: video.videoHeight || hint.height || 0,
-    });
+    const read = () => {
+      if (!Number.isFinite(video.duration) || video.duration <= 0 || !video.videoWidth || !video.videoHeight) return false;
+      finish(null, { duration: video.duration, width: video.videoWidth, height: video.videoHeight });
+      return true;
+    };
+    video.onloadedmetadata = () => {
+      if (!read()) { video.ondurationchange = video.ontimeupdate = read; video.currentTime = 1e10; }
+    };
     video.onerror = () => finish(new Error('촬영한 영상을 읽지 못했어요. 다시 촬영하거나 다운로드로 보관해주세요.'));
     video.src = url;
   });
@@ -107,6 +115,12 @@ function buildDialog(activity, canRecord) {
       <div class="studio-camera-timer" data-timer hidden><i></i><span>00:00</span></div>
       <div class="studio-camera-error" data-error role="status" aria-live="assertive" hidden></div>
       <div class="studio-camera-bottom" data-camera-controls>
+        <div class="studio-camera-zoom" data-camera-zoom hidden>
+          <div role="group" aria-label="카메라 배율">
+            ${[0.5, 1, 2].map(value => `<button type="button" data-zoom="${value}" aria-pressed="false" disabled>${value}×</button>`).join('')}
+          </div>
+          <span data-zoom-status role="status" aria-live="polite">배율을 확인하고 있어요.</span>
+        </div>
         <button class="studio-camera-record" type="button" data-record aria-label="녹화 시작" ${canRecord ? '' : 'hidden'}><span></span></button>
         <button class="studio-camera-stop" type="button" data-stop hidden>녹화 마치기</button>
         <button class="studio-camera-retry" type="button" data-retry data-camera-retry hidden>${icon('camera', 18)} 다시 시도</button>
@@ -163,6 +177,10 @@ class StudioCamera {
     this.recordButton = this.dialog.querySelector('[data-record]');
     this.stopButton = this.dialog.querySelector('[data-stop]');
     this.flipButton = this.dialog.querySelector('[data-flip]');
+    this.zoomNode = this.dialog.querySelector('[data-camera-zoom]');
+    this.zoomStatus = this.dialog.querySelector('[data-zoom-status]');
+    this.zoomButtons = [...this.dialog.querySelectorAll('[data-zoom]')];
+    this.zoomSession = null;
     this.retryButton = this.dialog.querySelector('[data-retry]');
     this.fileInput = this.dialog.querySelector('[data-file-fallback] input');
     this.reviewSheet = this.dialog.querySelector('[data-review-sheet]');
@@ -212,6 +230,7 @@ class StudioCamera {
     this.stopButton.addEventListener('click', () => this.stopRecording('manual'));
     this.retryButton.addEventListener('click', () => this.startCamera());
     this.flipButton.addEventListener('click', () => this.flipCamera());
+    this.zoomButtons.forEach(button => button.addEventListener('click', () => { void this.setZoom(Number(button.dataset.zoom)); }));
     this.dialog.querySelector('[data-retake]').addEventListener('click', () => this.requestRetake());
     this.dialog.querySelector('[data-download]').addEventListener('click', () => this.downloadReview());
     this.saveButton.addEventListener('click', () => this.saveReview());
@@ -261,6 +280,7 @@ class StudioCamera {
   }
 
   async startCamera(preferredDeviceId = '') {
+    if (this.recorder?.state === 'recording' || this.state === 'finalizing') return;
     const token = ++this.generation;
     this.clearError();
     this.setState('loading');
@@ -286,6 +306,8 @@ class StudioCamera {
       await this.liveVideo.play().catch(() => {});
       await this.enumerateDevices();
       if (!this.isActive(token)) return;
+      await this.prepareZoom(token);
+      if (!this.isActive(token)) return;
       this.setState('ready');
     } catch (error) {
       if (!this.isActive(token)) return;
@@ -308,6 +330,120 @@ class StudioCamera {
     }
   }
 
+  zoomIsCurrent(session) {
+    return this.zoomSession === session && this.stream === session.stream &&
+      this.isActive(session.token) && session.track.readyState !== 'ended';
+  }
+
+  zoomSupported(session, value) {
+    const range = session?.range;
+    if (!range || value < range.min || value > range.max) return false;
+    if (!range.step) return true;
+    const steps = (value - range.min) / range.step;
+    return Math.abs(steps - Math.round(steps)) < 0.00001;
+  }
+
+  readZoom(session) {
+    try {
+      const value = session.track.getSettings?.().zoom;
+      return Number.isFinite(value) && value > 0 ? value : null;
+    } catch { return null; }
+  }
+
+  async prepareZoom(token) {
+    const track = this.stream?.getVideoTracks()[0];
+    if (!track) return;
+    let capability;
+    try { capability = track.getCapabilities?.().zoom; } catch {}
+    const range = capability && Number.isFinite(capability.min) && Number.isFinite(capability.max) &&
+      capability.min > 0 && capability.max >= capability.min &&
+      (capability.step === undefined || (Number.isFinite(capability.step) && capability.step > 0)) &&
+      typeof track.applyConstraints === 'function' ? capability : null;
+    const session = { track, stream: this.stream, token, range, queue: Promise.resolve(), blocked: false, message: '' };
+    this.zoomSession = session;
+    session.actual = this.readZoom(session);
+    this.renderZoom();
+    // Safari may open a virtual rear camera at 0.5. Set the requested default on the recording track.
+    if (this.zoomSupported(session, 1)) await this.setZoom(1, { initializing: true });
+  }
+
+  setZoom(value, { initializing = false } = {}) {
+    const session = this.zoomSession;
+    if (!session || session.blocked || !this.zoomIsCurrent(session) || !this.zoomSupported(session, value) ||
+      (!initializing && !['ready', 'recording'].includes(this.state))) return Promise.resolve();
+    session.message = '배율을 변경하고 있어요.';
+    this.renderZoom();
+    const operation = async () => {
+      if (!this.zoomIsCurrent(session) || session.blocked) return;
+      let timer;
+      let timedOut = false;
+      try {
+        // Advanced constraints are used by Safari; settings verification catches silently ignored values.
+        const existing = session.track.getConstraints?.() || {};
+        const { zoom: previousZoom, advanced = [], ...constraints } = existing;
+        const preserved = advanced.map(({ zoom: oldZoom, ...other }) => other).filter(item => Object.keys(item).length);
+        const applying = Promise.resolve().then(() => {
+          if (!this.zoomIsCurrent(session)) return;
+          return session.track.applyConstraints({ ...constraints, advanced: [...preserved, { zoom: value }] });
+        });
+        // A stalled device must not block entering capture. Do not issue another constraint while it may still be running.
+        const refreshLateResult = () => {
+          if (timedOut && this.zoomIsCurrent(session)) {
+            session.actual = this.readZoom(session);
+            this.renderZoom();
+          }
+        };
+        applying.then(refreshLateResult, refreshLateResult);
+        await Promise.race([applying, new Promise((resolve, reject) => {
+          timer = setTimeout(() => { timedOut = true; reject(new Error('zoom-timeout')); }, ZOOM_TIMEOUT_MS);
+        })]);
+        clearTimeout(timer);
+        for (let attempt = 0; attempt < 6; attempt++) {
+          if (!this.zoomIsCurrent(session)) return;
+          session.actual = this.readZoom(session);
+          if (session.actual !== null && Math.abs(session.actual - value) < 0.00001) break;
+          if (attempt < 5) await new Promise(resolve => setTimeout(resolve, 60));
+        }
+        if (!this.zoomIsCurrent(session)) return;
+        session.message = session.actual !== null && Math.abs(session.actual - value) < 0.00001
+          ? '' : '요청한 배율이 적용되지 않았어요. 현재 배율을 확인해주세요.';
+      } catch {
+        if (!this.zoomIsCurrent(session)) return;
+        session.actual = this.readZoom(session);
+        session.blocked = timedOut;
+        session.message = timedOut
+          ? '배율 응답이 지연돼 변경을 멈췄어요. 현재 화각으로 촬영하거나 카메라를 다시 열어주세요.'
+          : '배율을 변경하지 못했어요. 다시 선택해주세요.';
+      } finally {
+        clearTimeout(timer);
+        if (this.zoomIsCurrent(session)) this.renderZoom();
+      }
+    };
+    session.queue = session.queue.then(operation, operation);
+    return session.queue;
+  }
+
+  renderZoom() {
+    if (!this.zoomNode) return;
+    const session = this.zoomSession;
+    const available = session && this.zoomIsCurrent(session);
+    this.zoomNode.hidden = !['ready', 'recording'].includes(this.state);
+    this.dialog.dataset.zoom = this.zoomNode.hidden ? 'hidden' : 'visible';
+    this.zoomButtons.forEach(button => {
+      const value = Number(button.dataset.zoom);
+      button.disabled = !available || session.blocked || !this.zoomSupported(session, value);
+      const selected = available && (session.actual !== null
+        ? Math.abs(session.actual - value) < 0.00001 : !session.range && value === 1);
+      button.setAttribute('aria-pressed', String(Boolean(selected)));
+      button.title = session?.blocked ? '카메라를 다시 열면 배율을 선택할 수 있어요.'
+        : button.disabled ? '이 카메라에서 지원하지 않는 배율입니다.' : `${value}배로 촬영`;
+    });
+    if (!available) this.zoomStatus.textContent = '카메라 배율을 확인하고 있어요.';
+    else if (session.message) this.zoomStatus.textContent = session.message;
+    else if (!session.range) this.zoomStatus.textContent = '기본 화각 · 이 기기는 배율 변경을 지원하지 않아요.';
+    else this.zoomStatus.textContent = `${session.actual === null ? '현재 배율 확인 불가' : `현재 ${session.actual}×`} · 지원 배율 ${[0.5, 1, 2].filter(value => this.zoomSupported(session, value)).map(value => `${value}×`).join(' / ') || '없음'}`;
+  }
+
   flipCamera() {
     if (this.recorder?.state === 'recording' || this.devices.length <= 1) return;
     this.deviceIndex = (this.deviceIndex + 1) % this.devices.length;
@@ -316,7 +452,12 @@ class StudioCamera {
   }
 
   startRecording() {
-    if (!this.stream || !hasRecorder() || this.recorder?.state === 'recording') return;
+    if (this.state !== 'ready' || !this.stream || !hasRecorder() || this.recorder?.state === 'recording') return;
+    // Wait for the native landscape lock (or a browser rotation) before encoding.
+    if (window.matchMedia?.('(orientation: portrait)').matches) {
+      this.showError('휴대폰을 가로로 돌린 뒤 촬영을 시작해주세요.');
+      return;
+    }
     this.chunks = [];
     this.size = 0;
     this.duration = 0;
@@ -344,20 +485,27 @@ class StudioCamera {
       this.stopRecording('error');
     };
     this.recorder.onstop = () => void this.finalizeRecording();
-    this.startedAt = now();
+    this.startedAt = null;
+    const recording = this.recorder;
+    recording.onstart = () => {
+      // Encoder start is asynchronous; startup latency is not recording time.
+      if (this.recorder !== recording || recording.state !== 'recording' || this.closed) return;
+      this.startedAt = now();
+      this.limitTimer = window.setTimeout(() => this.stopRecording('duration'), MAX_DURATION_MS);
+      this.recordTimer = window.setInterval(() => this.updateTimer(), 250);
+      this.updateTimer();
+    };
     this.recorder.start(1000);
-    this.limitTimer = window.setTimeout(() => this.stopRecording('duration'), MAX_DURATION_MS);
-    this.recordTimer = window.setInterval(() => this.updateTimer(), 250);
     this.setState('recording');
-    this.updateTimer();
   }
 
   stopRecording(reason = 'manual') {
+    if (this.recorder?.state !== 'recording') return;
     this.stopReason = reason;
     clearTimeout(this.limitTimer);
     clearInterval(this.recordTimer);
     if (this.recorder?.state === 'recording') {
-      this.duration = Math.max(0, (now() - this.startedAt) / 1000);
+      this.duration = Number.isFinite(this.startedAt) ? Math.max(0, (now() - this.startedAt) / 1000) : 0;
       const settings = this.stream?.getVideoTracks()[0]?.getSettings?.() || {};
       this.streamWidth = this.liveVideo.videoWidth || settings.width || 0;
       this.streamHeight = this.liveVideo.videoHeight || settings.height || 0;
@@ -381,7 +529,7 @@ class StudioCamera {
     const width = this.streamWidth || this.liveVideo.videoWidth || 0;
     const height = this.streamHeight || this.liveVideo.videoHeight || 0;
     try {
-      const details = await inspectVideo(blob, { duration: this.duration, width, height });
+      const details = await inspectVideo(blob);
       this.showReview(blob, details, { metadataValid: true });
     } catch (error) {
       this.showReview(blob, { duration: this.duration, width, height }, { metadataValid: false });
@@ -398,6 +546,7 @@ class StudioCamera {
     }
     try {
       const details = await inspectVideo(file);
+      assertVideoDuration(details.duration);
       this.mimeType = file.type || 'video/mp4';
       this.showReview(file, details, { metadataValid: true });
     } catch (error) {
@@ -424,10 +573,16 @@ class StudioCamera {
     this.reviewSheet.hidden = false;
     this.dialog.querySelector('[data-meta]').textContent = `${formatDuration(this.reviewMeta.duration)} · ${this.reviewMeta.width || '-'} × ${this.reviewMeta.height || '-'} · ${formatBytes(blob.size)}`;
     if (blob.size > MAX_SIZE) this.showError('영상이 250 MB를 넘었어요. 다운로드로 보관하거나 다시 촬영해주세요.', true);
-    else if (this.stopReason === 'duration') this.showError('최대 10분이 되어 녹화를 마쳤어요. 확인 후 저장할 수 있습니다.');
+    else if (this.stopReason === 'duration') this.showError('1분 촬영을 마쳤어요. 영상을 확인한 뒤 저장해주세요.');
     else if (this.stopReason === 'hidden') this.showError('화면이 숨겨져 녹화를 마쳤어요. 촬영분은 아래에서 확인할 수 있습니다.');
     else if (this.stopReason === 'track-ended') this.showError('카메라 연결이 종료되어 녹화를 마쳤어요. 촬영분은 아래에서 확인할 수 있습니다.');
     this.setState('review');
+    const durationError = videoDurationError(this.reviewMeta.duration);
+    if (validDetails && durationError) {
+      this.saveButton.disabled = true;
+      this.submitButton.hidden = true;
+      this.setSaveStatus(durationError + ' 다운로드하거나 다시 촬영해주세요.', true);
+    }
     if (!validDetails) {
       this.saveButton.hidden = true;
       this.saveButton.disabled = true;
@@ -442,6 +597,8 @@ class StudioCamera {
       this.setSaveStatus('영상 정보를 읽지 못해 저장할 수 없어요. 다운로드하거나 다시 촬영해주세요.', true);
       return;
     }
+    const durationError = videoDurationError(this.reviewMeta.duration);
+    if (durationError) { this.setSaveStatus(durationError, true); return; }
     if (this.reviewBlob.size > MAX_SIZE) {
       this.setSaveStatus('250 MB 이하 영상만 저장할 수 있어요. 다운로드 후 다시 촬영해주세요.', true);
       return;
@@ -538,6 +695,7 @@ class StudioCamera {
 
   setState(state) {
     this.state = state;
+    this.renderZoom();
     this.dialog.dataset.state = state;
     this.recordButton.hidden = state !== 'ready';
     this.stopButton.hidden = state !== 'recording';
@@ -563,7 +721,9 @@ class StudioCamera {
   }
 
   updateTimer() {
-    const elapsed = Math.max(0, now() - this.startedAt);
+    const actualElapsed = Math.max(0, now() - this.startedAt);
+    const elapsed = Math.min(TARGET_DURATION_MS, actualElapsed);
+    if (actualElapsed >= MAX_DURATION_MS && this.recorder?.state === 'recording') this.stopRecording('duration');
     const seconds = Math.floor(elapsed / 1000);
     const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
     const ss = String(seconds % 60).padStart(2, '0');
@@ -664,6 +824,8 @@ class StudioCamera {
   }
 
   stopStream() {
+    this.zoomSession = null;
+    this.renderZoom();
     const stream = this.stream;
     this.stream = null;
     if (stream) stream.getTracks().forEach(track => track.stop());
@@ -697,7 +859,7 @@ class StudioCamera {
     clearTimeout(this.limitTimer);
     clearInterval(this.recordTimer);
     if (this.recorder?.state === 'recording') {
-      this.recorder.onstop = null;
+      this.recorder.onstart = this.recorder.onstop = null;
       try { this.recorder.stop(); } catch {}
     }
     this.stopStream();

@@ -1,3 +1,4 @@
+import { bindSignupLegalViewer } from './legal-viewer.js';
 import { getCloudAccount, subscribeCloudAccount, continueWithGoogle, continueWithApple, appleSignInEnabled, completeRegistration, signOutCloudAccount, retryCloudAccount } from './cloud-account.js';
 import { dialog, esc } from './online-api.js';
 
@@ -37,6 +38,7 @@ export function showCloudAccount({returnTo, provider} = {}) {
   const inApp = !!document.querySelector('#app-shell');
   const element = dialog(inApp?'에고 계정':'60BASE 계정', '<div data-cloud-content></div>');
   element.id = 'cloud-account-dialog';
+  bindSignupLegalViewer(element);
   element.classList.add('cloud-account-dialog');
   if(inApp)element.classList.add('ego-form-sheet','ego-auth-sheet');
   if(returnTo)element.dataset.returnTo=returnTo;
@@ -62,7 +64,8 @@ export function showCloudAccount({returnTo, provider} = {}) {
     const form = content.querySelector('#cloud-registration-form');
     if (!form) return;
     const consentComplete = ['adult', 'terms', 'privacy'].every(name => form.elements[name].checked);
-    form.querySelector('[type="submit"]').disabled = account.busy || !consentComplete;
+    const nameComplete = form.elements.displayName.value.trim().length > 0 && form.elements.displayName.validity.valid;
+    form.querySelector('[type="submit"]').disabled = account.busy || !consentComplete || !nameComplete;
   }
   function busyMessage(account) {
     if (!account.busy) return '';
@@ -80,6 +83,9 @@ export function showCloudAccount({returnTo, provider} = {}) {
       requestAnimationFrame(()=>{if(location.hash===element.dataset.returnTo)document.getElementById('workspace')?.focus({preventScroll:true});});
       return;
     }
+    const registrationVisible = account.availability === 'ready' && account.phase === 'registrationRequired';
+    element.classList.toggle('cloud-signup-design-two', registrationVisible);
+    element.querySelector('.online-dialog-head h2').textContent = registrationVisible ? '에고 계정' : (document.querySelector('#app-shell') ? '에고 계정' : '60BASE 계정');
     const key = [account.availability, account.phase, account.user?.uid || ''].join(':');
     if (key !== renderedKey) {
       localError = null;
@@ -96,7 +102,7 @@ export function showCloudAccount({returnTo, provider} = {}) {
         content.innerHTML = `${inApp?'<div class="ego-auth-mark"><img src="/app/icons/symbol.svg" alt="" width="64" height="67"></div>':''}<h3>${inApp?'나의 일상을 담을 준비':'로그인 / 회원가입'}</h3><p class="cloud-intro">${appleSignInEnabled ? 'Google 또는 Apple 계정으로 계속하세요.' : 'Google 계정으로 계속하세요.'}</p><button type="button" class="cloud-google-button" data-google-signin><img src="../assets/brand/google-signin-g.png" alt="" width="20" height="20"><span>Google 계정으로 계속하기</span></button>${appleSignInEnabled ? '<button type="button" class="cloud-google-button" style="background:#000;color:#fff;border-color:#000;margin-top:12px" data-apple-signin><span>Apple로 계속하기</span></button>' : ''}`;
       } else if (account.phase === 'registrationRequired') {
         const name = draft?.displayName ?? account.user?.displayName ?? '';
-        content.innerHTML = `<h3>회원가입</h3><div class="cloud-account-identity"><p class="cloud-email">${esc(account.user.email)}</p><button type="button" class="cloud-account-switch" data-cloud-signout>계정 변경</button></div><form class="online-form" id="cloud-registration-form"><label>이름<input name="displayName" value="${esc(name)}" required maxlength="60" autocomplete="name"></label><label class="online-check"><input type="checkbox" name="adult" required ${draft?.adult?'checked':''}>만 19세 이상입니다.</label><label class="online-check"><input type="checkbox" name="terms" required ${draft?.terms?'checked':''}><span><a href="/studio/terms.html" target="_blank" rel="noopener">이용약관</a>에 동의합니다.</span></label><label class="online-check"><input type="checkbox" name="privacy" required ${draft?.privacy?'checked':''}><span><a href="/studio/privacy.html" target="_blank" rel="noopener">로그인과 개인정보 처리 안내</a>를 확인했습니다.</span></label><button class="button primary" type="submit">가입 완료하기</button></form>`;
+        content.innerHTML = `<h3 class="cloud-signup-title">회원가입</h3><div class="cloud-signup-panel"><div class="cloud-account-identity"><p class="cloud-email">${esc(account.user.email)}</p><button type="button" class="cloud-account-switch" data-cloud-signout>계정 변경</button></div><form class="online-form" id="cloud-registration-form"><label>이름<input name="displayName" value="${esc(name)}" required maxlength="60" autocomplete="name"></label><label class="online-check"><input type="checkbox" name="adult" required ${draft?.adult?'checked':''}>만 19세 이상입니다.</label><label class="online-check"><input type="checkbox" name="terms" required ${draft?.terms?'checked':''}><span><a href="/studio/terms.html" target="_blank" rel="noopener">이용약관</a>에 동의합니다.</span></label><label class="online-check"><input type="checkbox" name="privacy" required ${draft?.privacy?'checked':''}><span><a href="/studio/privacy.html" target="_blank" rel="noopener">로그인과 개인정보 처리 안내</a>를 확인했습니다.</span></label><button class="button primary" type="submit">가입 완료하기</button></form></div>`;
       } else if (account.phase === 'registered') {
         content.innerHTML = `<div class="cloud-registered" data-cloud-status="registered"><span class="cloud-check" aria-hidden="true">✓</span><h3>회원가입 완료</h3><strong>${esc(account.registration.displayName)}</strong><p class="cloud-email">${esc(account.user.email)}</p><p class="cloud-login-method">${account.user.provider === 'apple.com' ? '<span>Apple로 로그인됨</span>' : '<img src="../assets/brand/google-signin-g.png" alt="" width="18" height="18"><span>Google로 로그인됨</span>'}</p><a class="button primary" href="#guide" data-cloud-browse>촬영 교육 보기</a></div>`;
       } else {
@@ -115,7 +121,8 @@ export function showCloudAccount({returnTo, provider} = {}) {
       });
       content.querySelector('[data-cloud-browse]')?.addEventListener('click', () => element.close());
       const form = content.querySelector('#cloud-registration-form');
-      form?.addEventListener('change', updateRegistrationButton);
+      form?.addEventListener('change', () => updateRegistrationButton());
+      form?.addEventListener('input', () => updateRegistrationButton());
       if (form) form.addEventListener('submit', event => {
         event.preventDefault();
         updateRegistrationButton();

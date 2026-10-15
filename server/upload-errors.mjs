@@ -1,8 +1,11 @@
+import { videoDurationError } from '../shared/video-policy.js';
 // Public upload errors are fixed messages, never arbitrary upstream content.
 export const uploadErrors=Object.freeze({
  upload_format:'재생 가능한 MOV·MP4·WebM 원본 영상을 선택해주세요.',
  upload_size:'파일 용량이 업로드 한도를 초과했습니다.',
- upload_duration:'영상 길이를 확인해주세요. 최대 30분까지 제출할 수 있습니다.',
+ upload_duration:videoDurationError(NaN),
+ upload_too_short:videoDurationError(59),
+ upload_too_long:videoDurationError(91),
  upload_dimensions:'영상의 길이 또는 해상도를 확인해주세요.',
  upload_task:'모집 중인 촬영 활동을 선택해주세요.',
  upload_title:'영상 제목을 확인해주세요.',

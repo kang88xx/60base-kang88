@@ -81,6 +81,11 @@ export function createAccountDeletionService(store,{media=null,checkpoint=async(
    }
    transaction(()=>{
     for(const identity of identities)run('DELETE FROM apple_refresh_tokens WHERE firebaseUid=?',identity.uid);
+    // Retain only the surviving invitee's claim fence, never the erased inviter identity.
+    run('INSERT OR IGNORE INTO referral_claim_tombstones(inviteeId) SELECT inviteeId FROM referrals WHERE inviterId=?',user.id);
+    run('DELETE FROM referral_claim_tombstones WHERE inviteeId=?',user.id);
+    run('DELETE FROM referrals WHERE inviterId=? OR inviteeId=?',user.id,user.id);
+    run('DELETE FROM referral_codes WHERE userId=?',user.id);
     const owned=all('SELECT id FROM videos WHERE userId=?',user.id);
     for(const video of owned){for(const table of ['cleanup_jobs','reviews','annotations'])run(`DELETE FROM ${table} WHERE videoId=?`,video.id);run('DELETE FROM audit WHERE target=?',video.id);}
     for(const table of ['videos','uploads','ledger','payouts','orders','tickets','requests','auth_identities','sessions','app_popup_views'])run(`DELETE FROM ${table} WHERE userId=?`,user.id);

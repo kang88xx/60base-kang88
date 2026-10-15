@@ -1,0 +1,124 @@
+/* Selected header option 1: a short fade occupies its own gap above content. */
+#app-shell #app-header {
+  position: relative;
+  z-index: 26;
+}
+#app-shell:not([data-screen=welcome]) #app-header:not([hidden])::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 6px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, var(--ego-canvas), transparent);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+  mask-image: linear-gradient(to bottom, #000, transparent);
+}
+#app-shell:not([data-screen=welcome]) #app-header:not([hidden]) + #app-main {
+  margin-top: 6px;
+}
+/* The original navigation links remain the only interactive and accessible tabs. */
+#app-shell .ego-nav-backdrop {
+  position: fixed; z-index: 24; left: 50%; bottom: 0;
+  width: min(100%, var(--app-width)); height: calc(108px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--ego-canvas) 94%);
+}
+#app-shell .ego-nav-backdrop[hidden] { display: none; }
+#app-shell .app-bottom-nav.ego-glass-nav {
+  --glass-progress: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 0;
+  width: calc(min(100%, var(--app-width)) - 24px);
+  height: 66px; min-height: 66px; padding: 4px;
+  bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 25;
+  border: 1px solid rgba(214,218,225,.66); border-radius: 999px;
+  overflow: visible; isolation: isolate; touch-action: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  background: rgba(255,255,255,.68);
+  -webkit-backdrop-filter: blur(15px) saturate(1.2); backdrop-filter: blur(15px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 2px 9px rgba(37,52,83,.035);
+}
+#app-shell .app-bottom-nav.ego-glass-nav[hidden] { display: none !important; }
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab],
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab][aria-current] {
+  position: relative; z-index: 2; display: flex; flex: 1 1 0;
+  min-width: 0; min-height: 56px; height: 56px;
+  flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  padding: 4px 2px; border: 0; border-radius: 999px;
+  background: transparent; box-shadow: none; color: #596273;
+  text-decoration: none; -webkit-tap-highlight-color: transparent; transition: none;
+}
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab][aria-current] { color: #0024ff; }
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab]:active { background: transparent; }
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab]:focus-visible { outline: 2px solid #0024ff; outline-offset: -5px; }
+/* Keep original accessible content and hit areas; paint it once through inert tracks. */
+#app-shell .app-bottom-nav.ego-glass-nav[data-glass-ready] > a[data-tab] > * { opacity: 0; }
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab] > .app-icon,
+#app-shell .ego-glass-copy-tab > .app-icon { width: 25px; height: 25px; flex: 0 0 25px; transform: none; transition: none; }
+#app-shell .app-bottom-nav.ego-glass-nav > a[data-tab] > span:not(.app-icon),
+#app-shell .ego-glass-copy-tab > span:not(.app-icon) {
+  display: block; font-size: 12px; font-weight: 650; line-height: 14px; white-space: nowrap;
+}
+#app-shell .ego-glass-base-track { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; }
+#app-shell .ego-glass-copy-tab {
+  position: absolute; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 2px; padding: 4px 2px; color: #596273; --footer-fill: 0;
+  font: inherit; pointer-events: none;
+}
+#app-shell .ego-glass-copy-tab[data-current] { color: #0024ff; --footer-fill: 1; }
+#app-shell .ego-glass-copy-track .ego-glass-copy-tab:not([data-current]) {
+  --footer-fill: var(--glass-progress);
+  color: color-mix(in srgb, #0024ff calc(var(--glass-progress) * 100%), #596273);
+}
+#app-shell .app-bottom-nav.ego-glass-nav > .ego-glass-lens {
+  position: absolute; z-index: 0; top: 50%; left: 0;
+  border: 0; border-radius: 999px; pointer-events: none; opacity: 0;
+  background: rgba(255,255,255,calc(var(--glass-progress) * .12));
+  overflow: hidden;
+  box-shadow: 0 calc(6px * var(--glass-progress)) calc(15px * var(--glass-progress)) rgba(28,37,54,calc(.13 * var(--glass-progress))),
+    inset 0 1px 1px rgba(255,255,255,calc(.88 * var(--glass-progress))),
+    inset 0 -1px 2px rgba(125,139,156,calc(.22 * var(--glass-progress)));
+}
+#app-shell .app-bottom-nav.ego-glass-nav[data-glass-ready] > .ego-glass-lens { opacity: 1; }
+#app-shell .app-bottom-nav.ego-glass-nav[data-glass-optical] > .ego-glass-lens { z-index: 3; }
+#app-shell .ego-glass-lens::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: #e9eaed; opacity: calc(1 - var(--glass-progress));
+}
+#app-shell .ego-glass-lens::after {
+  content: ''; position: absolute; z-index: 2; inset: 0; border-radius: inherit;
+  border: 1px solid rgba(151,162,178,.38); opacity: var(--glass-progress);
+  box-shadow: inset 0 0 0 .5px rgba(255,255,255,.88), inset 1px 2px 3px rgba(255,255,255,.5), inset -1px -2px 2px rgba(135,150,170,.1);
+  pointer-events: none;
+}
+#app-shell .ego-glass-viewport { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+#app-shell .ego-glass-optics {
+  position: absolute; inset: 0; overflow: visible; border-radius: inherit;
+  filter: url(#ego-footer-refraction); pointer-events: none; opacity: 0;
+}
+#app-shell .app-bottom-nav.ego-glass-nav[data-glass-optical] .ego-glass-optics { opacity: 1; }
+#app-shell .ego-glass-copy-track { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; }
+@media (max-height: 500px) {
+  #app-shell .ego-nav-backdrop { height: calc(100px + env(safe-area-inset-bottom)); }
+  #app-shell .app-bottom-nav.ego-glass-nav { height: 64px; min-height: 64px; padding: 3px; }
+}
+@media (orientation: landscape) and (max-height: 600px) and (pointer: coarse) {
+  #app-shell .ego-nav-backdrop { width: 100%; }
+  #app-shell .app-bottom-nav.ego-glass-nav {
+    left: calc(12px + env(safe-area-inset-left));
+    width: calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)); transform: none;
+  }
+}
+/* Reserve the full bar height in the short scroll viewport; guide actions stay separate. */
+#app-shell:not([data-screen=welcome]):not([data-screen=activity]):not([data-screen=guide]) #app-main {
+  margin-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+@media (prefers-reduced-motion: reduce) {
+  #app-shell .app-bottom-nav.ego-glass-nav *, #app-shell .ego-nav-backdrop { transition: none; animation: none; }
+}
+
+/* Filled artwork is derived from each original icon and scoped to inert footer copies. */
+#app-shell .ego-footer-icon { background: none !important; -webkit-mask: none !important; mask: none !important; }
