@@ -13,7 +13,9 @@ test('Vercel operation function retains its fixed-error module and duration depe
  assert.ok(ignore.includes('server/*'));
  assert.ok(ignore.includes('!server/upload-errors.mjs'));
  assert.ok(ignore.indexOf('server/*')<ignore.indexOf('!server/upload-errors.mjs'));
- const include=config.functions['api/operations.js'].includeFiles;
+ const pattern=config.functions['api/operations.js'].includeFiles;
+ assert.equal(typeof pattern,'string','Vercel requires one glob pattern');
+ const include=pattern.slice(1,-1).split(',');
  for(const name of ['server/upload-errors.mjs','shared/video-policy.js']){assert.ok(include.includes(name));assert.ok((await stat(path.join(root,name))).isFile());}
  const {publicUploadError}=await import('../server/upload-errors.mjs');
  assert.equal(typeof publicUploadError,'function');
@@ -22,7 +24,7 @@ test('isolated function package starts without any other backend source',async()
  const config=JSON.parse(await readFile(path.join(root,'vercel.json'),'utf8'));
  const directory=await mkdtemp(path.join(os.tmpdir(),'ego-vercel-package-'));
  try{
-  for(const file of ['api/operations.js',...config.functions['api/operations.js'].includeFiles]){
+  for(const file of ['api/operations.js',...config.functions['api/operations.js'].includeFiles.slice(1,-1).split(',')]){
    const target=path.join(directory,file);await mkdir(path.dirname(target),{recursive:true});await copyFile(path.join(root,file),target);
   }
   await writeFile(path.join(directory,'package.json'),' {"type":"module"}');

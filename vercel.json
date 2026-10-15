@@ -131,10 +131,7 @@
     },
     "api/operations.js": {
       "maxDuration": 300,
-      "includeFiles": [
-        "server/upload-errors.mjs",
-        "shared/video-policy.js"
-      ]
+      "includeFiles": "{server/upload-errors.mjs,shared/video-policy.js}"
     }
   }
 }
