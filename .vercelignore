@@ -13,7 +13,8 @@ design-qa.md
 assets/**/*.md
 assets/**/*.json
 
-server/
+server/*
+!server/upload-errors.mjs
 scripts/bootstrap-admin.mjs
 scripts/backup-service.mjs
 scripts/reset-service-password.mjs
