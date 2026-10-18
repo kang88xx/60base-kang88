@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import './original-motions.css';
 
 // Pauses elapsed time offscreen, in a hidden page and under reduced motion.
@@ -50,19 +50,77 @@ function animateWhenVisible(host, render, options = {}) {
 }
 
 // Approved quality modes: Sample/Review = 01 (sequential), Rights/Delivery = 03
-// (back and forth). Coordinates, speeds, trail and artwork crop match main.js.
+// (back and forth). Speeds, trail and ring match the original raster version.
+// Artwork (2026-10-18): abstract SVG circles replace the four raster diagrams.
+// Sample/Review/Rights use 시안 3B (dot ring, facing dotted arcs, S-curve);
+// Delivery uses 시안 3C (tilted elliptical orbit).
+const INK = '#303030';
+const LINE = '#777';
+const MUTED = '#8a8a8a';
+const DASH = '4 5';
+const pt = (cx, cy, r, deg) => [cx + r * Math.cos(deg * Math.PI / 180), cy + r * Math.sin(deg * Math.PI / 180)];
+const f1 = n => Number(n).toFixed(1);
+
+function artworkTools(create, parent) {
+  const add = (tag, attrs) => { const node = create(tag, attrs); parent.append(node); return node; };
+  return {
+    hair: attrs => add('line', { stroke: LINE, class: 'original-quality-line', ...attrs }),
+    stroke: (d, attrs = {}) => add('path', { d, fill: 'none', stroke: INK, class: 'original-quality-line', ...attrs }),
+    circ: attrs => add('circle', { fill: 'none', stroke: INK, class: 'original-quality-line', ...attrs }),
+    dot: (cx, cy, r = 5, fill = INK) => add('circle', { cx, cy, r, fill }),
+  };
+}
+
 const qualityDefinitions = [
-  { name: 'sample', mode: 1, duration: 1.8, paths: [176, 256, 336].map(x => `M ${x} 157 L ${x} 385`) },
-  { name: 'review', mode: 1, duration: 3.2, paths: ['M 136 337 H 331 C 386 337 386 253 331 253 H 207 C 146 253 146 167 207 167 H 369'] },
-  { name: 'rights', mode: 3, duration: 1.5, paths: [[125, 140], [385, 140], [385, 372], [125, 372]].map(([x, y]) => `M 256 256 L ${x} ${y}`) },
-  { name: 'delivery', mode: 3, duration: 3.8, paths: ['M 256 111 A 142 142 0 1 1 255.99 111'] },
+  {
+    name: 'sample', mode: 1, duration: 1.8,
+    // Ring of twelve dots around a center dot; the marker runs the ring.
+    draw(t) {
+      for (let i = 0; i < 12; i++) { const [x, y] = pt(256, 256, 84, i * 30 - 90); t.dot(x, y, 5, MUTED); }
+      t.dot(256, 256, 7);
+      return ['M 256 172 A 84 84 0 1 1 255.99 172'];
+    },
+  },
+  {
+    name: 'review', mode: 1, duration: 3.2,
+    // Two facing dotted arcs, like parentheses; down the left one, up the right one.
+    draw(t) {
+      const R = 130, half = 50.3;
+      for (let i = 0; i < 7; i++) {
+        const a = -half + i * (half * 2 / 6);
+        const [lx, ly] = pt(289, 256, R, 180 + a); t.dot(lx, ly, 5);
+        const [rx, ry] = pt(223, 256, R, a); t.dot(rx, ry, 5, MUTED);
+      }
+      return ['M 206 156 A 130 130 0 0 0 206 356', 'M 306 356 A 130 130 0 0 0 306 156'];
+    },
+  },
+  {
+    name: 'rights', mode: 3, duration: 1.5,
+    // S-curve between two haloed dots, back and forth.
+    draw(t) {
+      const d = 'M 140 320 C 230 320 282 192 372 192';
+      t.stroke(d, { stroke: LINE });
+      t.circ({ cx: 140, cy: 320, r: 26, stroke: LINE, 'stroke-dasharray': DASH });
+      t.circ({ cx: 372, cy: 192, r: 26, stroke: LINE, 'stroke-dasharray': DASH });
+      t.dot(140, 320, 7); t.dot(372, 192, 7);
+      return [d];
+    },
+  },
+  {
+    name: 'delivery', mode: 3, duration: 3.8,
+    // Tilted elliptical orbit around a center dot, back and forth.
+    draw(t) {
+      const d = 'M 382.9 196.8 A 140 60 -25 0 1 129.1 315.2 A 140 60 -25 0 1 382.9 196.8';
+      t.stroke(d, { stroke: LINE });
+      t.dot(256, 256, 10);
+      return [d];
+    },
+  },
 ];
 
 export function QualityMotion({ index = 0, language = 'en' }) {
   const art = useRef(null);
   const svg = useRef(null);
-  const instanceId = useId().replace(/:/g, '');
-  const backgroundFilterId = `original-quality-background-${instanceId}`;
   const item = qualityDefinitions[Math.max(0, Math.min(3, Number(index) || 0))];
   useEffect(() => {
     const root = svg.current;
@@ -73,16 +131,14 @@ export function QualityMotion({ index = 0, language = 'en' }) {
       return node;
     };
     root.replaceChildren();
-    const clipId = `original-quality-dot-${instanceId}`;
-    const defs = create('defs', {}), clip = create('clipPath', { id: clipId });
-    clip.append(create('circle', { cx: 256, cy: 253, r: 12.2 })); defs.append(clip); root.append(defs);
-    const paths = item.paths.map(d => { const path = create('path', { d, fill: 'none', stroke: 'none' }); root.append(path); return path; });
+    const artwork = create('g', { class: 'original-quality-artwork' });
+    root.append(artwork);
+    const pathData = item.draw(artworkTools(create, artwork));
+    const paths = pathData.map(d => { const path = create('path', { d, fill: 'none', stroke: 'none' }); root.append(path); return path; });
     const trail = create('path', { class: 'original-quality-trail' });
     const ring = create('circle', { class: 'original-quality-ring', r: 24 });
-    const marker = create('g', { 'data-quality-marker': '' });
-    const crop = create('g', { transform: 'scale(1.45) translate(-256 -253)' });
-    crop.append(create('image', { href: '/assets/media/quality-review.webp', width: 512, height: 512, 'clip-path': `url(#${clipId})`, filter: `url(#${backgroundFilterId})` }));
-    marker.append(crop); root.append(trail, ring, marker);
+    const marker = create('circle', { 'data-quality-marker': '', class: 'original-quality-marker', r: 12.2 });
+    root.append(trail, ring, marker);
     const tracks = paths.map(path => { const length = path.getTotalLength(); return { path, length, end: path.getPointAtLength(length) }; });
     const render = elapsed => {
       const time = elapsed / 1000 / item.duration;
@@ -91,7 +147,7 @@ export function QualityMotion({ index = 0, language = 'en' }) {
       const progress = sequential ? time % 1 : (1 - Math.cos(time * Math.PI)) / 2;
       const distance = progress * track.length;
       const point = track.path.getPointAtLength(distance);
-      marker.setAttribute('transform', `translate(${point.x} ${point.y})`);
+      marker.setAttribute('cx', f1(point.x)); marker.setAttribute('cy', f1(point.y));
       let tail = '';
       for (let step = 0; step <= 16; step++) {
         const p = track.path.getPointAtLength(Math.max(0, distance - 90 + 90 * step / 16));
@@ -100,36 +156,11 @@ export function QualityMotion({ index = 0, language = 'en' }) {
       trail.setAttribute('d', tail); ring.setAttribute('cx', track.end.x); ring.setAttribute('cy', track.end.y);
       ring.setAttribute('r', String(22 + progress * 14)); ring.style.opacity = String(progress > .76 ? (1 - progress) * 3.5 : 0);
     };
-    return animateWhenVisible(art.current, render, { maxDelta: 70, threshold: .05, overlay: root });
-  }, [item, instanceId, backgroundFilterId]);
+    // Static artwork stays visible under reduced motion; only the moving overlay hides.
+    const overlay = { style: { set visibility(value) { [trail, ring, marker].forEach(node => { node.style.visibility = value; }); } } };
+    return animateWhenVisible(art.current, render, { maxDelta: 70, threshold: .05, overlay });
+  }, [item]);
   return <span ref={art} className="original-quality-motion" data-diagram={item.name} data-quality-motion={item.mode} aria-hidden="true">
-    <svg className="original-quality-filter-definitions" width="0" height="0" aria-hidden="true" focusable="false">
-      <defs>
-        {/* Keep the original geometry and neutral linework. Key the pale paper/grid
-            with its original 222–236 luminance ramp, then map the raster's orange
-            accents (including the moving image crop) to the selected brand blue. */}
-        <filter id={backgroundFilterId} x="0" y="0" width="100%" height="100%" colorInterpolationFilters="sRGB">
-          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.2126 0.7152 0.0722 0 0" result="paper-luminance" />
-          <feComponentTransfer in="paper-luminance" result="artwork-mask">
-            <feFuncA type="linear" slope="-18.2142857143" intercept="16.8571428571" />
-          </feComponentTransfer>
-          {/* Swapping red/blue and correcting green preserves every neutral gray
-              and makes compressed, antialiased orange edges blue as well. */}
-          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 1 0 0  -0.2 1 0.2 0 0  1 0 0 0 0  0 0 0 1 0" result="blue-artwork" />
-          {/* Saturated orange interiors use the exact #0024FF, while the soft
-              edge colors above retain the source artwork's antialiasing. */}
-          <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1 0 -1 0 0" result="accent-chroma" />
-          <feComponentTransfer in="accent-chroma" result="accent-mask">
-            <feFuncA type="linear" slope="4" intercept="-0.08" />
-          </feComponentTransfer>
-          <feFlood floodColor="#0024FF" result="brand-blue" />
-          <feComposite in="brand-blue" in2="accent-mask" operator="in" result="blue-accent" />
-          <feComposite in="blue-accent" in2="blue-artwork" operator="over" result="recolored-artwork" />
-          <feComposite in="recolored-artwork" in2="artwork-mask" operator="in" />
-        </filter>
-      </defs>
-    </svg>
-    <img src={`/assets/media/quality-${item.name}.webp`} alt="" width="512" height="512" loading="lazy" decoding="async" style={{ filter: `url(#${backgroundFilterId})` }} />
     <svg ref={svg} className="original-quality-overlay" viewBox="0 0 512 512" aria-hidden="true" focusable="false" />
   </span>;
 }

@@ -3,14 +3,15 @@
 .original-process-motion{width:100%;max-width:500px;color:#dedede;min-width:0}
 .original-process-stage{display:block;width:100%;height:auto;overflow:visible}
 .original-quality-motion{position:relative;display:block;width:100%;aspect-ratio:1;min-width:0;isolation:isolate}
-.original-quality-motion>img{display:block;width:100%;height:auto;aspect-ratio:1;max-width:100%;object-fit:contain;clip-path:inset(12%)}
-/* Hide the raster frame/corner points; paint one crisp, unscaled frame for all four. */
+/* One crisp, unscaled frame for all four SVG diagrams; no corner decorations. */
 .original-quality-motion::after{content:'';position:absolute;inset:4.6875%;border:var(--motion-line-width) solid #777;border-radius:4%;pointer-events:none;z-index:1}
 .original-quality-motion>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
-.original-quality-motion>.original-quality-filter-definitions{width:0;height:0;overflow:hidden}
+.original-quality-line{stroke-width:var(--motion-line-width);vector-effect:non-scaling-stroke}
+.original-quality-marker{fill:#0024FF}
 .original-quality-trail{fill:none;stroke:#0024FF;stroke-width:var(--motion-line-width);vector-effect:non-scaling-stroke;stroke-linecap:round;opacity:.74}
 .original-quality-ring{fill:none;stroke:#0024FF;stroke-width:var(--motion-line-width);vector-effect:non-scaling-stroke}
 /* User-selected 35% linear reduction; artwork and SVG share one square frame. */
 .section-quality .quality-item .original-quality-motion{width:min(100%,156px);max-width:156px;margin:0 auto 18.2px}
 @media(max-width:600px){.section-quality .quality-item .original-quality-motion{width:min(100%,143px);max-width:143px}}
-@media(prefers-reduced-motion:reduce){.original-quality-motion>.original-quality-overlay{visibility:hidden!important}}
+/* Reduced motion keeps the static diagram and hides only the moving marker, trail and ring. */
+@media(prefers-reduced-motion:reduce){.original-quality-overlay :is(.original-quality-marker,.original-quality-trail,.original-quality-ring){visibility:hidden!important}}
