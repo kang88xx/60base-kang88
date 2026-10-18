@@ -2,23 +2,23 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { createProcessRenderer, PROCESS_DURATION } from './process-reference-renderer.js';
 import './process-motion.css';
 
-const scenes = ['converge', 'align', 'produce', 'deliver'];
+const scenes = ['measure', 'compare', 'align', 'check'];
 const labels = {
-  en: ['Converge', 'Align', 'Produce', 'Deliver'],
-  ko: ['수렴', '정렬', '제작', '납품'],
+  en: ['Measure', 'Compare', 'Align', 'Check'],
+  ko: ['측정', '대조', '정렬', '확인'],
 };
 const descriptions = {
   en: [
-    'Eight points converge at the center to bring the recording requirements together.',
-    'Samples align into a matrix and the selected sample is highlighted.',
-    'Three layers assemble in sequence to represent production.',
-    'A review line scans the grid and the reviewed files form a delivery package.',
+    'A scope rectangle is drawn and dimension lines measure the recording requirements.',
+    'A reference frame and a sample frame sit side by side; a divider compares them and the sample is approved.',
+    'Footage, annotation and review-record tracks slide in and their markers align to one point.',
+    'A review line ticks the checklist from top to bottom and the delivery is closed with a blue outline.',
   ],
   ko: [
-    '여덟 방향의 점이 중앙으로 모여 촬영 요구사항을 하나로 정리합니다.',
-    '흩어진 샘플이 일정한 간격으로 정렬되고 선택한 샘플이 강조됩니다.',
-    '세 개의 층이 차례로 쌓이며 제작 과정을 표현합니다.',
-    '검수선이 격자를 지나고 확인한 자료가 납품 묶음으로 완성됩니다.',
+    '범위 사각형이 그려지고 치수선이 촬영 요구사항을 잽니다.',
+    '기준 프레임과 샘플 프레임을 나란히 놓고 구분선으로 대조한 뒤 샘플을 승인합니다.',
+    '영상·주석·검수 기록 세 줄이 들어오고 표식이 한 지점으로 정렬됩니다.',
+    '검수선이 체크리스트를 위에서 아래로 확인하고 파란 테두리로 납품을 닫습니다.',
   ],
 };
 
