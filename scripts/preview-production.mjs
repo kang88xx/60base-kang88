@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
 const port = Number(process.argv[2] || 4411);
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.pdf': 'application/pdf', '.txt': 'text/plain; charset=utf-8' };
+const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.mp4': 'video/mp4', '.gif':'image/gif', '.webm':'video/webm', '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.pdf': 'application/pdf', '.txt': 'text/plain; charset=utf-8' };
 const server = http.createServer(async (request, response) => {
   const send = (status, headers, body) => response.writeHead(status, { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', ...headers }).end(request.method === 'HEAD' ? undefined : body);
   try {
@@ -28,7 +28,7 @@ const server = http.createServer(async (request, response) => {
     const data = await readFile(asset);
     const headers = { 'Content-Type': types[path.extname(asset)] || 'application/octet-stream', 'Content-Length': data.length };
     if (asset.endsWith('sw.js')) headers['Service-Worker-Allowed'] = asset.includes(path.sep + 'app' + path.sep) ? '/app/' : '/';
-    if (path.extname(asset) === '.mp4') {
+    if (['.mp4', '.webm'].includes(path.extname(asset))) {
       headers['Accept-Ranges'] = 'bytes';
       if (request.headers.range) {
         const range = /^bytes=(\d+)-(\d*)$/.exec(request.headers.range);

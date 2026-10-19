@@ -564,3 +564,19 @@
   .studio-camera-dialog[data-zoom="visible"] .studio-camera-scrim { right: calc(184px + env(safe-area-inset-right)); padding-bottom: 16px; }
   .studio-camera-dialog[data-zoom="visible"] .studio-camera-error { left: calc((100% - 184px - env(safe-area-inset-right)) / 2); bottom: 12px; max-width: calc(100% - 220px - env(safe-area-inset-right)); }
 }
+
+/* Finalizing reserves a separate heading row; the mascot never covers footage. */
+.studio-processing-heading[hidden] { display:none; }
+.studio-processing-heading { position:absolute; inset:0 0 auto; z-index:6; height:calc(var(--processing-heading-height, 120px) + env(safe-area-inset-top)); padding:calc(12px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left)); display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; color:#242428; }
+.studio-processing-heading h2 { margin:0; font-size:20px; line-height:1.4; }
+.studio-processing-heading ego-mascot-motion { width:108px; height:82px; flex:none; }
+.studio-camera-dialog[data-state=finalizing] .studio-camera-top,
+.studio-camera-dialog[data-state=finalizing] .studio-camera-scrim { display:none; }
+.studio-camera-dialog[data-state=finalizing] .studio-camera-live { top:calc(var(--processing-heading-height, 120px) + env(safe-area-inset-top)); height:calc(100% - var(--processing-heading-height, 120px) - env(safe-area-inset-top)); }
+
+@media (orientation:landscape) and (max-height:500px) {
+  .studio-camera-dialog { --processing-heading-height:76px; }
+  .studio-processing-heading { padding-top:calc(6px + env(safe-area-inset-top)); padding-bottom:6px; }
+  .studio-processing-heading h2 { font-size:17px; }
+  .studio-processing-heading ego-mascot-motion { width:80px; height:60px; }
+}

@@ -6,7 +6,7 @@ import { buildHomepage } from './build-homepage.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = path.join(root, 'dist');
-const allowedExtensions = new Set(['.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.mp4', '.webmanifest', '.woff2', '.txt']);
+const allowedExtensions = new Set(['.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif', '.webm', '.mp4', '.webmanifest', '.woff2', '.txt']);
 let count = 0;
 
 async function copyAsset(relative) {

@@ -1,3 +1,4 @@
+import { mascotMotion } from './mascot-motion.js';
 import { esc, points } from '../studio/online-api.js';
 import { appleSignInEnabled } from '../studio/cloud-account.js';
 import { checkingAppAccess } from './access-boundary.js';
@@ -11,7 +12,7 @@ export function welcomeScreen(state, { icon }) {
   return `<section class="ego-welcome" aria-labelledby="welcome-title">
     <div class="welcome-brand" aria-label="에고">${brandLockup()}</div>
     <div class="welcome-intro"><p class="welcome-eyebrow">반가워요, 에고입니다</p><h1 id="welcome-title">내 일상이,<br>AI의 배움이<br>되는 곳.</h1><p class="welcome-description">익숙한 순간을 영상으로 담고<br>당신의 기여를 포인트로 돌려받아요.</p></div>
-    <div class="welcome-art" aria-hidden="true"><img src="icons/symbol.svg" width="190" height="200" alt=""></div>
+    <div class="welcome-art" aria-hidden="true">${mascotMotion('welcome')}</div>
     <div class="welcome-actions">
       ${checking ? '<p class="welcome-status" role="status">계정을 확인하고 있어요…</p>' : ''}
       ${error ? `<p class="welcome-error" role="alert">${esc(error)}</p>` : ''}
@@ -28,7 +29,7 @@ export function homeScreen(state, { tasks, activityCard, categoryRail, icon, ui 
   const items = tasks();
   const selected = items.filter(task => ui.category === '전체' || task.category === ui.category);
   return `<section class="ego-home-intro"><div><p class="eyebrow">MY EVERYDAY, OUR AI</p><h1>오늘은 어떤 일상을<br>담아볼까요?</h1></div><a class="round-button" href="#announcements" aria-label="공지사항">${icon('bell')}</a></section>
-    <a class="ego-guide-banner" href="#education"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src="icons/symbol.svg" width="80" height="85" alt=""></a>
+    <a class="ego-guide-banner" href="#education"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src="icons/mascot-purple-3d-20261019.png" width="80" height="85" alt=""></a>
     <section class="ego-activity-section"><div class="section-row"><h2>카테고리</h2><a href="#missions">전체 보기 ${icon('caret-right')}</a></div>${categoryRail()}
     <div class="ego-mission-list">${selected.map(task => activityCard(task, { homeRow: true })).join('') || '<p class="muted-caption">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;
 }

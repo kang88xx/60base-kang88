@@ -7,7 +7,7 @@ import { renderEnglishHomepage } from './scripts/localize-homepage.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 4317), host = process.env.HOST || '127.0.0.1';
-const types = { '.pdf':'application/pdf', '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.webp':'image/webp', '.mp4':'video/mp4', '.webmanifest':'application/manifest+json', '.woff2':'font/woff2', '.txt':'text/plain; charset=utf-8' };
+const types = { '.pdf':'application/pdf', '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.svg':'image/svg+xml', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg', '.webp':'image/webp', '.mp4':'video/mp4', '.gif':'image/gif', '.webm':'video/webm', '.webmanifest':'application/manifest+json', '.woff2':'font/woff2', '.txt':'text/plain; charset=utf-8' };
 const server = http.createServer(async (request,response) => {
   try {
     if (new URL(request.url,`http://${request.headers.host}`).pathname.replace(/\/$/,'') === '/api/contact') { await contact(request,response); return; }
@@ -29,7 +29,7 @@ const server = http.createServer(async (request,response) => {
     }
     const headers = { 'Content-Type':types[path.extname(filename)] || 'application/octet-stream', 'Cache-Control':'no-cache', 'X-Content-Type-Options':'nosniff' };
     if (filename.endsWith('sw.js')) headers['Service-Worker-Allowed'] = '/';
-    if (filename.endsWith('.mp4')) {
+    if (/\.(?:mp4|webm)$/.test(filename)) {
       headers['Accept-Ranges'] = 'bytes';
       const range = request.headers.range;
       if (range) {

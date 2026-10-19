@@ -1,4 +1,5 @@
 import { VIDEO_TARGET_SECONDS, videoDurationError, assertVideoDuration } from '../shared/video-policy.js';
+import { mascotMotion } from '../app/mascot-motion.js';
 import { isNativeApp, shareNativeBlob } from '../app/native.js';
 import { deleteClip, saveClip } from '../shared/store.js';
 import { formatBytes, formatDuration } from '../shared/data.js';
@@ -103,6 +104,7 @@ function buildDialog(activity, canRecord) {
           ${GUIDE_LINES.map(line => `<span>${esc(line)}</span>`).join('')}
         </div>
       </div>
+      <section class="studio-processing-heading" data-processing-heading hidden><h2>촬영한 영상을<br>준비하고 있어요.</h2><span data-processing-mascot></span></section>
       <div class="studio-camera-top">
         <button class="studio-camera-tool" type="button" data-close aria-label="카메라 닫기" title="닫기">${icon('close', 20)}</button>
         <div class="studio-camera-heading">
@@ -697,6 +699,11 @@ class StudioCamera {
     this.state = state;
     this.renderZoom();
     this.dialog.dataset.state = state;
+    const processing = this.dialog.querySelector('[data-processing-heading]');
+    processing.hidden = state !== 'finalizing';
+    const mascot = processing.querySelector('[data-processing-mascot]');
+    if (state === 'finalizing' && !mascot.firstElementChild) mascot.innerHTML = mascotMotion('processing');
+    else if (state !== 'finalizing') mascot.replaceChildren();
     this.recordButton.hidden = state !== 'ready';
     this.stopButton.hidden = state !== 'recording';
     this.retryButton.hidden = !['error', 'fallback'].includes(state) || !hasMediaDevices() || !hasRecorder();

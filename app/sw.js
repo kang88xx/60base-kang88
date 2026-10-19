@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261015-settings-legal-v23';
+const CACHE='60base-app-20261019-mascot-motion-v24';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -7,6 +7,8 @@ const SHELL=[
   "/app/community.js",
   "/app/referrals.js",
   "/app/experience-ui.js",
+  "/app/mascot-motion.js",
+  "/app/icons/mascot-purple-3d-20261019.png",
   "/app/ego-experience.css",
   "/app/ego-reference-theme.css",
   "/app/ego-glass-nav.css",
