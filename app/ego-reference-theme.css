@@ -796,3 +796,10 @@ body:has(#app-shell) .studio-camera-dialog .button.primary:is(:disabled, [aria-d
   }
   #app-shell:not([data-screen=welcome]) .app-bottom-nav > a { min-height: 44px; }
 }
+
+/* Keep motion artwork in the existing welcome and account hero slots. */
+.welcome-art ego-mascot-motion { width:118px; height:124px; }
+.ego-auth-mark ego-mascot-motion { width:64px; height:67px; transform:translateY(-10px); }
+@media(max-height:720px) { .welcome-art ego-mascot-motion { width:90px; height:95px; } }
+
+#app-shell .ego-guide-banner > img[src$="mascot-purple-3d-20261019.png"] { object-fit:cover; scale:1.3893; }

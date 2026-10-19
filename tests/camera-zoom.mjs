@@ -25,6 +25,7 @@ function fixture({ capability = { min: 0.5, max: 4, step: 0.1 }, initial = 0.5, 
   const stream = { getTracks: () => [track], getVideoTracks: () => [track] };
   const context = vm.createContext({
     VIDEO_TARGET_SECONDS, videoDurationError, assertVideoDuration,
+    mascotMotion: variant => `<ego-mascot-motion variant="${variant}"></ego-mascot-motion>`,
     navigator: {}, document: { hidden: false, dispatchEvent() {} },
     window: { setTimeout, setInterval, addEventListener() {}, removeEventListener() {} },
     // Advance the verification poll without 300 ms of wall-clock delay.
@@ -36,11 +37,13 @@ function fixture({ capability = { min: 0.5, max: 4, step: 0.1 }, initial = 0.5, 
   });
   vm.runInContext(source + '\nglobalThis.Controller = StudioCamera;', context);
   const node = () => ({ hidden: false, disabled: false, textContent: '', classList: { toggle() {} } });
+  const processingMascot = { firstElementChild:null, innerHTML:'', replaceChildren() { this.firstElementChild=null; this.innerHTML=''; } };
+  const processingHeading = { ...node(), querySelector: () => processingMascot };
   const buttons = [0.5, 1, 2].map(value => ({ ...node(), dataset: { zoom: String(value) }, attrs: {}, setAttribute(key, value) { this.attrs[key] = value; } }));
   const camera = Object.create(context.Controller.prototype);
   Object.assign(camera, {
     stream, generation: 1, closed: false, state: 'ready', isCurrent: () => true,
-    dialog: { open: true, dataset: {}, querySelector: () => node() },
+    dialog: { open: true, dataset: {}, querySelector: selector => selector === '[data-processing-heading]' ? processingHeading : node() },
     zoomNode: node(), zoomStatus: node(), zoomButtons: buttons,
     recordButton: node(), stopButton: node(), retryButton: node(), timerNode: { ...node(), querySelector: () => node() },
     reviewSheet: node(), flipButton: node(), guideButton: node(), statusNode: node(), errorNode: node(),

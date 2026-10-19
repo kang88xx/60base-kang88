@@ -164,6 +164,16 @@
           "before": "  \"/app/icons/phosphor/user.svg\",\n  \"/app/icons/phosphor/video-camera.svg\",\n  \"/app/icons/phosphor/wallet.svg\",\n  \"/app/icons/phosphor/warning-circle.svg\",\n  \"/app/icons/phosphor/x.svg\",\n  \"/assets/videos/collection/dishwashing.jpg\",\n  \"/assets/videos/collection/folding-clothes.jpg\",\n  \"/assets/videos/collection/cutting-vegetables.jpg\",\n  \"/assets/videos/collection/vacuuming.jpg\",\n  \"/assets/videos/collection/folding-towels.jpg\",\n",
           "after": "  \"/app/icons/phosphor/user.svg\",\n  \"/app/icons/phosphor/video-camera.svg\",\n  \"/app/icons/phosphor/wallet.svg\",\n  \"/app/icons/phosphor/warning-circle.svg\",\n  \"/app/icons/phosphor/x.svg\",\n  \"/assets/images/ego-filming-frame-20261015.png\",\n  \"/assets/videos/collection/dishwashing.jpg\",\n  \"/assets/videos/collection/folding-clothes.jpg\",\n  \"/assets/videos/collection/cutting-vegetables.jpg\",\n  \"/assets/videos/collection/vacuuming.jpg\",\n  \"/assets/videos/collection/folding-towels.jpg\",\n",
           "review": "ego-store-update-20261015: owner-approved app/legal/camera/referral settings and reviewed admin/receipt fixes"
+        },
+        {
+          "before": "const CACHE='60base-app-20261015-settings-legal-v23';\nconst SHELL=[\n  \"/app/\",\n  \"/app/index.html\",\n",
+          "after": "const CACHE='60base-app-20261019-mascot-motion-v24';\nconst SHELL=[\n  \"/app/\",\n  \"/app/index.html\",\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "  \"/app/community.js\",\n  \"/app/referrals.js\",\n  \"/app/experience-ui.js\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-glass-nav.css\",\n",
+          "after": "  \"/app/community.js\",\n  \"/app/referrals.js\",\n  \"/app/experience-ui.js\",\n  \"/app/mascot-motion.js\",\n  \"/app/icons/mascot-purple-3d-20261019.png\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-glass-nav.css\",\n",
+          "review": "owner-approved-mascot-motion-20261019"
         }
       ]
     },
@@ -230,6 +240,92 @@
           "before": " const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});\n let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}\n if(response.status===401&&requestUserId&&session.user?.id===requestUserId&&sessionEpoch===requestEpoch&&path!=='/session')await refreshSession({expectedUserId:requestUserId,expectedEpoch:requestEpoch});\n if(!response.ok){const error=Error(result.error||'요청을 처리하지 못했습니다.');error.status=response.status;throw error;}return result;\n",
           "after": " const {response,result}=await requestJson(path,{method,body,raw,signal});\n if(response.status===401&&requestUserId&&session.user?.id===requestUserId&&sessionEpoch===requestEpoch&&path!=='/session')await refreshSession({expectedUserId:requestUserId,expectedEpoch:requestEpoch});\n if(!response.ok){const error=Error(result.error||'요청을 처리하지 못했습니다.');error.status=response.status;throw error;}return result;\n}\nasync function requestJson(path,{method,body,raw,signal}){\n // Bound authentication waits, including response bodies and uncancellable native transports.\n const bounded=path==='/session'||path.startsWith('/auth/');\n if(signal?.aborted)throw new DOMException('Request aborted','AbortError');\n const controller=new AbortController();\n let timer,onAbort;\n const cancelled=new Promise((_,reject)=>{\n  onAbort=()=>{controller.abort();reject(new DOMException('Request aborted','AbortError'));};\n  signal?.addEventListener('abort',onAbort,{once:true});\n  if(bounded)timer=setTimeout(()=>{\n   const error=Object.assign(Error('계정 서비스 응답이 늦어지고 있어요. 연결을 확인한 뒤 다시 시도해주세요.'),{code:'service/request-timeout'});\n   reject(error);controller.abort();\n  },15000);\n });\n try{\n  const request=(async()=>{\n   const response=isNativeApp()?await nativeApiRequest('/api'+path,{method,body,raw,csrf:session.csrf||'',signal:controller.signal}):await fetch('/api'+path,{method,credentials:'same-origin',signal:controller.signal,headers:{...(raw?{'Content-Type':'application/octet-stream'}:body?{'Content-Type':'application/json'}:{}),...(method!=='GET'?{'X-CSRF-Token':session.csrf||''}:{})},body:raw|| (body?JSON.stringify(body):undefined)});\n   let result;try{result=await response.json();}catch{throw Error('온라인 서비스 연결을 준비하고 있습니다. 잠시 후 다시 확인해주세요.');}\n   return {response,result};\n  })();\n  return await Promise.race([request,cancelled]);\n }finally{clearTimeout(timer);signal?.removeEventListener('abort',onAbort);}\n",
           "review": "deployed-auth-launch-0063233-20261012"
+        }
+      ]
+    },
+    {
+      "file": "app/experience-ui.js",
+      "replacements": [
+        {
+          "before": "import { esc, points } from '../studio/online-api.js';\nimport { appleSignInEnabled } from '../studio/cloud-account.js';\nimport { checkingAppAccess } from './access-boundary.js';\n",
+          "after": "import { mascotMotion } from './mascot-motion.js';\nimport { esc, points } from '../studio/online-api.js';\nimport { appleSignInEnabled } from '../studio/cloud-account.js';\nimport { checkingAppAccess } from './access-boundary.js';\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "  return `<section class=\"ego-welcome\" aria-labelledby=\"welcome-title\">\n    <div class=\"welcome-brand\" aria-label=\"에고\">${brandLockup()}</div>\n    <div class=\"welcome-intro\"><p class=\"welcome-eyebrow\">반가워요, 에고입니다</p><h1 id=\"welcome-title\">내 일상이,<br>AI의 배움이<br>되는 곳.</h1><p class=\"welcome-description\">익숙한 순간을 영상으로 담고<br>당신의 기여를 포인트로 돌려받아요.</p></div>\n    <div class=\"welcome-art\" aria-hidden=\"true\"><img src=\"icons/symbol.svg\" width=\"190\" height=\"200\" alt=\"\"></div>\n    <div class=\"welcome-actions\">\n      ${checking ? '<p class=\"welcome-status\" role=\"status\">계정을 확인하고 있어요…</p>' : ''}\n      ${error ? `<p class=\"welcome-error\" role=\"alert\">${esc(error)}</p>` : ''}\n",
+          "after": "  return `<section class=\"ego-welcome\" aria-labelledby=\"welcome-title\">\n    <div class=\"welcome-brand\" aria-label=\"에고\">${brandLockup()}</div>\n    <div class=\"welcome-intro\"><p class=\"welcome-eyebrow\">반가워요, 에고입니다</p><h1 id=\"welcome-title\">내 일상이,<br>AI의 배움이<br>되는 곳.</h1><p class=\"welcome-description\">익숙한 순간을 영상으로 담고<br>당신의 기여를 포인트로 돌려받아요.</p></div>\n    <div class=\"welcome-art\" aria-hidden=\"true\">${mascotMotion('welcome')}</div>\n    <div class=\"welcome-actions\">\n      ${checking ? '<p class=\"welcome-status\" role=\"status\">계정을 확인하고 있어요…</p>' : ''}\n      ${error ? `<p class=\"welcome-error\" role=\"alert\">${esc(error)}</p>` : ''}\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "  const items = tasks();\n  const selected = items.filter(task => ui.category === '전체' || task.category === ui.category);\n  return `<section class=\"ego-home-intro\"><div><p class=\"eyebrow\">MY EVERYDAY, OUR AI</p><h1>오늘은 어떤 일상을<br>담아볼까요?</h1></div><a class=\"round-button\" href=\"#announcements\" aria-label=\"공지사항\">${icon('bell')}</a></section>\n    <a class=\"ego-guide-banner\" href=\"#education\"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src=\"icons/symbol.svg\" width=\"80\" height=\"85\" alt=\"\"></a>\n    <section class=\"ego-activity-section\"><div class=\"section-row\"><h2>카테고리</h2><a href=\"#missions\">전체 보기 ${icon('caret-right')}</a></div>${categoryRail()}\n    <div class=\"ego-mission-list\">${selected.map(task => activityCard(task, { homeRow: true })).join('') || '<p class=\"muted-caption\">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;\n}\n",
+          "after": "  const items = tasks();\n  const selected = items.filter(task => ui.category === '전체' || task.category === ui.category);\n  return `<section class=\"ego-home-intro\"><div><p class=\"eyebrow\">MY EVERYDAY, OUR AI</p><h1>오늘은 어떤 일상을<br>담아볼까요?</h1></div><a class=\"round-button\" href=\"#announcements\" aria-label=\"공지사항\">${icon('bell')}</a></section>\n    <a class=\"ego-guide-banner\" href=\"#education\"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src=\"icons/mascot-purple-3d-20261019.png\" width=\"80\" height=\"85\" alt=\"\"></a>\n    <section class=\"ego-activity-section\"><div class=\"section-row\"><h2>카테고리</h2><a href=\"#missions\">전체 보기 ${icon('caret-right')}</a></div>${categoryRail()}\n    <div class=\"ego-mission-list\">${selected.map(task => activityCard(task, { homeRow: true })).join('') || '<p class=\"muted-caption\">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;\n}\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        }
+      ]
+    },
+    {
+      "file": "app/ego-reference-theme.css",
+      "replacements": [
+        {
+          "before": "  }\n  #app-shell:not([data-screen=welcome]) .app-bottom-nav > a { min-height: 44px; }\n}\n",
+          "after": "  }\n  #app-shell:not([data-screen=welcome]) .app-bottom-nav > a { min-height: 44px; }\n}\n\n/* Keep motion artwork in the existing welcome and account hero slots. */\n.welcome-art ego-mascot-motion { width:118px; height:124px; }\n.ego-auth-mark ego-mascot-motion { width:64px; height:67px; transform:translateY(-10px); }\n@media(max-height:720px) { .welcome-art ego-mascot-motion { width:90px; height:95px; } }\n\n#app-shell .ego-guide-banner > img[src$=\"mascot-purple-3d-20261019.png\"] { object-fit:cover; scale:1.3893; }\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        }
+      ]
+    },
+    {
+      "file": "studio/cloud-account-ui.js",
+      "replacements": [
+        {
+          "before": "import { bindSignupLegalViewer } from './legal-viewer.js';\nimport { getCloudAccount, subscribeCloudAccount, continueWithGoogle, continueWithApple, appleSignInEnabled, completeRegistration, signOutCloudAccount, retryCloudAccount } from './cloud-account.js';\nimport { dialog, esc } from './online-api.js';\n\n",
+          "after": "import { bindSignupLegalViewer } from './legal-viewer.js';\nimport { mascotMotion } from '../app/mascot-motion.js';\nimport { getCloudAccount, subscribeCloudAccount, continueWithGoogle, continueWithApple, appleSignInEnabled, completeRegistration, signOutCloudAccount, retryCloudAccount } from './cloud-account.js';\nimport { dialog, esc } from './online-api.js';\n\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "      } else if (account.availability === 'error') {\n        content.innerHTML = `<p class=\"cloud-intro\">로그인 연결을 확인해주세요.</p><p class=\"online-help\">문의: ${support}</p><button type=\"button\" class=\"button primary\" data-cloud-retry>다시 연결하기</button>`;\n      } else if (account.phase === 'signedOut') {\n        content.innerHTML = `${inApp?'<div class=\"ego-auth-mark\"><img src=\"/app/icons/symbol.svg\" alt=\"\" width=\"64\" height=\"67\"></div>':''}<h3>${inApp?'나의 일상을 담을 준비':'로그인 / 회원가입'}</h3><p class=\"cloud-intro\">${appleSignInEnabled ? 'Google 또는 Apple 계정으로 계속하세요.' : 'Google 계정으로 계속하세요.'}</p><button type=\"button\" class=\"cloud-google-button\" data-google-signin><img src=\"../assets/brand/google-signin-g.png\" alt=\"\" width=\"20\" height=\"20\"><span>Google 계정으로 계속하기</span></button>${appleSignInEnabled ? '<button type=\"button\" class=\"cloud-google-button\" style=\"background:#000;color:#fff;border-color:#000;margin-top:12px\" data-apple-signin><span>Apple로 계속하기</span></button>' : ''}`;\n      } else if (account.phase === 'registrationRequired') {\n        const name = draft?.displayName ?? account.user?.displayName ?? '';\n        content.innerHTML = `<h3 class=\"cloud-signup-title\">회원가입</h3><div class=\"cloud-signup-panel\"><div class=\"cloud-account-identity\"><p class=\"cloud-email\">${esc(account.user.email)}</p><button type=\"button\" class=\"cloud-account-switch\" data-cloud-signout>계정 변경</button></div><form class=\"online-form\" id=\"cloud-registration-form\"><label>이름<input name=\"displayName\" value=\"${esc(name)}\" required maxlength=\"60\" autocomplete=\"name\"></label><label class=\"online-check\"><input type=\"checkbox\" name=\"adult\" required ${draft?.adult?'checked':''}>만 19세 이상입니다.</label><label class=\"online-check\"><input type=\"checkbox\" name=\"terms\" required ${draft?.terms?'checked':''}><span><a href=\"/studio/terms.html\" target=\"_blank\" rel=\"noopener\">이용약관</a>에 동의합니다.</span></label><label class=\"online-check\"><input type=\"checkbox\" name=\"privacy\" required ${draft?.privacy?'checked':''}><span><a href=\"/studio/privacy.html\" target=\"_blank\" rel=\"noopener\">로그인과 개인정보 처리 안내</a>를 확인했습니다.</span></label><button class=\"button primary\" type=\"submit\">가입 완료하기</button></form></div>`;\n",
+          "after": "      } else if (account.availability === 'error') {\n        content.innerHTML = `<p class=\"cloud-intro\">로그인 연결을 확인해주세요.</p><p class=\"online-help\">문의: ${support}</p><button type=\"button\" class=\"button primary\" data-cloud-retry>다시 연결하기</button>`;\n      } else if (account.phase === 'signedOut') {\n        content.innerHTML = `${inApp?'<div class=\"ego-auth-mark\">'+mascotMotion('welcome')+'</div>':''}<h3>${inApp?'나의 일상을 담을 준비':'로그인 / 회원가입'}</h3><p class=\"cloud-intro\">${appleSignInEnabled ? 'Google 또는 Apple 계정으로 계속하세요.' : 'Google 계정으로 계속하세요.'}</p><button type=\"button\" class=\"cloud-google-button\" data-google-signin><img src=\"../assets/brand/google-signin-g.png\" alt=\"\" width=\"20\" height=\"20\"><span>Google 계정으로 계속하기</span></button>${appleSignInEnabled ? '<button type=\"button\" class=\"cloud-google-button\" style=\"background:#000;color:#fff;border-color:#000;margin-top:12px\" data-apple-signin><span>Apple로 계속하기</span></button>' : ''}`;\n      } else if (account.phase === 'registrationRequired') {\n        const name = draft?.displayName ?? account.user?.displayName ?? '';\n        content.innerHTML = `<h3 class=\"cloud-signup-title\">회원가입</h3><div class=\"cloud-signup-panel\"><div class=\"cloud-account-identity\"><p class=\"cloud-email\">${esc(account.user.email)}</p><button type=\"button\" class=\"cloud-account-switch\" data-cloud-signout>계정 변경</button></div><form class=\"online-form\" id=\"cloud-registration-form\"><label>이름<input name=\"displayName\" value=\"${esc(name)}\" required maxlength=\"60\" autocomplete=\"name\"></label><label class=\"online-check\"><input type=\"checkbox\" name=\"adult\" required ${draft?.adult?'checked':''}>만 19세 이상입니다.</label><label class=\"online-check\"><input type=\"checkbox\" name=\"terms\" required ${draft?.terms?'checked':''}><span><a href=\"/studio/terms.html\" target=\"_blank\" rel=\"noopener\">이용약관</a>에 동의합니다.</span></label><label class=\"online-check\"><input type=\"checkbox\" name=\"privacy\" required ${draft?.privacy?'checked':''}><span><a href=\"/studio/privacy.html\" target=\"_blank\" rel=\"noopener\">로그인과 개인정보 처리 안내</a>를 확인했습니다.</span></label><button class=\"button primary\" type=\"submit\">가입 완료하기</button></form></div>`;\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        }
+      ]
+    },
+    {
+      "file": "studio/camera.js",
+      "replacements": [
+        {
+          "before": "import { VIDEO_TARGET_SECONDS, videoDurationError, assertVideoDuration } from '../shared/video-policy.js';\nimport { isNativeApp, shareNativeBlob } from '../app/native.js';\nimport { deleteClip, saveClip } from '../shared/store.js';\nimport { formatBytes, formatDuration } from '../shared/data.js';\n",
+          "after": "import { VIDEO_TARGET_SECONDS, videoDurationError, assertVideoDuration } from '../shared/video-policy.js';\nimport { mascotMotion } from '../app/mascot-motion.js';\nimport { isNativeApp, shareNativeBlob } from '../app/native.js';\nimport { deleteClip, saveClip } from '../shared/store.js';\nimport { formatBytes, formatDuration } from '../shared/data.js';\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "          ${GUIDE_LINES.map(line => `<span>${esc(line)}</span>`).join('')}\n        </div>\n      </div>\n      <div class=\"studio-camera-top\">\n        <button class=\"studio-camera-tool\" type=\"button\" data-close aria-label=\"카메라 닫기\" title=\"닫기\">${icon('close', 20)}</button>\n        <div class=\"studio-camera-heading\">\n",
+          "after": "          ${GUIDE_LINES.map(line => `<span>${esc(line)}</span>`).join('')}\n        </div>\n      </div>\n      <section class=\"studio-processing-heading\" data-processing-heading hidden><h2>촬영한 영상을<br>준비하고 있어요.</h2><span data-processing-mascot></span></section>\n      <div class=\"studio-camera-top\">\n        <button class=\"studio-camera-tool\" type=\"button\" data-close aria-label=\"카메라 닫기\" title=\"닫기\">${icon('close', 20)}</button>\n        <div class=\"studio-camera-heading\">\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "    this.state = state;\n    this.renderZoom();\n    this.dialog.dataset.state = state;\n    this.recordButton.hidden = state !== 'ready';\n    this.stopButton.hidden = state !== 'recording';\n    this.retryButton.hidden = !['error', 'fallback'].includes(state) || !hasMediaDevices() || !hasRecorder();\n",
+          "after": "    this.state = state;\n    this.renderZoom();\n    this.dialog.dataset.state = state;\n    const processing = this.dialog.querySelector('[data-processing-heading]');\n    processing.hidden = state !== 'finalizing';\n    const mascot = processing.querySelector('[data-processing-mascot]');\n    if (state === 'finalizing' && !mascot.firstElementChild) mascot.innerHTML = mascotMotion('processing');\n    else if (state !== 'finalizing') mascot.replaceChildren();\n    this.recordButton.hidden = state !== 'ready';\n    this.stopButton.hidden = state !== 'recording';\n    this.retryButton.hidden = !['error', 'fallback'].includes(state) || !hasMediaDevices() || !hasRecorder();\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        }
+      ]
+    },
+    {
+      "file": "studio/camera.css",
+      "replacements": [
+        {
+          "before": "  .studio-camera-dialog[data-zoom=\"visible\"] .studio-camera-scrim { right: calc(184px + env(safe-area-inset-right)); padding-bottom: 16px; }\n  .studio-camera-dialog[data-zoom=\"visible\"] .studio-camera-error { left: calc((100% - 184px - env(safe-area-inset-right)) / 2); bottom: 12px; max-width: calc(100% - 220px - env(safe-area-inset-right)); }\n}\n",
+          "after": "  .studio-camera-dialog[data-zoom=\"visible\"] .studio-camera-scrim { right: calc(184px + env(safe-area-inset-right)); padding-bottom: 16px; }\n  .studio-camera-dialog[data-zoom=\"visible\"] .studio-camera-error { left: calc((100% - 184px - env(safe-area-inset-right)) / 2); bottom: 12px; max-width: calc(100% - 220px - env(safe-area-inset-right)); }\n}\n\n/* Finalizing reserves a separate heading row; the mascot never covers footage. */\n.studio-processing-heading[hidden] { display:none; }\n.studio-processing-heading { position:absolute; inset:0 0 auto; z-index:6; height:calc(var(--processing-heading-height, 120px) + env(safe-area-inset-top)); padding:calc(12px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left)); display:flex; align-items:center; justify-content:space-between; gap:12px; background:#fff; color:#242428; }\n.studio-processing-heading h2 { margin:0; font-size:20px; line-height:1.4; }\n.studio-processing-heading ego-mascot-motion { width:108px; height:82px; flex:none; }\n.studio-camera-dialog[data-state=finalizing] .studio-camera-top,\n.studio-camera-dialog[data-state=finalizing] .studio-camera-scrim { display:none; }\n.studio-camera-dialog[data-state=finalizing] .studio-camera-live { top:calc(var(--processing-heading-height, 120px) + env(safe-area-inset-top)); height:calc(100% - var(--processing-heading-height, 120px) - env(safe-area-inset-top)); }\n\n@media (orientation:landscape) and (max-height:500px) {\n  .studio-camera-dialog { --processing-heading-height:76px; }\n  .studio-processing-heading { padding-top:calc(6px + env(safe-area-inset-top)); padding-bottom:6px; }\n  .studio-processing-heading h2 { font-size:17px; }\n  .studio-processing-heading ego-mascot-motion { width:80px; height:60px; }\n}\n",
+          "review": "owner-approved-mascot-motion-20261019"
+        }
+      ]
+    },
+    {
+      "file": "vercel.json",
+      "replacements": [
+        {
+          "before": "    \"api/operations.js\": {\n      \"maxDuration\": 300\n    }",
+          "after": "    \"api/operations.js\": {\n      \"maxDuration\": 300,\n      \"includeFiles\": \"{server/upload-errors.mjs,shared/video-policy.js}\"\n    }",
+          "review": "preexisting-deployed-function-packaging",
+          "reason": "Records already deployed includeFiles from 0cd2010/369e2e8; configuration and immutable baseline unchanged."
         }
       ]
     }
