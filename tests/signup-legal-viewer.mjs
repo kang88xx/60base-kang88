@@ -57,7 +57,6 @@ try {
    if(pathname==='/app/ego-icons.js')return route.fulfill({contentType:'text/javascript',body:'export const icon=()=>"";'});
    if(pathname==='/studio/cloud-account-ui.js')return route.fulfill({contentType:'text/javascript',body:componentSource});
    if(pathname==='/studio/cloud-account.js')return route.fulfill({contentType:'text/javascript',body:`let listener;const state={availability:'ready',phase:'registrationRequired',user:{uid:'preview',email:'preview@example.test',displayName:'미리보기'},busy:false};window.accountFixture={submissions:[],setBusy(busy){state.busy=busy;listener(state);}};export const getCloudAccount=()=>state;export const subscribeCloudAccount=fn=>{listener=fn;fn(state);return()=>{};};export const appleSignInEnabled=false;export const continueWithGoogle=()=>Promise.resolve();export const continueWithApple=()=>Promise.resolve();export const signOutCloudAccount=()=>Promise.resolve();export const retryCloudAccount=()=>Promise.resolve();export const completeRegistration=body=>{window.accountFixture.submissions.push(body);return Promise.reject({code:'cloud/invalid-name'});};`});
-   if(pathname==='/studio/online-api.js')return route.fulfill({contentType:'text/javascript',body:`export const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));export function dialog(title,content){const element=document.createElement('dialog');element.className='online-dialog';element.innerHTML='<div class="online-dialog-head"><h2>'+title+'</h2><button data-close>닫기</button></div><div class="online-dialog-body">'+content+'</div>';document.body.append(element);element.querySelector('[data-close]').onclick=()=>element.close();element.addEventListener('close',()=>element.remove());element.showModal();return element;}`});
    if(pathname.startsWith('/app/')&&pathname.endsWith('.css')) {
     try { return await route.fulfill({contentType:'text/css',body:await readFile(new URL('../mobile/overlays/ios-ego'+pathname,import.meta.url),'utf8')}); }
     catch(error) { if(error.code!=='ENOENT')throw error; }
@@ -70,8 +69,8 @@ try {
   await form.waitFor();
   assert.equal(await page.locator('#cloud-account-dialog').evaluate(el=>el.classList.contains('cloud-signup-design-two')),true);
   const colors=await page.locator('#cloud-account-dialog').evaluate(el=>({background:getComputedStyle(el).backgroundColor,title:getComputedStyle(el.querySelector('.cloud-signup-title')).color,brand:getComputedStyle(el.querySelector('.online-dialog-head h2')).color,close:getComputedStyle(el.querySelector('[data-close]')).color,closeBackground:getComputedStyle(el.querySelector('[data-close]')).backgroundColor,titleAlign:getComputedStyle(el.querySelector('.cloud-signup-title')).textAlign}));
-  assert.equal(colors.background,'rgb(36, 93, 255)','full production stylesheet cascade preserves blue signup header');
-  assert.equal(colors.title,'rgb(255, 255, 255)');assert.equal(colors.brand,'rgb(255, 255, 255)');assert.equal(colors.close,'rgb(255, 255, 255)');assert.equal(colors.closeBackground,'rgba(0, 0, 0, 0)');assert.equal(colors.titleAlign,'left');
+  assert.equal(colors.background,'rgb(255, 255, 255)','restored Figma R3 signup uses white canvas');
+  assert.equal(colors.title,'rgb(41, 40, 45)');assert.equal(colors.brand,'rgb(41, 40, 45)');assert.equal(colors.titleAlign,'left');assert.equal(await page.locator('#cloud-account-dialog').evaluate(el=>el.classList.contains('ego-r3-form-page')),true,'real shared dialog supplies R3 full-screen header');
   assert.equal(await submit.isDisabled(),true);
   for(const name of ['adult','terms','privacy'])await form.locator(`[name=${name}]`).check();
   assert.equal(await submit.isEnabled(),true);
@@ -86,7 +85,7 @@ try {
   await form.evaluate(el=>el.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})));
   assert.equal(await page.evaluate(()=>accountFixture.submissions.length),0,'busy form cannot submit');
   await page.evaluate(()=>accountFixture.setBusy(false));
-  await form.locator('a[href="/studio/terms.html"]').click();
+  await form.locator('a[href="/studio/terms.html"]').first().click();
   await page.locator('.legal-body [data-legal-content]').waitFor();
   await page.locator('.legal-footer button').click();
   assert.equal(await form.locator('[name=displayName]').inputValue(),'보존할 이름');

@@ -9,7 +9,7 @@ try { await access(new URL('app.js', app)); } catch { app = new URL('../app/', i
 const popup = (await readFile(new URL('welcome-popup.js', app), 'utf8')).replace(/^import .*;\r?\n/gm, '').replace(/^export /gm, '');
 const experience = await readFile(new URL('experience-ui.js', app), 'utf8');
 const source = await readFile(new URL('app.js', app), 'utf8');
-const home = experience.slice(experience.indexOf('export function homeScreen'), experience.indexOf('\nfunction progressCard')).replace('export ', '');
+const home = experience.slice(experience.indexOf('export function homeScreen'), experience.indexOf('\nexport const mascotArt')).replace('export ', '');
 const settings = source.match(/^function settings\(state\).*$/m)[0];
 const row = source.match(/^function row\(.*$/m)[0];
 const browser = await chromium.launch({ headless: true });
@@ -33,7 +33,7 @@ try {
  }
  await page.evaluate(() => { document.querySelector('main').innerHTML=homeScreen({}, {tasks:()=>[],activityCard:()=>'',categoryRail:()=>'',icon,ui:{category:'전체'}}); });
  assert.match(await page.locator('.ego-guide-banner').innerText(), /처음이라면, 여기부터/);
- await page.locator('.ego-guide-banner').click(); await page.waitForURL('**/#missions');
+ await page.locator('.ego-guide-banner').click(); await page.waitForURL('**/#first-filming');
  await page.evaluate(() => {location.hash='settings';document.querySelector('main').innerHTML=settings({access:'allowed',user:{email:'member@example.test'}});});
  const guide = page.locator('.settings-row').filter({has:page.getByText('촬영 가이드',{exact:true})});
  assert.match(await guide.innerText(),/활동을 고른 뒤 세 단계/);

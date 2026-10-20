@@ -48,7 +48,11 @@ export async function refreshSession({expectedUserId=session.user?.id,expectedEp
 export const sessionReady=refreshSession();
 export function dialog(title,content,{wide=false,accountBound=true}={}){
  const ownerId=accountBound?session.user?.id:null,trigger=document.activeElement,element=document.createElement('dialog');element.className=`online-dialog ${wide?'is-wide':''}`;const titleId='online-dialog-title-'+crypto.randomUUID();element.setAttribute('aria-labelledby',titleId);
- element.innerHTML=`<div class="online-dialog-head"><h2 id="${titleId}">${esc(title)}</h2><button type="button" class="button" data-close aria-label="닫기">닫기</button></div><div class="online-dialog-body">${content}</div>`;
+ const appForm=!!document.querySelector('#app-shell')&&(/계정|로그인|회원|에고 시작|포인트 교환|기기 촬영 설정|문의 작성|영상과 심사 기록|영상 상세|영상 삭제 요청|영상 삭제·동의 철회|영상 제출|같은 영상 재검토/.test(title));
+ if(appForm)element.classList.add('ego-r3-form-page');
+ element.innerHTML=`<div class="online-dialog-head">${appForm?'<button type="button" class="ego-form-back" data-form-back aria-label="뒤로"><img src="/app/assets/figma-forms/back.svg" alt=""></button>':''}<h2 id="${titleId}">${esc(title)}</h2><button type="button" class="button" data-close aria-label="닫기">${appForm?'<img src="/app/assets/figma-forms/close.svg" alt="">':'닫기'}</button></div><div class="online-dialog-body">${content}</div>`;
+ element.querySelector('[data-form-back]')?.addEventListener('click',()=>element.close());
+ if(appForm&&title==='문의 작성')element.querySelector('.online-dialog-body').insertAdjacentHTML('afterbegin','<h3 class="ego-form-title">궁금한 점을 남겨주세요</h3><p class="ego-form-description">영상 · 심사 · 계정 · 정산 관련 문의</p>');
  const closeOnSessionChange=()=>{if(ownerId&&(!session.online||session.user?.id!==ownerId))element.close();};
  if(ownerId)window.addEventListener('service-session',closeOnSessionChange);
  document.body.append(element);element.querySelector('[data-close]').onclick=()=>element.close();element.addEventListener('click',e=>{if(e.target!==element)return;const r=element.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)element.close();});element.addEventListener('close',()=>{window.removeEventListener('service-session',closeOnSessionChange);element.querySelectorAll('video').forEach(v=>{v.pause();v.removeAttribute('src');v.load();});element.remove();if(trigger?.isConnected)trigger.focus({preventScroll:true});});element.showModal();return element;
@@ -59,6 +63,16 @@ export function showAccount({onSignOut}={}){
  if(!session.online){dialog('온라인 서비스 준비 중','<p>회원 가입과 온라인 제출을 준비하고 있습니다. 촬영 교육과 이 브라우저의 영상 기록은 지금 이용할 수 있습니다.</p>');return;}
  if(session.user){
   const user=session.user,isGoogle=['google','apple'].includes(session.authMethod),isApple=session.authMethod==='apple',d=dialog(user.forcePassword?'비밀번호 변경':'계정 관리',`<p>${esc(user.email)}</p>${isApple?'<p class="cloud-login-method">Apple로 로그인됨</p>':isGoogle?'<p class="cloud-login-method"><img src="../assets/brand/google-signin-g.png" alt="" width="18" height="18"><span>Google로 로그인됨</span></p>':''}${user.forcePassword?'<p class="online-notice">임시 비밀번호를 새 비밀번호로 변경해주세요.</p>':''}<form id="online-account-form" class="online-form"><label>이름<input name="name" required maxlength="60" value="${esc(user.name)}" autocomplete="name"></label>${isGoogle?'':`<label>현재 비밀번호<input name="currentPassword" type="password" autocomplete="current-password" ${user.forcePassword?'required':''}></label><label>새 비밀번호<input name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" ${user.forcePassword?'required':''}><small>변경할 때만 입력해주세요. 12자 이상</small></label>`}${statusLine}<button type="submit" class="button primary">저장</button></form><button type="button" class="button online-logout">로그아웃</button>`);
+  if(document.querySelector('#app-shell')){
+   d.querySelector('.online-dialog-head h2').textContent=user.forcePassword?'비밀번호 변경':'내 정보 수정';
+   d.querySelector('.online-dialog-body').insertAdjacentHTML('afterbegin','<h3 class="ego-form-title">로그인 계정 정보</h3>');
+   d.querySelector('#online-account-form').classList.add('ego-account-form');
+   d.querySelector('.online-dialog-body>p').outerHTML='<div class="ego-form-row"><strong>이메일</strong><small>'+esc(user.email)+'</small></div>';
+   d.querySelector('[name=newPassword]')?.setAttribute('placeholder','변경할 때만 입력해주세요');
+   if(!isGoogle)d.querySelector('#online-account-form [type=submit]').insertAdjacentHTML('beforebegin','<section class="ego-form-card"><h4>소셜 로그인 계정</h4><p>Google·Apple 로그인 계정에는 현재·새 비밀번호 입력란이 표시되지 않아요. 이 화면은 이메일 계정입니다.</p></section>');
+   const identity=d.querySelector('.online-dialog-body>.ego-form-row');identity.classList.add('ego-account-identity');identity.append(d.querySelector('.online-logout'));
+
+  }
   const form=d.querySelector('form'),ownerId=user.id,epoch=sessionEpoch;
   let saving=false,job=0;
   const current=()=>d.isConnected&&d.open&&session.online&&session.user?.id===ownerId&&sessionEpoch===epoch;

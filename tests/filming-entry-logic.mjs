@@ -28,13 +28,13 @@ for(const preview of [false,true]){
 }
 const source=await readFile(new URL('app.js',app),'utf8');
 const experience=await readFile(new URL('experience-ui.js',app),'utf8');
-const home=experience.slice(experience.indexOf('export function homeScreen'),experience.indexOf('\nfunction progressCard')).replace('export ','');
+const home=experience.slice(experience.indexOf('export function homeScreen'),experience.indexOf('\nexport const mascotArt')).replace('export ','');
 vm.runInContext(`const icon=()=>'',esc=String,getInstallState=()=>({}),isNativeApp=()=>false,appVersion=()=>'테스트';\n${home}\n${source.match(/^function row\(.*$/m)[0]}\n${source.match(/^function settings\(state\).*$/m)[0]}`,context);
 const markup=context.homeScreen({},{tasks:()=>[],activityCard:()=>'',categoryRail:()=>'',icon:()=>'',ui:{category:'전체'}});
-assert.match(markup,/<a class="ego-guide-banner" href="#missions">/);
+assert.match(markup,/<a class="ego-guide-banner" href="#first-filming">/);
 assert.match(markup,/처음이라면, 여기부터/);
 const settings=context.settings({access:'allowed',user:{email:'member@example.test'}});
-assert.match(settings,/<a class="settings-row" href="#missions">[^]*?<strong>촬영 가이드<\/strong><small>활동을 고른 뒤 세 단계로 준비해요<\/small>/);
+assert.match(settings,/<a class="settings-row" href="#missions">[^]*?<strong>촬영 가이드<\/strong><small>활동을 골라 준비해요\.<\/small>/);
 assert.match(settings,/<a class="settings-row" href="#education\?from=settings">[^]*?<strong>촬영 교육·점검<\/strong>/);
 assert.doesNotMatch(settings,/#guide\/dishwashing\/1/);
 console.log('Filming entry unit logic passed: real popup route/action handlers and rendered home/settings destinations. DOM fixture only; browser interaction remains separately tested.');

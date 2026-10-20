@@ -18,7 +18,7 @@
   mask-image: linear-gradient(to bottom, #000, transparent);
 }
 #app-shell:not([data-screen=welcome]) #app-header:not([hidden]) + #app-main {
-  margin-top: 6px;
+  margin-top: 0;
 }
 /* The original navigation links remain the only interactive and accessible tabs. */
 #app-shell .ego-nav-backdrop {

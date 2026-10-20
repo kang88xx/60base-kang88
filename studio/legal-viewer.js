@@ -10,16 +10,19 @@ function ensureStyle() {
 function closeButton(close) {
   const button = document.createElement('button');
   button.type = 'button'; button.className = 'legal-close'; button.setAttribute('aria-label', '닫기');
-  button.innerHTML = icon('close', 24); button.addEventListener('click', close);
+  button.innerHTML = document.querySelector('#app-shell') ? '<img src="/app/assets/figma-forms/close.svg" alt="">' : icon('close', 24); button.addEventListener('click', close);
   return button;
 }
 function frame(title, close, returnLabel) {
   const header = document.createElement('header'); header.className = 'legal-header';
   const heading = document.createElement('h1'); heading.id = 'legal-viewer-title'; heading.textContent = title;
+  if(document.querySelector('#app-shell')){
+    const back=document.createElement('button');back.type='button';back.className='legal-back';back.setAttribute('aria-label','뒤로');back.innerHTML='<img src="/app/assets/figma-forms/back.svg" alt="">';back.addEventListener('click',close);header.append(back);
+  }
   header.append(heading, closeButton(close));
   const body = document.createElement('div'); body.className = 'legal-body'; body.tabIndex = 0;
   const footer = document.createElement('footer'); footer.className = 'legal-footer';
-  const button = document.createElement('button'); button.type = 'button'; button.textContent = '닫기'; button.addEventListener('click', close);
+  const button = document.createElement('button'); button.type = 'button'; button.textContent = document.querySelector('#app-shell') ? '확인' : '닫기'; button.addEventListener('click', close);
   const note = document.createElement('p'); note.textContent = returnLabel;
   footer.append(button, note);
   return {header, body, footer};
@@ -58,7 +61,10 @@ export function bindSignupLegalViewer(signup) {
       if (!content) throw Error('legal-content-missing');
       // Only reviewed same-shell documents are loaded; retain absolute destinations for inner links.
       content.querySelectorAll('a[href]').forEach(link => { link.href = new URL(link.getAttribute('href'), url).href; });
-      parts.body.replaceChildren(document.importNode(content, true));
+      if(document.querySelector('#app-shell')){
+        const title=document.createElement('h1');title.className='legal-content-title';title.textContent=parts.header.querySelector('h1').textContent;
+        parts.body.replaceChildren(title,document.importNode(content,true));
+      }else parts.body.replaceChildren(document.importNode(content, true));
     }).catch(error => {
       if (error.name === 'AbortError' || !sheet.open) return;
       status.textContent = '안내를 불러오지 못했습니다. 다시 열거나 원문을 확인해주세요.';

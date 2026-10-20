@@ -192,6 +192,8 @@ function exampleCard(example, active, icon, esc) {
   </button>`;
 }
 
+let educationStep = 1;
+
 function quizMarkup(training, icon, esc) {
   const questions = [
     ['q1', '촬영 방향은 무엇이 기준인가요?', [['landscape', '가로 화면으로 촬영'], ['portrait', '세로 화면으로 촬영']]],
@@ -201,7 +203,7 @@ function quizMarkup(training, icon, esc) {
   const correct = trainingDone(training);
   const done = training.completed === true && correct;
   return `<section class="prep-panel prep-quiz" aria-labelledby="prep-quiz-title">
-    <div class="prep-panel-head"><span class="row-icon mint">${icon('shield-check')}</span><div><h2 id="prep-quiz-title">촬영 기준 확인</h2><p>${done ? '교육 확인이 완료됐어요.' : '3개 문항에 답한 뒤 완료를 눌러주세요.'}</p></div></div>
+    <div class="prep-panel-head"><span class="row-icon mint">${icon('shield-check')}</span><div><h2 id="prep-quiz-title">3가지 기준을<br>확인해볼까요?</h2><p>${done ? '교육 확인이 완료됐어요.' : '3개 문항에 답한 뒤 완료를 눌러주세요.'}</p></div></div>
     ${questions.map(([id, title, options]) => `<fieldset class="prep-question"><legend>${esc(title)}</legend>${options.map(([value, label]) => {
       const selected = training.answers[id] === value;
       const correct = trainingAnswers[id] === value;
@@ -223,15 +225,15 @@ function preflightMarkup(training, activity, icon, esc, returnStep) {
   ];
   const count = preflightCount(training);
   return `<section class="prep-panel prep-preflight" aria-labelledby="prep-preflight-title">
-    <div class="prep-panel-head"><span class="row-icon cyan">${icon('camera')}</span><div><h2 id="prep-preflight-title">촬영 전 체크</h2><p>${activity ? `${esc(activity.title)} 촬영 전 확인 ${count}/4` : '활동을 선택하면 체크를 시작할 수 있어요.'}</p></div></div>
+    <div class="prep-panel-head"><span class="row-icon cyan">${icon('camera')}</span><div><h2 id="prep-preflight-title">교육 확인이 완료됐어요</h2><p>${activity ? `${esc(activity.title)} 촬영 전 4가지를 확인해주세요. (${count}/4)` : '활동을 선택하면 체크를 시작할 수 있어요.'}</p></div></div>
     ${checks.map(([id, label]) => `<label><input type="checkbox" data-prep-check="${id}" ${training.preflight[id] ? 'checked' : ''} ${activity ? '' : 'disabled'}>${esc(label)}</label>`).join('')}
+    <p class="muted-caption">촬영 준비를 마치면 가이드에서 촬영을 시작할 수 있어요.</p>
     <div class="prep-actions">
       <a class="app-button secondary" href="#library">${icon('video-camera')}보관함</a>
       <a class="app-button secondary" href="#reviews">${icon('cloud-check')}심사</a>
       <button type="button" class="app-button secondary" data-prep-action="reset-preflight" ${count ? '' : 'disabled'}>점검 초기화</button>
       ${activity ? `<a class="app-button primary" href="#guide/${encodeURIComponent(activity.id)}/${returnStep}">${icon('arrow-right')}${returnStep === 3 ? '촬영 가이드로 돌아가기' : '가이드로 촬영'}</a>` : '<a class="app-button primary" href="#missions">활동 고르기</a>'}
     </div>
-    <p class="muted-caption">이 확인은 촬영 준비용입니다. 영상 제출 동의와 심사 승인은 제출 단계에서 별도로 진행돼요.</p>
   </section>`;
 }
 
@@ -319,30 +321,31 @@ export function renderEducation(options = {}) {
   const activity = selectedActivity({ version: capturePlanVersion, saved: state.plan.saved, selected: state.plan.selected });
   const activeExample = exampleFor(activity);
   const complete = state.training.completed && preflightCount(state.training) === preflightKeys.length && activity;
-  return `<section class="app-education">
+  return `<section class="app-education" data-education-step="${educationStep}">
     <div class="screen-heading">
-      <span class="step-chip">촬영 준비</span>
-      <h1>촬영 전에 함께 확인해요</h1>
-      <p>${activity ? '선택한 활동의 예시와 촬영 기준을 확인해요.' : '촬영할 활동을 고르고 해당 예시 영상을 확인한 뒤, 촬영 기준과 마지막 점검을 차례로 확인해요.'}</p>
+
+      <h1>좋은 기록을 위한<br>작은 준비</h1>
+
     </div>
     ${state.notice ? `<div class="app-alert" role="status">${esc(state.notice)}</div>` : ''}
-    <section class="prep-status ${complete ? 'is-complete' : ''}">
-      <span class="row-icon navy">${icon(complete ? 'check-circle' : 'video-camera')}</span>
-      <div><strong>${complete ? '촬영 준비 완료' : activity ? `${esc(activity.title)} 준비 중` : '촬영 활동을 선택해 주세요'}</strong><small>${activity ? `교육 ${state.training.completed ? '완료' : '확인 필요'} · 촬영 전 확인 ${preflightCount(state.training)}/4` : '아래 활동 중 하나를 누르면 준비가 시작돼요.'}</small></div>
+    <section class="prep-lesson" aria-label="촬영 예시">
+      ${activeExample ? `<button type="button" class="prep-lesson-hero" data-app-action="sample" data-example="${esc(activeExample.id)}" aria-label="${esc(activeExample.title)} 예시 영상 재생"><img src="${esc(activeExample.poster)}" alt=""><span>${esc(activeExample.label)} 실제 촬영 예시</span></button><div class="prep-lesson-list">${examples.slice(0,3).map(example=>`<button type="button" class="prep-lesson-row" data-app-action="sample" data-example="${esc(example.id)}"><span class="prep-lesson-play" aria-hidden="true">${icon('play')}</span><span><strong>${esc(example.title)}</strong><small>${esc(example.note)}</small></span></button>`).join('')}</div>` : `<p class="prep-example-empty">${activity ? `${esc(activity.title)} 예시 영상이 아직 준비되지 않았어요.` : '촬영할 활동을 먼저 선택해주세요.'}</p>`}
+      <p class="prep-lesson-note">가로 화면 · 양손과 작업 대상 · 자연스러운 속도<br>개인정보가 보이지 않는지 확인해주세요.</p>
     </section>
-    ${activity ? `<details class="prep-activity-picker"${options.activityPickerOpen ? ' open' : ''}><summary id="prep-activity-picker-summary"><span>활동 변경 · ${esc(activity.title)}</span></summary>` : ''}
+    <details class="prep-activity-picker"${options.activityPickerOpen ? ' open' : ''}><summary id="prep-activity-picker-summary"><span>${activity ? `활동 변경 · ${esc(activity.title)}` : '촬영 활동 선택'}</span></summary>
     <section class="prep-panel" aria-labelledby="prep-activity-title">
       <div class="prep-panel-head"><span class="row-icon lavender">${icon('squares-four')}</span><div><h2 id="prep-activity-title">촬영 활동 준비</h2><p>선택하면 해당 예시로 교육 화면이 맞춰지고 촬영 전 체크가 새로 시작돼요.</p></div></div>
       <div class="prep-activity-list">${currentActivities.map(item => activityCard(item, state.plan, icon, esc)).join('') || '<p>현재 공개된 촬영 활동이 없어요. 새 활동이 올라오면 이곳에서 선택할 수 있어요.</p>'}</div>
     </section>
-    ${activity ? '</details>' : ''}
-    <section class="prep-panel" aria-labelledby="prep-example-title">
-      <div class="prep-panel-head"><span class="row-icon peach">${icon('play')}</span><div><h2 id="prep-example-title">예시 영상으로 구도 확인</h2><p>${activeExample ? `${esc(activeExample.title)} · ${esc(activeExample.note)}` : activity ? `${esc(activity.title)} 예시 영상이 아직 준비되지 않았어요.` : '촬영할 활동을 먼저 선택해주세요.'}</p></div></div>
-      ${activeExample ? `<button type="button" class="prep-sample-play app-button secondary" data-app-action="sample" data-example="${esc(activeExample.id)}">${icon('play')}예시 영상 재생</button>` : ''}
-      <div class="prep-examples prep-examples--single">${activeExample ? exampleCard(activeExample, true, icon, esc) : '<p class="muted-caption">활동의 촬영 안내와 아래 공통 촬영 기준을 확인해주세요.</p>'}</div>
+    </details>
+    <section class="prep-status ${complete ? 'is-complete' : ''}">
+      <span class="row-icon navy">${icon(complete ? 'check-circle' : 'video-camera')}</span>
+      <div><strong>${complete ? '촬영 준비 완료' : activity ? `${esc(activity.title)} 준비 중` : '촬영 활동을 선택해 주세요'}</strong><small>${activity ? `교육 ${state.training.completed ? '완료' : '확인 필요'} · 촬영 전 확인 ${preflightCount(state.training)}/4` : '아래 활동 중 하나를 누르면 준비가 시작돼요.'}</small></div>
     </section>
+    <button type="button" class="app-button primary prep-education-next" data-prep-action="education-step" data-prep-step="2">촬영 기준 확인하기</button>
     ${quizMarkup(state.training, icon, esc)}
     ${preflightMarkup(state.training, activity, icon, esc, options.returnStep === 3 && options.returnActivity === encodeURIComponent(activity?.id) ? 3 : 1)}
+    <button type="button" class="app-button secondary prep-education-back" data-prep-action="education-step" data-prep-step="${educationStep === 3 ? 2 : 1}">이전 단계</button>
     <section class="prep-faq">
       <details><summary><span>촬영 활동을 고르면 바로 신청되나요?</span></summary><p>활동 선택은 촬영할 내용을 정하는 단계입니다. 촬영하거나 가져온 영상은 동의를 확인하고 제출해야 접수됩니다.</p></details>
       <details><summary><span>영상은 어디에 저장되고, 어떻게 제출하나요?</span></summary><p>촬영하거나 가져온 영상은 미리보기에서 확인한 뒤 이용 범위와 동의 내용을 확인하고 바로 제출합니다. 실패하면 같은 영상으로 다시 시도할 수 있어요.</p></details>
@@ -357,7 +360,10 @@ export function handlePreparationClick(target) {
   if (!actionTarget) return { handled: false };
   const action = actionTarget.dataset.prepAction;
   let handled = true;
-  if (action === 'save') { if (!toggleSavedActivity(actionTarget.dataset.prepId)) return { handled: true, message: preparationActivityError(actionTarget.dataset.prepId) }; }
+  if (action === 'education-step') {
+    const next = Number(actionTarget.dataset.prepStep);
+    if ([1, 2].includes(next)) { educationStep = next; notify(); }
+  } else if (action === 'save') { if (!toggleSavedActivity(actionTarget.dataset.prepId)) return { handled: true, message: preparationActivityError(actionTarget.dataset.prepId) }; }
   else if (action === 'select') { if (!selectPreparationActivity(actionTarget.dataset.prepId)) return { handled: true, message: preparationActivityError(actionTarget.dataset.prepId) }; }
   else if (action === 'example') {
     const id = actionTarget.dataset.prepExample;
@@ -376,6 +382,7 @@ export function handlePreparationClick(target) {
     const training = readTraining();
     if (!trainingDone(training)) return { handled: true, message: '3개 문항을 모두 맞춘 뒤 완료할 수 있어요.' };
     writeTraining({ completed: true });
+    educationStep = 3;
     notify();
   } else if (action === 'reset-preflight') {
     writeTraining({ preflight: {} });

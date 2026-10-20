@@ -37,7 +37,7 @@ try {
   }
   async function navigate(route) {
     await page.evaluate(value => { location.hash = value; }, route);
-    await page.waitForFunction(value => document.querySelector('#app-shell')?.dataset.screen === value, route.split('/')[0]);
+    await page.waitForFunction(value => document.querySelector('#app-shell')?.dataset.screen === value, route.split('/')[0]==='library'?'reviews':route.split('/')[0]);
     await page.evaluate(() => document.fonts.ready);
   }
   const plan = () => page.evaluate(async () => (await import('/app/preparation.js')).getPreparationState());
@@ -68,6 +68,7 @@ try {
   assert.deepEqual((await plan()).plan.saved.sort(), ['dishwashing', newId].sort());
   assert.match(await page.locator('.prep-status').innerText(), /QA 새 촬영 활동 준비 중/);
   assert.equal(await page.locator(`[data-prep-id="${newId}"][data-prep-action=select]`).getAttribute('aria-pressed'), 'true');
+  await page.locator('[data-prep-action=education-step][data-prep-step="2"]').click();
   for (const [question, answer] of Object.entries({ q1: 'landscape', q2: 'privacy', q3: 'natural' })) await page.locator(`[data-prep-question=${question}][data-prep-answer=${answer}]`).click();
   await page.locator('[data-prep-action=complete-training]').click();
   for (const key of ['headgear', 'landscape', 'oneMinute', 'privacy']) await page.locator(`[data-prep-check=${key}]`).check();
@@ -92,6 +93,7 @@ try {
     assert.equal(await page.locator('[data-app-action=refresh]').count(), 1);
   }
   await navigate('education');
+  if(!await page.locator('.prep-activity-picker').evaluate(node=>node.open))await page.locator('.prep-activity-picker>summary').click();
   await page.locator('[data-prep-action=select][data-prep-id=dishwashing]').click();
   await page.getByText('현재 공개된 활동을 확인하지 못했어요. 인터넷 연결을 확인하고 다시 불러와주세요.', { exact: true }).waitFor();
   assert.equal((await plan()).plan.selected, newId);
@@ -108,29 +110,30 @@ try {
       assert.equal(result.overflow, false, JSON.stringify(result)); layout.push(result);
       if (['home', 'profile', 'ranking', 'education'].includes(route)) {
         const nav = await page.locator('.app-bottom-nav > a').evaluateAll(nodes => nodes.map(node => { const label = node.querySelector('span:not(.app-icon)'), box = label.getBoundingClientRect(); return { label: label.textContent, visible: getComputedStyle(label).display !== 'none' && box.width > 0 && box.height > 0, size: parseFloat(getComputedStyle(label).fontSize) }; }));
-        assert.equal(nav.length, 4); assert.ok(nav.every(item => item.visible && item.size >= 12));
+        assert.equal(nav.length, 4); assert.ok(nav.every(item => item.visible && item.size >= 11));
         if (width < 400) await page.screenshot({ path: path.join(output, `${route}-${width}.png`), fullPage: true });
       }
       if (route === 'home') {
         assert.equal(await page.locator('.task-card').first().getAttribute('aria-label'), null, 'the natural link name includes the title, review condition and reward');
-        assert.match(await page.locator('.task-card').first().ariaSnapshot(), /검수 승인 시/);
-        assert.match(await page.locator('[aria-label="공지사항"] .app-icon').getAttribute('style'), /bell\.svg/);
+        assert.match(await page.locator('.task-card').first().ariaSnapshot(), /최종 심사 승인 시/);
+        assert.equal(await page.locator('.app-bottom-nav a[href="#profile"]').count(),1,'home retains the real profile/settings navigation path');
         const targets = await page.locator('.rail-dots button').evaluateAll(nodes => nodes.map(node => { const rect = node.getBoundingClientRect(); return { width: rect.width, height: rect.height }; }));
         assert.equal(targets.length, 0, 'the removed top recommendation rail has no detached paging controls');
       }
+      if(route==='settings')assert.match(await page.locator('a[href="#announcements?from=settings"] .row-icon .app-icon').getAttribute('style'),/bell\.svg/);
       if (route === 'announcements') assert.equal(await page.locator('.header-title').textContent(), '공지사항');
       if (route === 'profile' || route === 'ranking') {
-        const selector = route === 'profile' ? '.profile-stat-grid span' : '.ego-progress-card > p';
+        const selector = '.alan-summary-stats>div>span';
         const values = await page.locator(selector).evaluateAll(nodes => nodes.map(node => {
-          const style = getComputedStyle(node), ownBg = style.backgroundColor, background = ownBg === 'rgba(0, 0, 0, 0)' ? getComputedStyle(node.parentElement).backgroundColor : ownBg;
+          const style=getComputedStyle(node);let ancestor=node,background='rgb(255, 255, 255)';while(ancestor){const color=getComputedStyle(ancestor).backgroundColor;if(color!=='rgba(0, 0, 0, 0)'&&color!=='transparent'){background=color;break;}ancestor=ancestor.parentElement;}
           const luminance = color => { const rgb = color.match(/[\d.]+/g).slice(0, 3).map(Number).map(value => { value /= 255; return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4; }); return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722; };
           const f = luminance(style.color), b = luminance(background); return { text: node.textContent, fontSize: parseFloat(style.fontSize), foreground: style.color, background, ratio: (Math.max(f, b) + .05) / (Math.min(f, b) + .05) };
         }));
-        assert.ok(values.length > 0 && values.every(item => item.fontSize >= 12 && item.ratio >= 4.5), JSON.stringify(values)); contrast.push({ width, route, values });
+        assert.equal(values.length,2,'Both actual profile/ranking stat labels are checked, never an empty selector');assert.ok(values.every(item => item.fontSize >= 12 && item.ratio >= 4.5), JSON.stringify(values)); contrast.push({ width, route, values });
       }
     }
   }
-  checks.push('39 route/viewport checks at 320, 390 and 1440 px; labels visible, dots 44px and profile/ranking auxiliary contrast ≥4.5:1.');
+  checks.push('39 route/viewport checks at 320, 390 and 1440 px; labels visible at Figma11px minimum, removed rail controls absent and profile/ranking auxiliary contrast ≥4.5:1.');
 
   await saveTask({ ...newTask, id: newId, published: false });
   await page.evaluate(async () => { await (await import('/app/service.js')).refreshApp(); });
@@ -147,11 +150,12 @@ try {
     await navigate(`guide/${newId}/${step}`);
     assert.match(await page.locator('#app-main').innerText(), /현재 공개되지 않은 활동/);
     assert.equal(await page.locator('[data-app-action=record]').count(), 0, 'an archived guide never records the first task as a fallback');
-    assert.equal(await page.locator('.guide-progress').count(), 0);
+    assert.equal(await page.locator('.alan-guide-progress').count(), 0);
   }
   await page.reload({ waitUntil: 'networkidle' });
   assert.deepEqual((await plan()).plan, { saved: ['dishwashing'], selected: '' });
   await navigate('education');
+  if(!await page.locator('.prep-activity-picker').evaluate(node=>node.open))await page.locator('.prep-activity-picker>summary').click();
   await page.locator('[data-prep-action=select][data-prep-id=dishwashing]').click();
   assert.equal((await plan()).plan.selected, 'dishwashing');
   checks.push('Archiving prunes only unavailable saved IDs/selection and preflight, preserves other saved tasks and education, and explains archived deep links.');
