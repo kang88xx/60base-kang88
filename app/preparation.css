@@ -57,3 +57,16 @@
 .prep-faq p{margin:0 0 16px;color:#66738b;font-size:12.5px;line-height:1.75}
 @media(min-width:700px){.prep-activity-main{grid-template-columns:104px minmax(0,1fr)}.prep-activity-main img,.prep-activity-icon{width:104px}.prep-examples{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:359px){.prep-panel,.prep-faq{padding-left:15px;padding-right:15px}.prep-activity-main{grid-template-columns:70px minmax(0,1fr);gap:10px;padding-right:42px}.prep-activity-main img,.prep-activity-icon{width:70px}.prep-activity-main strong{font-size:14px}.prep-examples{grid-template-columns:1fr}.prep-question button{width:100%;margin-right:0}.prep-actions{grid-template-columns:1fr}}
+
+/* Selected activity stays compact; the caller preserves the disclosure across rerenders. */
+.prep-activity-picker{min-width:0;background:#fff;border:1px solid var(--app-line);border-radius:21px}
+.prep-activity-picker>summary{display:flex;align-items:center;gap:12px;min-height:55px;padding:14px 16px;list-style:none;cursor:pointer;font-size:15px;font-weight:650;line-height:1.5}
+.prep-activity-picker>summary>span,.prep-faq summary>span{min-width:0;overflow-wrap:anywhere}
+.prep-activity-picker>summary::-webkit-details-marker,.prep-faq summary::-webkit-details-marker{display:none}
+.prep-activity-picker>summary::after,.prep-faq summary::after{content:"";width:8px;height:8px;flex:0 0 8px;margin:0 4px 4px auto;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.prep-activity-picker[open]>summary::after,.prep-faq details[open]>summary::after{transform:rotate(225deg);margin-bottom:0}
+.prep-activity-picker>summary:focus-visible{outline:3px solid var(--app-blue,#0024ff);outline-offset:3px;border-radius:18px}
+#app-shell .prep-activity-picker>.prep-panel{border:0;border-top:1px solid var(--app-line);border-radius:0 0 21px 21px}
+.prep-examples.prep-examples--single{grid-template-columns:minmax(0,1fr)}
+.prep-examples--single .prep-example-card img{height:auto;aspect-ratio:16/9}
+.prep-faq summary{gap:12px;list-style:none}

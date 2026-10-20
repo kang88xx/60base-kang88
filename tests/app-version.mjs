@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const root=new URL('../',import.meta.url);
+let source=await readFile(new URL('app/native.js',root),'utf8');
+let pluginCalls=0;
+globalThis.Capacitor={isNativePlatform:()=>false};
+globalThis.__versionPlugins=()=>{pluginCalls++;return [{},{},{},{},{App:{getInfo:async()=>({version:'1.1.3',build:'35',id:'private-id'})}},{ }];};
+source=source.replace(/const dependencies=\(\)=>Promise\.all\(\[.*?\]\);/, 'const dependencies=()=>Promise.resolve(globalThis.__versionPlugins());');
+const native=await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
+assert.equal(await native.getNativeAppInfo(),null);assert.equal(pluginCalls,0,'web never loads native plugins');
+Capacitor.isNativePlatform=()=>true;
+assert.deepEqual(await native.getNativeAppInfo(),{version:'1.1.3',build:'35'});
+const app=await readFile(new URL('app/app.js',root),'utf8');
+const start=app.indexOf('let nativeVersion');const end=app.indexOf('\nfunction settings(',start);
+assert.ok(start>=0&&end>start);
+const labelSource=app.slice(start,end);
+for(const mode of ['web','success','error','missing']){
+ let resolve,reject,calls=0,renders=0;
+ const pending=new Promise((yes,no)=>{resolve=yes;reject=no;});
+ const context=vm.createContext({isNativeApp:()=>mode!=='web',getNativeAppInfo:()=>{calls++;return pending;},queueRender:()=>renders++});
+ vm.runInContext(labelSource,context);
+ assert.equal(context.appVersion(),mode==='web'?'웹 앱':'확인 중…');
+ context.appVersion();assert.equal(calls,mode==='web'?0:1);
+ if(mode==='web')continue;
+ if(mode==='error')reject(Error('unavailable'));else resolve(mode==='missing'?null:{version:'1.1.3',build:'35'});
+ await new Promise(setImmediate);
+ assert.equal(context.appVersion(),mode==='success'?'1.1.3 (35)':'확인할 수 없음');
+ context.appVersion();assert.equal(calls,1);assert.equal(renders,1);
+}
+console.log('Native version and web label: real bridge accessor, delayed resolution, rejection, missing data and single fetch passed.');

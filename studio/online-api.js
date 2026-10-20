@@ -38,8 +38,8 @@ async function requestJson(path,{method,body,raw,signal}){
   return await Promise.race([request,cancelled]);
  }finally{clearTimeout(timer);signal?.removeEventListener('abort',onAbort);}
 }
-export async function refreshSession({expectedUserId=session.user?.id,expectedEpoch=sessionEpoch}={}){
- const isCurrent=()=>session.user?.id===expectedUserId&&sessionEpoch===expectedEpoch;
+export async function refreshSession({expectedUserId=session.user?.id,expectedEpoch=sessionEpoch,isCurrent:expectedCurrent=()=>true}={}){
+ const isCurrent=()=>expectedCurrent()&&session.user?.id===expectedUserId&&sessionEpoch===expectedEpoch;
  try{const value=await api('/session');if(!isCurrent())return session;Object.assign(session,value,{online:value.online===true,authProvider:value.authProvider||'password',authMethod:value.authMethod||null});}
  catch{if(!isCurrent())return session;Object.assign(session,{online:false,user:null,csrf:null,authProvider:'password',authMethod:null});}
  if(publishedUserId!==session.user?.id){sessionEpoch++;publishedUserId=session.user?.id;}
@@ -59,7 +59,22 @@ export function showAccount({onSignOut}={}){
  if(!session.online){dialog('온라인 서비스 준비 중','<p>회원 가입과 온라인 제출을 준비하고 있습니다. 촬영 교육과 이 브라우저의 영상 기록은 지금 이용할 수 있습니다.</p>');return;}
  if(session.user){
   const user=session.user,isGoogle=['google','apple'].includes(session.authMethod),isApple=session.authMethod==='apple',d=dialog(user.forcePassword?'비밀번호 변경':'계정 관리',`<p>${esc(user.email)}</p>${isApple?'<p class="cloud-login-method">Apple로 로그인됨</p>':isGoogle?'<p class="cloud-login-method"><img src="../assets/brand/google-signin-g.png" alt="" width="18" height="18"><span>Google로 로그인됨</span></p>':''}${user.forcePassword?'<p class="online-notice">임시 비밀번호를 새 비밀번호로 변경해주세요.</p>':''}<form id="online-account-form" class="online-form"><label>이름<input name="name" required maxlength="60" value="${esc(user.name)}" autocomplete="name"></label>${isGoogle?'':`<label>현재 비밀번호<input name="currentPassword" type="password" autocomplete="current-password" ${user.forcePassword?'required':''}></label><label>새 비밀번호<input name="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" ${user.forcePassword?'required':''}><small>변경할 때만 입력해주세요. 12자 이상</small></label>`}${statusLine}<button type="submit" class="button primary">저장</button></form><button type="button" class="button online-logout">로그아웃</button>`);
-  const form=d.querySelector('form');form.onsubmit=async e=>{e.preventDefault();busy(form,true);try{const body=Object.fromEntries(new FormData(form));if(!body.newPassword){delete body.newPassword;delete body.currentPassword;}const result=await api('/account',{method:'PATCH',body});Object.assign(session,result);await refreshSession();d.close();}catch(e){form.querySelector('[role="status"]').textContent=e.message;}finally{busy(form,false);}};
+  const form=d.querySelector('form'),ownerId=user.id,epoch=sessionEpoch;
+  let saving=false,job=0;
+  const current=()=>d.isConnected&&d.open&&session.online&&session.user?.id===ownerId&&sessionEpoch===epoch;
+  d.addEventListener('close',()=>{job++;});
+  form.onsubmit=async e=>{
+   e.preventDefault();if(saving||!current())return;
+   saving=true;const pending=++job,isCurrent=()=>pending===job&&current();busy(form,true);
+   try{
+    const body=Object.fromEntries(new FormData(form));if(!body.newPassword){delete body.newPassword;delete body.currentPassword;}
+    await api('/account',{method:'PATCH',body});
+    if(!isCurrent())return;
+    await refreshSession({expectedUserId:ownerId,expectedEpoch:epoch,isCurrent});
+    if(isCurrent())d.close();
+   }catch(error){if(isCurrent())form.querySelector('[role="status"]').textContent=error.message;}
+   finally{saving=false;if(isCurrent())busy(form,false);}
+  };
   d.querySelector('.online-logout').onclick=async()=>{try{if(onSignOut)await onSignOut();else{await api('/auth/logout',{method:'POST'});await refreshSession();}d.close();}catch(e){form.querySelector('[role="status"]').textContent=e.message;}};return;
  }
  const d=dialog(document.querySelector('#app-shell')?'에고 시작하기':'60BASE 시작하기','<div class="online-auth-tabs" role="group" aria-label="회원 시작"><button type="button" aria-pressed="true" data-auth="login">로그인</button><button type="button" aria-pressed="false" data-auth="register">회원 가입</button></div><div id="online-auth-content"></div>');

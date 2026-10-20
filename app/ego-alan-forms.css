@@ -1,0 +1,89 @@
+/* Alan R3 participant forms. Keep service/admin forms outside this scope. */
+body:has(#app-shell) .online-dialog {
+  --form-primary:#5b59f2;
+  --form-ink:#29282d;
+  --form-muted:#666779;
+  --form-line:#e5e5ef;
+  width:min(460px,calc(100vw - 24px));
+  max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+  padding:0;border:1px solid var(--form-line);border-radius:24px;
+  background:#fff;color:var(--form-ink);font-family:var(--sans,Arial,sans-serif);
+  box-shadow:0 24px 80px #29282d26;
+}
+body:has(#app-shell) .online-dialog.is-wide {width:min(760px,calc(100vw - 24px))}
+body:has(#app-shell) .online-dialog::backdrop {background:#29282d66;backdrop-filter:blur(5px)}
+body:has(#app-shell) .online-dialog .online-dialog-head {padding:20px 20px 12px;border:0;background:#fff;gap:12px}
+body:has(#app-shell) .online-dialog .online-dialog-head h2 {color:var(--form-ink);font-size:19px;line-height:1.4;font-weight:700;letter-spacing:-.035em}
+body:has(#app-shell) .online-dialog .online-dialog-head [data-close] {min-width:44px;min-height:44px;padding:8px 12px;border:0;border-radius:12px;background:#f6f6fa;color:var(--form-muted);font-size:13px}
+body:has(#app-shell) .online-dialog .online-dialog-body {padding:12px 20px 24px;background:#fff}
+body:has(#app-shell) .online-dialog :is(.ego-form-intro,.cloud-intro,.online-help,.online-dialog-body>p) {color:var(--form-muted);line-height:1.7}
+body:has(#app-shell) .online-dialog .online-form {gap:18px}
+body:has(#app-shell) .online-dialog .online-form label {color:var(--form-ink);font-size:14px;line-height:1.6;gap:8px}
+body:has(#app-shell) .online-dialog .online-form :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {min-height:52px;padding:13px 16px;border:1px solid var(--form-line);border-radius:12px;background:#fff;color:var(--form-ink);font-size:16px;line-height:1.5}
+body:has(#app-shell) .online-dialog :is(.button,.cloud-google-button) {min-height:52px;border:1px solid var(--form-line);border-radius:18px;background:#fff;color:var(--form-ink);padding:13px 18px;font-size:14px;font-weight:650;box-shadow:none;line-height:1.5}
+body:has(#app-shell) .online-dialog .button.primary {background:var(--form-primary);border-color:var(--form-primary);color:#fff}
+body:has(#app-shell) .online-dialog .button.primary:hover:not(:disabled) {background:#4c49dc;border-color:#4c49dc}
+body:has(#app-shell) .online-dialog :is(button,input,select,textarea,a):focus-visible {outline:3px solid var(--form-primary);outline-offset:3px}
+body:has(#app-shell) .online-dialog :is(button,input,select,textarea):disabled {cursor:not-allowed;opacity:.6}
+body:has(#app-shell) .online-dialog :is(input,select,textarea):disabled {background:#f6f6fa;color:var(--form-muted)}
+body:has(#app-shell) .online-dialog .online-check {font-size:13px!important;line-height:1.7!important;padding-left:30px;min-height:40px}
+body:has(#app-shell) .online-dialog .online-check input {width:20px;height:20px;min-height:20px;accent-color:var(--form-primary)}
+body:has(#app-shell) .online-dialog :is(.online-check a,.cloud-account-switch) {color:#514ed8}
+body:has(#app-shell) .online-dialog :is(.online-status,.capture-status) {font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+body:has(#app-shell) .online-dialog .online-status[data-error=true] {color:#af3154}
+body:has(#app-shell) .online-dialog :is(.online-notice,.local-notice,.cloud-account-identity) {background:#fff4e6;color:var(--form-ink);border:0;border-radius:12px}
+body:has(#app-shell) .online-dialog .online-auth-tabs {border:0;border-radius:14px;background:#f6f6fa;padding:4px;gap:4px}
+body:has(#app-shell) .online-dialog .online-auth-tabs button {flex:1;border-radius:12px;color:var(--form-muted)}
+body:has(#app-shell) .online-dialog .online-auth-tabs [aria-pressed=true] {color:#514ed8;background:#eef0ff;box-shadow:none}
+body:has(#app-shell) .online-dialog .cloud-check {background:#eef0ff;color:var(--form-primary)}
+body:has(#app-shell) .online-dialog .ego-auth-mark {height:100px;margin-bottom:20px;background:#fff4e6;border-radius:18px}
+body:has(#app-shell) .online-dialog .ego-file-drop {border-color:#d6d5f6;border-radius:18px;background:#fafaff}
+body:has(#app-shell) .online-dialog .ego-file-drop:hover {border-color:var(--form-primary);background:#eef0ff}
+body:has(#app-shell) .online-dialog .ego-file-drop:focus-within {border-color:var(--form-primary);outline-color:var(--form-primary)}
+body:has(#app-shell) .online-dialog :is(.ego-file-icon,.ego-file-thumbnail) {background:#eef0ff;color:var(--form-primary)}
+body:has(#app-shell) .online-dialog .ego-file-choose {color:#514ed8}
+body:has(#app-shell) .online-dialog .ego-file-card {border-color:var(--form-line);border-radius:12px}
+body:has(#app-shell) .online-dialog :is(.ego-file-card small,.ego-file-drop small,.online-upload-stages) {color:var(--form-muted)}
+body:has(#app-shell) .online-dialog .ego-file-card [data-file-remove]:hover {background:#eef0ff;color:#514ed8}
+body:has(#app-shell) .online-dialog .online-upload-stages [aria-current=step] {color:#514ed8}
+body:has(#app-shell) .online-dialog .online-progress {background:#eef0ff;accent-color:var(--form-primary)}
+body:has(#app-shell) .online-dialog .online-progress::-webkit-progress-bar {background:#eef0ff}
+body:has(#app-shell) .online-dialog .online-progress::-webkit-progress-value {background:var(--form-primary)}
+body:has(#app-shell) .online-dialog .online-progress::-moz-progress-bar {background:var(--form-primary)}
+body:has(#app-shell) .online-dialog [data-deletion-form] button[type=submit] {background:#af3154;border-color:#af3154;color:#fff}
+/* Match the existing signup selector specificity without changing its state machine. */
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] {background:#fff;border-radius:24px;color:#29282d}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head {padding:20px 20px 12px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head h2 {color:#29282d;font-size:19px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head [data-close] {min-width:44px;padding:8px 12px;border:0;border-radius:12px;background:#f6f6fa;color:#666779;font-size:13px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-body {padding:12px 20px 24px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-title {margin:8px 0 28px;color:#29282d;font-size:28px;line-height:1.3;letter-spacing:-.04em;white-space:pre-line}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-panel {padding:0;border-radius:0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-identity {padding:14px;margin-bottom:28px;border-radius:12px;background:#eef0ff;gap:10px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-email {color:#666779;font-size:14px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-switch {color:#514ed8;border-color:#d6d5f6;font-size:13px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form>label:not(.online-check) {color:#29282d;font-size:14px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form input[name=displayName] {min-height:52px;border-color:#e5e5ef;color:#29282d;font-size:16px;font-weight:400}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check {border:0;padding:10px 0;gap:12px;min-height:44px;color:#29282d}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-check input {accent-color:#5b59f2}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-check a {color:#514ed8}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit] {min-height:52px;margin-top:24px;border-color:#5b59f2;border-radius:18px;background:#5b59f2;color:#fff;font-size:14px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit]:disabled {border-color:#e7e7f1;background:#e7e7f1;color:#777887;opacity:1}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] [data-cloud-error]:not(:empty) {padding:16px 0 0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] :focus-visible {outline-color:#5b59f2}
+body:has(#app-shell) .legal-sheet {color:#29282d;border-radius:24px 24px 0 0}
+body:has(#app-shell) .legal-sheet :is(.legal-header h1,.legal-body h2,.legal-reward dd) {color:#29282d}
+body:has(#app-shell) .legal-sheet :is(.legal-body [data-legal-content],.legal-close) {color:#666779}
+body:has(#app-shell) .legal-sheet .legal-body a {color:#514ed8}
+body:has(#app-shell) .legal-sheet .legal-footer>button {min-height:52px;border-radius:18px;background:#5b59f2;font-size:14px}
+body:has(#app-shell) .legal-sheet :focus-visible {outline-color:#5b59f2}
+@media(max-width:380px) {
+  body:has(#app-shell) .online-dialog .online-dialog-head {padding:16px 16px 8px}
+  body:has(#app-shell) .online-dialog .online-dialog-body {padding:12px 16px 20px}
+}
+body:has(#app-shell) .online-dialog .app-button {min-height:52px;border-radius:18px;font-size:14px;box-shadow:none}
+body:has(#app-shell) .online-dialog .app-button.primary {background:#5b59f2;border-color:#5b59f2;color:#fff}
+body:has(#app-shell) .online-dialog .coupon-product {border-color:#e5e5ef;border-radius:12px}
+body:has(#app-shell) .online-dialog .coupon-product[aria-pressed=true] {border-color:#5b59f2;background:#eef0ff}
+body:has(#app-shell) .online-dialog .coupon-test-note {background:#fff4e6;color:#666779;border-radius:12px}
+body:has(#app-shell) .online-dialog .coupon-error {color:#af3154}

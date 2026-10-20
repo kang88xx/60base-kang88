@@ -1,0 +1,154 @@
+{
+  "retrieved_at_utc": "2026-10-16T15:14:27.654590+00:00",
+  "purpose": "Existing real reward coupon listing imagery; no generated images",
+  "assets": [
+    {
+      "id": "shinsegae-10000",
+      "filename": "shinsegae-10000.png",
+      "requested_value_krw": 10000,
+      "source_listing_title": "[신세계백화점] 1만원 모바일 상품권",
+      "source_page_url": "https://thegiftmall.shop/product-details.asp?GIFT_CODE=SW1",
+      "discovery_page_url": "https://thegiftmall.shop/category.asp",
+      "image_url": "https://thegiftmall.shop/assets/img/product/shin_1만.png",
+      "source_type": "retailer product listing",
+      "usage_restrictions": {
+        "status": "not licensed for reuse by this download",
+        "known_restrictions": "The Gift terms Article 21 reserves rights in its authored works and requires prior consent for commercial reproduction, transmission, publication, distribution or third-party use of information whose intellectual property belongs to The Gift. Footer states All Rights Reserved. Brand artwork may have separate rightsholders.",
+        "terms_url": "https://thegiftmall.shop/tos.asp"
+      },
+      "notes": [
+        "Existing retailer promotional artwork showing a 10,000 KRW certificate. Listing says image may differ from actual issued form."
+      ],
+      "format": "PNG",
+      "width": 600,
+      "height": 240,
+      "mime_type": "image/png",
+      "byte_count": 53426,
+      "sha256": "46769145489e047969958adeb6db799d2b3e734253cb01cd65b24dbf343ba9f2",
+      "download_transformations": "none; original HTTP response body bytes preserved",
+      "visual_review": "No visible barcode, QR code, PIN, coupon serial or redeemable code. Public catalog artwork, not a customer-issued coupon.",
+      "local_path": "design_previews/ego-release-20261014/app/assets/rewards/shinsegae-10000.png",
+      "mirror_path": "mobile_worktrees/ego-release-20261014/mobile/overlays/ios-ego/app/assets/rewards/shinsegae-10000.png"
+    },
+    {
+      "id": "lotte-10000",
+      "filename": "lotte-10000.png",
+      "requested_value_krw": 10000,
+      "source_listing_title": "롯데 상품권 1만원권",
+      "source_page_url": "https://thegiftmall.shop/product-details.asp?GIFT_CODE=LO1",
+      "discovery_page_url": "https://thegiftmall.shop/category.asp",
+      "image_url": "https://thegiftmall.shop/assets/img/product/lotte_1만원.png",
+      "source_type": "retailer product listing",
+      "usage_restrictions": {
+        "status": "not licensed for reuse by this download",
+        "known_restrictions": "The Gift terms Article 21 reserves rights in its authored works and requires prior consent for commercial reproduction, transmission, publication, distribution or third-party use of information whose intellectual property belongs to The Gift. Footer states All Rights Reserved. Brand artwork may have separate rightsholders.",
+        "terms_url": "https://thegiftmall.shop/tos.asp"
+      },
+      "notes": [
+        "Existing retailer promotional artwork showing a 10,000 KRW certificate. Listing marked awaiting stock; image may differ from actual issued form."
+      ],
+      "format": "PNG",
+      "width": 600,
+      "height": 240,
+      "mime_type": "image/png",
+      "byte_count": 54171,
+      "sha256": "db86b7440c2afbaec0b124d8888c3c11e62df2f2d8538b503d244b3963db7bac",
+      "download_transformations": "none; original HTTP response body bytes preserved",
+      "visual_review": "No visible barcode, QR code, PIN, coupon serial or redeemable code. Public catalog artwork, not a customer-issued coupon.",
+      "local_path": "design_previews/ego-release-20261014/app/assets/rewards/lotte-10000.png",
+      "mirror_path": "mobile_worktrees/ego-release-20261014/mobile/overlays/ios-ego/app/assets/rewards/lotte-10000.png"
+    },
+    {
+      "id": "starbucks-10000",
+      "filename": "starbucks-10000.jpg",
+      "requested_value_krw": 10000,
+      "source_listing_title": "우리카드 꾹 [꾹 전용] 스타벅스 E-Gift Card 1만원",
+      "source_page_url": "https://mall.ncnc.app/items/27384",
+      "discovery_page_url": "https://mall.ncnc.app/search/E-Gift?from=web",
+      "image_url": "https://d2na9jaypdrp94.cloudfront.net/sXyHT5N7pH.png",
+      "source_type": "coupon reseller catalog / product Open Graph image",
+      "usage_restrictions": {
+        "status": "reuse permission not established",
+        "known_restrictions": "No image-specific reuse license was found in the inspected product/search pages. This download grants no copyright or trademark permission; brand and retailer rights remain with their respective owners.",
+        "terms_url": null
+      },
+      "notes": [
+        "Source listing is restricted to the Woori Card Kkuk channel and was marked sold out in search. Artwork itself shows a generic Starbucks 10,000 KRW e-card exchange voucher.",
+        "Origin URL ends in .png but downloaded bytes are JPEG; saved as .jpg without conversion."
+      ],
+      "format": "JPEG",
+      "width": 500,
+      "height": 500,
+      "mime_type": "image/jpeg",
+      "byte_count": 84608,
+      "sha256": "42ae5daa64a66d15090bae0aed095250f5422794cbef2471a842283888bb5f74",
+      "download_transformations": "none; original HTTP response body bytes preserved",
+      "visual_review": "No visible barcode, QR code, PIN, coupon serial or redeemable code. Public catalog artwork, not a customer-issued coupon.",
+      "local_path": "design_previews/ego-release-20261014/app/assets/rewards/starbucks-10000.jpg",
+      "mirror_path": "mobile_worktrees/ego-release-20261014/mobile/overlays/ios-ego/app/assets/rewards/starbucks-10000.jpg"
+    },
+    {
+      "id": "mega-2000",
+      "filename": "mega-2000.png",
+      "requested_value_krw": 2000,
+      "source_listing_title": "메가MGC커피 2천원권 [잔액관리형]",
+      "source_page_url": "https://mall.ncnc.app/items/26906",
+      "image_url": "https://d2na9jaypdrp94.cloudfront.net/65tshcyDvF.png",
+      "source_type": "coupon reseller catalog / product Open Graph image",
+      "usage_restrictions": {
+        "status": "reuse permission not established",
+        "known_restrictions": "No image-specific reuse license was found in the inspected product/search pages. This download grants no copyright or trademark permission; brand and retailer rights remain with their respective owners.",
+        "terms_url": null
+      },
+      "notes": [
+        "Exact 2,000 KRW monetary voucher artwork, not an Americano substituted for a monetary coupon."
+      ],
+      "format": "PNG",
+      "width": 600,
+      "height": 600,
+      "mime_type": "image/png",
+      "byte_count": 70988,
+      "sha256": "f33ef6aabccf92488805a543cef9ef8df5a5906138d7052d180d9240c95a1f78",
+      "download_transformations": "none; original HTTP response body bytes preserved",
+      "visual_review": "No visible barcode, QR code, PIN, coupon serial or redeemable code. Public catalog artwork, not a customer-issued coupon.",
+      "local_path": "design_previews/ego-release-20261014/app/assets/rewards/mega-2000.png",
+      "mirror_path": "mobile_worktrees/ego-release-20261014/mobile/overlays/ios-ego/app/assets/rewards/mega-2000.png"
+    },
+    {
+      "id": "starbucks-americano",
+      "filename": "starbucks-americano.jpg",
+      "requested_value_krw": 4900,
+      "source_listing_original_price_krw": 4700,
+      "source_listing_title": "스타벅스 카페아메리카노 T",
+      "source_page_url": "https://mall.ncnc.app/items/137",
+      "discovery_page_url": "https://mall.ncnc.app/search/스타벅스?from=web",
+      "image_url": "https://d2na9jaypdrp94.cloudfront.net/VLrUptfFjQ.png",
+      "source_type": "coupon reseller catalog / product image",
+      "usage_restrictions": {
+        "status": "reuse permission not established",
+        "known_restrictions": "No image-specific reuse license was found in the inspected product/search pages. This download grants no copyright or trademark permission; brand and retailer rights remain with their respective owners.",
+        "terms_url": null
+      },
+      "notes": [
+        "PRICE MISMATCH: source catalog lists original price 4,700 KRW, not requested 4,900 KRW. Image depicts iced Americano and has no printed price. A 4,900 KRW Americano listing was not verified; no claim is made that this is that exact denomination.",
+        "Origin URL ends in .png but downloaded bytes are JPEG; saved as .jpg without conversion."
+      ],
+      "format": "JPEG",
+      "width": 500,
+      "height": 500,
+      "mime_type": "image/jpeg",
+      "byte_count": 47024,
+      "sha256": "a201147cc968502f8448cda4be80ea8f93e979eeae042d283e9cc43ee29de7d6",
+      "download_transformations": "none; original HTTP response body bytes preserved",
+      "visual_review": "No visible barcode, QR code, PIN, coupon serial or redeemable code. Public catalog artwork, not a customer-issued coupon.",
+      "local_path": "design_previews/ego-release-20261014/app/assets/rewards/starbucks-americano.jpg",
+      "mirror_path": "mobile_worktrees/ego-release-20261014/mobile/overlays/ios-ego/app/assets/rewards/starbucks-americano.jpg"
+    }
+  ],
+  "validation": "All five images passed Pillow verify and full pixel decode; all were visually inspected; mirrored files match SHA-256 and exact bytes. No cropping, conversion, resizing, generation or retouching.",
+  "ui_mapping_note": "Use .png for shinsegae-10000, lotte-10000 and mega-2000; .jpg for starbucks-10000 and starbucks-americano.",
+  "limitations": [
+    "Retailer provenance is verified by public listing image references; brand authorization and commercial reuse rights are not established.",
+    "Starbucks Americano requested 4,900 KRW face value was not verified; source catalog says 4,700 KRW."
+  ]
+}

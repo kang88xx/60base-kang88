@@ -1,6 +1,6 @@
 import { assertVideoDuration, VIDEO_DURATION_HELP } from '../shared/video-policy.js';
 import { isNativeApp, shareNativeBlob } from '../app/native.js';
-import { getMission, formatDuration, formatBytes, statusLabel, reviewStatusLabel } from '../shared/data.js';
+import { missions, formatDuration, formatBytes, statusLabel, reviewStatusLabel } from '../shared/data.js';
 import { getClip, saveClip, updateClip, deleteClip } from '../shared/store.js';
 import { getServiceState } from '../shared/service-store.js';
 import { icon } from '../shared/ui.js';
@@ -108,19 +108,21 @@ function localNotice(text = '이 기기에만 보관되며 자동 제출되지 �
   return `<div class="local-notice">${icon('folder', 16)}<span>${esc(text)}</span></div>`;
 }
 
-export function openLocalImport({ missionId } = {}) {
+export function openLocalImport({ activity, missionId } = {}) {
   if(getStudioAccess()!=='allowed'){location.hash='library';return;}
   activeImport?.close();
-  const initialTitle = missionId ? getMission(missionId).title : FALLBACK_TITLE;
+  const selectedActivity = activity?.id ? { id: activity.id, title: activity.title, category: activity.category } : missions.find(item => item.id === missionId);
+  const initialTitle = selectedActivity?.title || FALLBACK_TITLE;
   const inApp = !!document.querySelector('#app-shell');
   const element = dialog('영상 가져오기', `
     ${inApp?'<p class="ego-form-intro">기기에 있는 영상을 골라주세요.<br>재생을 확인한 뒤 내 기록에 보관할 수 있어요.</p>':''}
     <form id="local-import-form" class="online-form local-record-form">
       <label class="${inApp?'ego-file-drop':''}">${inApp?'<span class="ego-file-icon" aria-hidden="true">'+icon('upload',28)+'</span><strong>보관할 영상을 선택하세요</strong><span class="ego-file-choose">파일 선택</span>':'영상 파일'}
-        <input name="file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" required aria-label="보관할 영상 파일 선택">
+        <input name="file" type="file" accept="video/*,.mp4,.webm,.mov,.m4v" required aria-describedby="local-import-file-status" aria-label="보관할 영상 파일 선택">
         <small>${VIDEO_DURATION_HELP}</small><small>최대 250 MB · MP4·WebM 권장. MOV·M4V는 브라우저에서 재생 가능한 경우에만 보관할 수 있습니다.</small>
       </label>
       ${inApp?'<div class="ego-file-card" data-file-card hidden><span class="ego-file-thumbnail" aria-hidden="true">'+icon('video',24)+'</span><div><strong data-file-name></strong><small data-file-size></small></div><button type="button" data-file-remove aria-label="선택한 영상 제외">×</button></div>':''}
+      <p id="local-import-file-status" data-file-status role="status" aria-live="polite"></p>
       <div id="local-import-preview" class="local-record-preview" hidden>
         <video controls playsinline preload="metadata"></video>
         <p class="online-help" data-meta></p>
@@ -137,7 +139,7 @@ export function openLocalImport({ missionId } = {}) {
       <label><span>메모 <span class="optional">선택</span></span>
         <textarea name="notes" rows="3" maxlength="1000" placeholder="촬영 조건이나 확인할 점을 적어두세요."></textarea>
       </label>
-      <p class="capture-status" role="status" aria-live="polite"></p>
+      <p class="capture-status" data-save-status role="status" aria-live="polite"></p>
       ${localNotice()}
       <div class="save-actions">
         <button class="button" type="button" data-cancel>취소</button>
@@ -151,7 +153,15 @@ export function openLocalImport({ missionId } = {}) {
   const form = element.querySelector('#local-import-form');
   const fileInput = form.elements.file;
   const submit = form.querySelector('button[type="submit"]');
-  const statusNode = form.querySelector('[role="status"]');
+  const statusNode = form.querySelector('[data-save-status]');
+  const fileStatus = form.querySelector('[data-file-status]');
+  const setFileStatus = (message = '', error = false) => {
+    status(fileStatus, message, error);
+    if (error) fileInput.setAttribute('aria-invalid', 'true');
+    else fileInput.removeAttribute('aria-invalid');
+    const drop = fileInput.closest?.('label');
+    if (drop) drop.dataset.error = String(error);
+  };
   const preview = form.querySelector('#local-import-preview');
   const video = preview.querySelector('video');
   const meta = preview.querySelector('[data-meta]');
@@ -173,7 +183,7 @@ export function openLocalImport({ missionId } = {}) {
   }, { once: true });
   form.querySelector('[data-cancel]').onclick = () => element.close();
   form.elements.title.addEventListener('input', () => { titleTouched = true; });
-  form.querySelector('[data-file-remove]')?.addEventListener('click',()=>{fileInput.value='';fileInput.dispatchEvent(new Event('change'));fileInput.focus();});
+  form.querySelector('[data-file-remove]')?.addEventListener('click',()=>{fileInput.value='';fileInput.dispatchEvent(new Event('change'));fileInput.focus({preventScroll:true});});
 
   fileInput.addEventListener('change', async () => {
     const file = fileInput.files?.[0];
@@ -186,6 +196,8 @@ export function openLocalImport({ missionId } = {}) {
     video.removeAttribute('src');
     video.load();
     clearObjectURL();
+    setFileStatus();
+    status(statusNode, '');
     const card=form.querySelector('[data-file-card]');
     if(card){card.hidden=!file;if(file){card.querySelector('[data-file-name]').textContent=file.name;card.querySelector('[data-file-size]').textContent=formatBytes(file.size);}}
     if (!file) {
@@ -194,7 +206,7 @@ export function openLocalImport({ missionId } = {}) {
     }
     try {
       assertVideoFile(file);
-      status(statusNode, '영상 정보를 확인하고 있어요...');
+      setFileStatus('영상 정보를 확인하고 있어요...');
       const details = await inspectVideo(file);
       assertVideoDuration(details.duration);
       if (!element.open || token !== readingToken) return;
@@ -207,16 +219,16 @@ export function openLocalImport({ missionId } = {}) {
       meta.textContent = `${formatDuration(details.duration)} · ${details.width} × ${details.height} · ${formatBytes(file.size)}`;
       if (!titleTouched) form.elements.title.value = titleFromFile(file);
       submit.disabled = false;
-      status(statusNode, '재생을 확인한 뒤 보관할 수 있습니다.');
+      setFileStatus('재생을 확인한 뒤 보관할 수 있습니다.');
     } catch (error) {
-      if (element.open && token === readingToken) status(statusNode, messageFromError(error), true);
+      if (element.open && token === readingToken) setFileStatus(messageFromError(error), true);
     }
   });
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (!selectedFile || !metadata) {
-      status(statusNode, '먼저 재생 가능한 영상 파일을 선택해주세요.', true);
+      setFileStatus('먼저 재생 가능한 영상 파일을 선택해주세요.', true);
       fileInput.focus();
       return;
     }
@@ -229,11 +241,11 @@ export function openLocalImport({ missionId } = {}) {
     form.querySelectorAll('button,input,select,textarea').forEach(control => { control.disabled = true; });
     status(statusNode, '영상을 이 기기에 저장하고 있어요...');
     try {
-      const baseMission = getMission(missionId);
       const saved = await saveClip({
         title,
-        missionId: baseMission.id,
-        category: missionId ? baseMission.category : '미분류',
+        activityId: selectedActivity?.id || '',
+        missionId: selectedActivity?.id || '',
+        category: selectedActivity?.category || '미분류',
         duration: metadata.duration,
         size: selectedFile.size,
         mimeType: selectedMimeType,
@@ -271,7 +283,8 @@ export function openLocalImport({ missionId } = {}) {
   });
 
   element.dataset.studioPrivate='';
-  fileInput.focus();
+  if (inApp) element.querySelector('[data-close]')?.focus({ preventScroll: true });
+  else fileInput.focus();
   return element;
 }
 

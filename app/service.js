@@ -1,7 +1,7 @@
 import { getClips, subscribe as subscribeClips } from '../shared/store.js';
 import { getStudioAccess, studioAccountKey, subscribeStudioAccess } from '../studio/access.js';
 import { openStudioCamera, closeStudioCamera } from '../studio/camera.js';
-import { openLocalImport, openLocalClip } from '../studio/local-records.js';
+import { openLocalClip } from '../studio/local-records.js';
 import { getCloudAccount, subscribeCloudAccount } from '../studio/cloud-account.js';
 import { cloudDisplayName, showCloudAccount } from '../studio/cloud-account-ui.js';
 import {
@@ -104,6 +104,7 @@ function clearPrivateDialogs({ preserveCamera = false } = {}) {
   closeStudioCamera({ preserve: preserveCamera });
   if (typeof document === 'undefined') return;
   document.querySelectorAll('dialog[data-studio-private], dialog.online-dialog:not(#cloud-account-dialog)').forEach(dialog => {
+    if (dialog.hasAttribute('data-account-deletion-receipt')) return;
     try { dialog.close(); } catch {}
   });
 }
@@ -377,13 +378,13 @@ export function record(activity = {}) {
     activity,
     isCurrent: () => getStudioAccess() === 'allowed' && studioAccountKey() === accountKey && sessionEpoch === epoch,
     onSaved: () => { void refreshApp(); },
-    onSubmit: session.online && session.user ? clip => submitClip(clip.id) : undefined,
+    onSubmit: (clip, options) => submitClip(undefined, { ...options, clip }),
   });
 }
 
 export function importVideo(activity = {}) {
   if (!assertMember()) return;
-  openLocalImport({ missionId: activity.id || activity.missionId });
+  return submitClip(undefined, { activity });
 }
 
 export function openClip(id) {
@@ -391,14 +392,15 @@ export function openClip(id) {
   return openLocalClip(id);
 }
 
-export async function submitClip(id) {
+export async function submitClip(id, options = {}) {
   if (!assertMember()) return;
   if (!session.online || !session.user) {
     await login('#reviews');
     return;
   }
-  await submitLocalRecording(id);
-  await refreshApp();
+  const accepted = await submitLocalRecording(id, { ...options, onSubmitted: () => { void refreshApp(); } });
+  if (accepted) void refreshApp();
+  return accepted;
 }
 
 export function viewSubmission(id) {

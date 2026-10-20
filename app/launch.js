@@ -3,7 +3,20 @@
 const launch = document.querySelector('#app-launch');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const previousInert = new Map();
+const eyes = launch?.querySelector('.app-launch-eyes');
 let dismissed = true, fallback, dialogs;
+
+// One menu-strength impact per actual blink cycle; no wall-clock haptic timers.
+function blinkHaptic(event) {
+  if (event.target !== eyes || event.animationName !== 'ego-intro-blink' ||
+      dismissed || launch.hidden || document.hidden || reduced.matches ||
+      !launch.classList.contains('is-playing')) return;
+  const capacitor = window.Capacitor;
+  try {
+    if (!capacitor?.isNativePlatform?.() || !capacitor.isPluginAvailable?.('EgoTabHaptics')) return;
+    Promise.resolve(capacitor.registerPlugin('EgoTabHaptics').impact()).catch(() => {});
+  } catch { /* Optional native feedback must never interrupt startup. */ }
+}
 
 function fitFlood() {
   if (dismissed) return;
@@ -17,6 +30,8 @@ function dismissLaunch() {
   if (dismissed) return;
   dismissed = true;
   clearTimeout(fallback);
+  eyes?.removeEventListener('animationstart', blinkHaptic);
+  eyes?.removeEventListener('animationiteration', blinkHaptic);
   dialogs?.disconnect();
   const restoreFocus = launch.contains(document.activeElement);
   launch.hidden = true;
@@ -46,6 +61,8 @@ if (launch) {
       if (node === launch) continue;
       previousInert.set(node, node.inert); node.inert = true;
     }
+    eyes?.addEventListener('animationstart', blinkHaptic);
+    eyes?.addEventListener('animationiteration', blinkHaptic);
     launch.hidden = false;
     fitFlood();
     launch.querySelector('.app-launch-continue').addEventListener('click', dismissLaunch, { once: true });

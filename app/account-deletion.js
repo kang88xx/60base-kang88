@@ -6,10 +6,11 @@ const receiptKey = 'husuabi.deletion-receipt.v1';
 const deadlineText = '삭제 요청 후 7일 이내에 처리합니다.';
 let memoryReceipt = null;
 let memoryOnly = false;
+const discardedTokens = new Set();
 function savedReceipt() {
   if (!memoryOnly) { try { memoryReceipt = JSON.parse(localStorage.getItem(receiptKey)); } catch {} }
   const value = memoryReceipt;
-  return value && typeof value.owner === 'string' && typeof value.id === 'string' && /^[-_A-Za-z0-9]{43}$/.test(value.token) ? value : null;
+  return value && !discardedTokens.has(value.token) && typeof value.owner === 'string' && typeof value.id === 'string' && /^[-_A-Za-z0-9]{43}$/.test(value.token) ? value : null;
 }
 function rememberReceipt(owner, value) {
   const saved = { owner, id: value.id, token: value.receiptToken };
@@ -21,9 +22,10 @@ function rememberReceipt(owner, value) {
 }
 function forgetReceipt(value) {
   if (savedReceipt()?.token !== value.token) return;
+  discardedTokens.add(value.token);
   memoryReceipt = null;
   memoryOnly = false;
-  try { localStorage.removeItem(receiptKey); } catch {}
+  try { localStorage.removeItem(receiptKey); } catch { memoryOnly = true; }
   window.dispatchEvent(new Event('deletion-receipt'));
 }
 window.addEventListener('storage', event => {
@@ -43,6 +45,7 @@ async function showReceipt(saved, initial) {
   if (session.user && session.user.id !== saved.owner) return;
   // Only the minimal possession-authorized receipt survives logout. Other dialogs stay account-bound.
   const element = dialog('계정 삭제 처리 결과', '<p role="status">처리 결과를 확인하고 있습니다.</p>', { accountBound: false });
+  element.setAttribute('data-account-deletion-receipt', '');
   const content = element.querySelector('.online-dialog-body');
   const active = () => element.isConnected && element.open && savedReceipt()?.token === saved.token && (!session.user || session.user.id === saved.owner);
   let loading = false;
@@ -79,6 +82,23 @@ async function showReceipt(saved, initial) {
   element.addEventListener('close', () => { clearInterval(timer); window.removeEventListener('service-session', onSession); window.removeEventListener('deletion-receipt', onReceipt); });
   if (initial) render(initial);
   await load();
+}
+
+export function hasDeletionReceipt() {
+  const saved = savedReceipt();
+  if (saved && session.user && session.user.id !== saved.owner) {
+    forgetReceipt(saved);
+    return false;
+  }
+  return Boolean(saved);
+}
+
+// This entry can only query an existing receipt; it never requests deletion or starts login.
+export async function openDeletionReceipt() {
+  await sessionReady;
+  if (!hasDeletionReceipt()) return false;
+  await showReceipt(savedReceipt());
+  return true;
 }
 
 export async function openAccountDeletion() {
