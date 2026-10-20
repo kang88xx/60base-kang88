@@ -1,0 +1,13 @@
+{
+  "fileKey": "mqLzAb8888THEKjqH3eA7G",
+  "boardNodeId": "137:2484",
+  "figmaUrl": "https://www.figma.com/design/mqLzAb8888THEKjqH3eA7G/EGO?node-id=137-2484",
+  "frameCount": 64,
+  "retrieval": "Read-only Figma plugin API getNodeByIdAsync and bounded descendant traversal in eight batches. No Figma mutation.",
+  "sourceModifiedAt": "2026-10-20T02:50:50.980000+00:00",
+  "originalStructureSha256": "b46e00327b0026cb534ac32d1b67f32cf9e347d51bac073e35dcf196ce73306d",
+  "compactFixtureSha256": "02bf55e2dd2a01d4e9843a9bb3830c398b9546a6e561e877e7b1cba4ffad70f2",
+  "transformation": "Lossless JSON whitespace compaction only. Actual node ids, geometry, text, font attributes and image hashes retained.",
+  "coordinateConvention": "All node x/y relative to source screen. Portrait source390x844 includes40px native system bar; browser measured390x804 subtracts40px from Y. Landscape844x390 retains source coordinates.",
+  "limitations": "Structural fixture is not a substitute for original image references, complete design contexts or physical iPhone proof."
+}

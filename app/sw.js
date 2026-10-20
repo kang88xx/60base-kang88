@@ -1,5 +1,17 @@
-const CACHE='60base-app-20261020-alan-redesign-v25';
+const CACHE='60base-app-20261020-restored-figma-v26';
 const SHELL=[
+  "/app/icons/figma-filming-frame-137.png",
+  "/app/icons/figma-home-halo-137.svg",
+  "/app/assets/figma-forms/back.svg",
+  "/app/assets/figma-forms/close.svg",
+  "/app/assets/figma-forms/chevron.svg",
+  "/app/assets/figma-forms/mascot.png",
+  "/app/assets/figma-forms/shinsegae.png",
+  "/app/assets/figma-forms/lotte.png",
+  "/app/assets/figma-forms/starbucks.png",
+  "/app/assets/figma-forms/mega.png",
+  "/app/assets/figma-forms/americano.png",
+
   "/app/",
   "/app/index.html",
   "/app/app.js",

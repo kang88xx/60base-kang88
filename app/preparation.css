@@ -70,3 +70,61 @@
 .prep-examples.prep-examples--single{grid-template-columns:minmax(0,1fr)}
 .prep-examples--single .prep-example-card img{height:auto;aspect-ratio:16/9}
 .prep-faq summary{gap:12px;list-style:none}
+
+/* Figma 137:3337 / 3384 / 3432: distinct education, quiz and checklist views. */
+.app-education[data-education-step="1"]>.prep-quiz,.app-education[data-education-step="1"]>.prep-preflight,.app-education[data-education-step="1"]>.prep-education-back,
+.app-education[data-education-step="2"]>:not(.prep-quiz):not(.prep-education-back):not(.app-alert),
+.app-education[data-education-step="3"]>:not(.prep-preflight):not(.prep-education-back):not(.app-alert){display:none!important}
+#app-shell .app-education .prep-panel{border:0;border-radius:0;padding:0;box-shadow:none}
+#app-shell .app-education .prep-panel-head .row-icon{display:none}
+#app-shell .app-education .prep-panel h2{font-size:28px;line-height:36px;letter-spacing:-.6px;font-weight:600}
+#app-shell .app-education .prep-question button{display:flex;width:100%;text-align:left;justify-content:flex-start;margin:0 0 8px;border-radius:12px;min-height:44px}
+#app-shell .app-education .prep-preflight input{width:22px;height:22px;min-width:22px;accent-color:#5b59f2}
+#app-shell .app-education .prep-preflight label{border:0;font-size:15px;line-height:23px;gap:12px}
+#app-shell .app-education .prep-education-next{min-height:52px;border-radius:18px}
+
+.prep-lesson-example button{display:grid;gap:8px;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;font:inherit}
+.prep-lesson-example img{display:block;width:100%;aspect-ratio:350/152;object-fit:cover;border-radius:18px}
+.prep-lesson-example strong{font-size:15px;line-height:23px;font-weight:600}
+/* Restored nodes 19–21. Runtime activity selection remains a compact disclosure. */
+#app-shell[data-screen=education] .app-bottom-nav {display:none!important}
+#app-shell .app-education {display:flex;flex-direction:column;gap:20px;padding-bottom:100px}
+#app-shell .app-education .screen-heading {margin:0}
+#app-shell .app-education .screen-heading h1 {font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px;margin:0}
+#app-shell .app-education>.prep-status {display:none}
+#app-shell .app-education>.prep-faq {display:none}
+#app-shell .app-education .prep-lesson-hero {display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;font:inherit;color:#666779}
+#app-shell .app-education .prep-lesson-hero img {display:block;width:100%;height:170px;object-fit:cover;border-radius:20px}
+#app-shell .app-education .prep-lesson-hero>span {display:block;font-size:12px;line-height:18px;font-weight:500;margin-top:8px}
+#app-shell .app-education .prep-lesson-list {display:grid;gap:0;margin-top:14px}
+#app-shell .app-education .prep-lesson-row {display:flex;align-items:center;gap:14px;width:100%;min-height:69px;padding:10px 14px;border:0;background:#fff;text-align:left;color:#29282d;font:inherit}
+#app-shell .app-education .prep-lesson-play {display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:12px;background:#eef0ff;color:#5b59f2}
+#app-shell .app-education .prep-lesson-row>span:last-child {min-width:0}
+#app-shell .app-education .prep-lesson-row strong {display:block;font-size:15px;line-height:23px;font-weight:600;margin-bottom:4px}
+#app-shell .app-education .prep-lesson-row small {display:block;font-size:12px;line-height:18px;font-weight:500;color:#666779}
+#app-shell .app-education .prep-lesson-note {font-size:13px;line-height:20px;font-weight:500;color:#666779;margin:20px 0 0}
+#app-shell .app-education .prep-activity-picker {border-radius:12px;background:#fff;border:1px solid #e9e9f1}
+#app-shell .app-education .prep-activity-picker>summary {min-height:44px;padding:8px 14px;font-size:13px;line-height:20px;color:#666779}
+#app-shell .app-education .prep-activity-picker>.prep-panel {padding:16px}
+#app-shell .app-education .prep-activity-picker h2 {font-size:17px;line-height:25px}
+#app-shell .app-education :is(.prep-quiz,.prep-preflight) {margin:0;background:transparent}
+#app-shell .app-education :is(.prep-quiz,.prep-preflight) .prep-panel-head {margin:0 0 20px}
+#app-shell .app-education :is(.prep-quiz,.prep-preflight) .prep-panel-head p {font-size:15px;line-height:23px;font-weight:400;color:#666779;margin:8px 0 0}
+#app-shell .app-education .prep-question {display:flow-root;min-width:0;border:1px solid #e9e9f1;border-radius:24px;padding:20px;margin:0 0 20px}
+#app-shell .app-education .prep-question legend {float:left;width:100%;font-size:17px;line-height:25px;font-weight:600;padding:0;margin:0 0 12px;color:#29282d}
+#app-shell .app-education .prep-question button {clear:both;min-height:48px;padding:12px 16px;border:1px solid #e9e9f1;background:#fff;border-radius:16px;font-size:15px;line-height:23px;font-weight:400;color:#29282d;margin:0 0 8px}
+#app-shell .app-education .prep-question button.is-correct {background:#eef0ff;border-color:#eef0ff;color:#5b59f2}
+#app-shell .app-education .prep-question button.is-wrong {background:#fff4e6;border-color:#fff4e6;color:#964a31}
+#app-shell .app-education .prep-feedback {min-height:44px!important;margin:16px 0 0!important;padding:12px 14px;border-radius:12px;background:#e7f5ef;font-size:12px;line-height:18px;font-weight:500;color:#34785e!important}
+#app-shell .app-education .prep-feedback:empty {background:transparent}
+#app-shell .app-education .prep-complete-row .prep-state {font-size:12px;background:#eef0ff;color:#666779}
+#app-shell .app-education .prep-preflight label {padding:8px 0;min-height:39px;align-items:flex-start;font-size:15px;line-height:23px;color:#666779}
+#app-shell .app-education .prep-preflight input {width:22px;height:22px;min-width:22px;margin:0;accent-color:#5b59f2}
+#app-shell .app-education .prep-preflight .muted-caption {font-size:13px;line-height:20px;font-weight:500;margin:12px 0 0;color:#666779}
+#app-shell .app-education .prep-actions {display:flex;flex-wrap:wrap;margin-top:20px}
+#app-shell .app-education .prep-actions>.secondary {font-size:12px;min-height:44px;padding:8px 12px;background:#eef0ff;color:#5b59f2}
+#app-shell .app-education :is(.prep-education-next,.prep-complete-row>button,.prep-actions>.primary) {position:fixed;left:50%;transform:translateX(-50%);bottom:calc(26px + env(safe-area-inset-bottom));width:min(calc(100% - 40px),420px);min-height:52px;padding:14px 16px;border-radius:18px;background:#5b59f2;color:#fff;font-size:15px;line-height:23px;font-weight:600;z-index:12}
+#app-shell .app-education .prep-education-back {align-self:flex-start;font-size:13px;min-height:44px;padding:8px 16px}
+/* Override the older reference theme's 3px/12px heading margins and 16px gap. */
+#app-shell[data-screen=education] .app-education[data-education-step="1"] {gap:20px}
+#app-shell[data-screen=education] .app-education[data-education-step="1"]>.screen-heading {margin:0}

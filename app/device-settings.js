@@ -78,28 +78,23 @@ export function getDevicePhoto() {
 export function renderDeviceSettings({ profile, photo, icon = () => '', message = '' } = {}) {
   const safeProfile = profile || { name: '참여자', goal: 3 };
   return `<form class="online-form app-device-settings" id="app-device-settings-form">
-    <div class="app-device-profile">
-      <div class="app-device-photo-preview" aria-label="이 기기 프로필 사진 미리보기">${previewMarkup(photo, safeProfile.name)}</div>
-      <div>
-        <h3>기기 촬영 설정</h3>
-        <p>이름, 촬영 목표, 사진은 이 기기에만 저장됩니다. 에고에서 사용하는 로그인 계정 정보는 <strong>내 정보 수정</strong>에서 관리해주세요.</p>
-      </div>
-    </div>
+    <h3 class="ego-form-title">이 기기에서의 나</h3>
     <label>표시 이름
       <input id="app-device-name" name="name" required maxlength="24" autocomplete="name" value="${esc(safeProfile.name)}">
     </label>
     <label>기록 목표
       <select id="app-device-goal" name="goal">${goalOptions(safeProfile.goal)}</select>
     </label>
-    <div class="app-device-photo-panel">
-      <label class="app-device-photo-file">프로필 사진 선택
-        <input id="app-device-photo-file" type="file" accept="image/jpeg,image/png,image/webp">
-      </label>
-      <p>JPG, PNG, WebP 파일을 5MB 이하로 선택하세요. 사진 중앙을 정사각형으로 잘라 원형으로 표시합니다.</p>
+    <div class="app-device-photo-panel ego-form-card">
+      <h4>프로필 사진</h4>
+      <p>JPG, PNG, WebP · 5MB 이하<br>사진 중앙을 정사각형으로 잘라 원형으로 표시합니다.</p>
+      <div class="app-device-photo-preview" aria-label="이 기기 프로필 사진 미리보기">${previewMarkup(photo, safeProfile.name)}</div>
+      <label class="app-device-photo-file">프로필 사진 선택<input id="app-device-photo-file" type="file" accept="image/jpeg,image/png,image/webp"></label>
+      <button class="button" type="button" data-device-remove>기본 이미지로 변경</button>
     </div>
+    <p class="ego-form-notice is-lavender">이름, 촬영 목표, 사진은 이 기기에만 저장됩니다. 로그인 계정 정보는 내 정보 수정에서 관리해주세요.</p>
     <p class="online-status" id="app-device-status" role="status" aria-live="polite">${esc(message || (photoReadError ? '저장된 사진을 읽지 못했어요. 새 사진을 선택해 다시 저장할 수 있어요.' : ''))}</p>
     <div class="app-device-actions">
-      <button class="button" type="button" data-device-remove>${icon('trash') || ''}기본 이미지로 변경</button>
       <button class="button" type="button" data-device-cancel>취소</button>
       <button class="button primary" type="submit" data-device-save>${icon('check') || ''}저장</button>
     </div>

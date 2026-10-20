@@ -23,6 +23,7 @@ const WEBM_MIME_CANDIDATES = [
 ];
 
 let activeCamera = null;
+let cameraGrantedThisSession = false;
 
 const hasMediaDevices = () => Boolean(navigator.mediaDevices?.getUserMedia);
 const hasRecorder = () => typeof MediaRecorder === 'function';
@@ -96,6 +97,13 @@ function buildDialog(activity, canRecord, submission = false) {
   dialog.innerHTML = `
     <div class="studio-camera-shell" data-camera-stage>
       <video class="studio-camera-live" autoplay muted playsinline></video>
+      <section class="studio-camera-permission" data-camera-permission hidden aria-label="카메라 연결">
+        <div class="studio-permission-card"><h2>촬영할 준비를 해요</h2><p>촬영을 위해 카메라 접근을 허용해주세요.</p><span class="studio-permission-mascot"><img src="/app/icons/mascot-purple-3d-20261019.png" alt=""></span></div>
+        <div class="studio-permission-note"><h3>카메라 권한</h3><p>권한 요청이 나타나면 허용을 선택해주세요. 거부했다면 브라우저 또는 기기 설정에서 카메라 접근을 확인해주세요.</p></div>
+        <p>카메라를 사용할 수 없다면 촬영한 파일을 가져올 수 있어요.</p>
+        <label class="button studio-permission-import">영상 가져오기<input type="file" accept="video/mp4,video/webm,video/quicktime,.mov,.mp4,.webm" data-permission-import></label>
+        <button type="button" class="button primary" data-camera-enable>카메라 열기</button>
+      </section>
       <div class="studio-camera-review-stage" data-camera-review hidden>
         <video class="studio-camera-review" controls playsinline></video>
       </div>
@@ -104,7 +112,7 @@ function buildDialog(activity, canRecord, submission = false) {
           ${GUIDE_LINES.map(line => `<span>${esc(line)}</span>`).join('')}
         </div>
       </div>
-      <section class="studio-processing-heading" data-processing-heading hidden><h2>촬영한 영상을<br>준비하고 있어요.</h2><span data-processing-mascot></span></section>
+      <section class="studio-processing-heading" data-processing-heading hidden><h2>촬영한 영상을<br>준비하고 있어요</h2><span data-processing-mascot></span><canvas data-processing-preview aria-label="촬영 마지막 장면" hidden></canvas><p>영상 준비가 끝나면 촬영분을 확인할 수 있어요.</p><button type="button" class="button" disabled>영상 준비 중</button></section>
       <div class="studio-camera-top">
         <button class="studio-camera-tool" type="button" data-close aria-label="카메라 닫기" title="닫기">${icon('close', 20)}</button>
         <div class="studio-camera-heading">
@@ -133,15 +141,15 @@ function buildDialog(activity, canRecord, submission = false) {
       </div>
       <section class="studio-camera-review-sheet" data-review-sheet hidden aria-label="촬영 영상 확인">
         <div>
-          <h2>${esc(title)}</h2>
-          <p data-meta>촬영 정보를 확인하고 있어요.</p>
+          <small>${esc(title)}</small><h2>내 기록을 확인해요</h2>
+          <p data-meta>촬영 정보를 확인하고 있어요.</p><dl class="studio-review-metrics"><div><dt>영상 길이</dt><dd data-review-duration>—</dd></div><div><dt>촬영 방향</dt><dd data-review-direction>—</dd></div></dl>
           <p>${submission ? '영상을 확인한 뒤 제출해주세요. 다음 화면에서 이용 범위와 동의를 확인합니다.' : '이 브라우저에 저장됩니다. 자동 제출되지 않으며, 심사 제출은 별도 버튼을 눌러 진행합니다.'}</p>
         </div>
         <p class="studio-camera-save-status" data-save-status role="status" aria-live="polite"></p>
         <div class="studio-camera-review-actions">
           <button class="button" type="button" data-retake>다시 촬영</button>
-          <button class="button" type="button" data-download>${icon('download', 17)} 다운로드</button>
-          <button class="button primary" type="button" data-save>${submission ? '제출 계속하기' : '이 브라우저에 저장'}</button>
+          <button class="button" type="button" data-download>${icon('download', 17)} 영상 저장 또는 공유</button>
+          <button class="button primary" type="button" data-save>${submission ? '심사 제출하기' : '이 브라우저에 저장'}</button>
           <button class="button" type="button" data-open-saved hidden>보관한 영상 보기</button>
           <button class="button primary" type="button" data-submit hidden>심사 제출하기</button>
         </div>
@@ -223,11 +231,27 @@ class StudioCamera {
     this.dialog.showModal();
     this.dialog.querySelector('[data-close]').focus();
     if (!hasMediaDevices() || !hasRecorder()) this.showUnsupported();
-    else void this.startCamera();
+    else void this.prepareCameraPermission();
+  }
+
+  async prepareCameraPermission() {
+    let knownGranted = cameraGrantedThisSession;
+    try {
+      if (navigator.permissions?.query) {
+        const permission = await navigator.permissions.query({ name: 'camera' });
+        knownGranted = permission.state === 'granted';
+      }
+    } catch { /* Safari may not expose camera permissions; only trust this session's successful stream. */ }
+    if (this.closed || !this.dialog.open || !this.isCurrent()) return;
+    if (knownGranted) void this.startCamera();
+    else { this.setState('permission'); this.dialog.querySelector('[data-camera-enable]').focus(); }
   }
 
   bind() {
     this.dialog.querySelector('[data-close]').addEventListener('click', () => this.requestClose());
+    this.dialog.querySelector('[data-camera-enable]').addEventListener('click', () => this.startCamera());
+    const permissionImport = this.dialog.querySelector('[data-permission-import]');
+    permissionImport.addEventListener('change', () => this.useFallbackFile(permissionImport.files?.[0]));
     this.guideButton.addEventListener('click', () => this.toggleGuide());
     this.recordButton.addEventListener('click', () => this.startRecording());
     this.stopButton.addEventListener('click', () => this.stopRecording('manual'));
@@ -301,6 +325,7 @@ class StudioCamera {
         stream.getTracks().forEach(track => track.stop());
         return;
       }
+      cameraGrantedThisSession = true;
       this.stream = stream;
       this.liveVideo.srcObject = stream;
       this.liveVideo.hidden = false;
@@ -315,6 +340,7 @@ class StudioCamera {
     } catch (error) {
       if (!this.isActive(token)) return;
       this.stopStream();
+      if (['NotAllowedError', 'SecurityError'].includes(error?.name)) cameraGrantedThisSession = false;
       this.showError(usefulError(error), true);
       this.setState('error');
     }
@@ -512,6 +538,12 @@ class StudioCamera {
       const settings = this.stream?.getVideoTracks()[0]?.getSettings?.() || {};
       this.streamWidth = this.liveVideo.videoWidth || settings.width || 0;
       this.streamHeight = this.liveVideo.videoHeight || settings.height || 0;
+      // A display-only last frame keeps processing grounded in this recording.
+      const preview = this.dialog.querySelector('[data-processing-preview]');
+      try {
+        preview.width = this.streamWidth; preview.height = this.streamHeight;
+        if (preview.width && preview.height) { preview.getContext('2d').drawImage(this.liveVideo, 0, 0, preview.width, preview.height); preview.hidden = false; }
+      } catch { preview.hidden = true; }
       try { this.recorder.requestData?.(); } catch {}
       try { this.recorder.stop(); } catch { void this.finalizeRecording(); }
       this.setState('finalizing');
@@ -544,10 +576,10 @@ class StudioCamera {
     }
   }
 
-  async useFallbackFile() {
+  async useFallbackFile(selectedFile) {
     if (this.closed || !this.dialog.open || !this.isCurrent()) return;
     const token = this.metadataGeneration = (this.metadataGeneration || 0) + 1;
-    const file = this.fileInput.files?.[0];
+    const file = selectedFile || this.fileInput.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('video/') || file.size > MAX_SIZE) {
       this.showError('250 MB 이하의 동영상 파일만 보관할 수 있어요.', true);
@@ -585,6 +617,8 @@ class StudioCamera {
     this.reviewStage.hidden = false;
     this.liveVideo.hidden = true;
     this.reviewSheet.hidden = false;
+    this.dialog.querySelector('[data-review-duration]').textContent = formatDuration(this.reviewMeta.duration);
+    this.dialog.querySelector('[data-review-direction]').textContent = this.reviewMeta.width > this.reviewMeta.height ? '가로' : this.reviewMeta.width < this.reviewMeta.height ? '세로' : '정사각형';
     this.dialog.querySelector('[data-meta]').textContent = `${formatDuration(this.reviewMeta.duration)} · ${this.reviewMeta.width || '-'} × ${this.reviewMeta.height || '-'} · ${formatBytes(blob.size)}`;
     if (blob.size > MAX_SIZE) this.showError('영상이 250 MB를 넘었어요. 다운로드로 보관하거나 다시 촬영해주세요.', true);
     else if (this.stopReason === 'duration') this.showError('1분 촬영을 마쳤어요. 영상을 확인한 뒤 제출해주세요.');
@@ -740,6 +774,8 @@ class StudioCamera {
     this.state = state;
     this.renderZoom();
     this.dialog.dataset.state = state;
+    this.dialog.querySelector('[data-camera-permission]').hidden = state !== 'permission';
+    this.dialog.querySelector('#studio-camera-title').textContent = state === 'permission' ? '카메라 연결' : state === 'review' ? '촬영 영상 확인' : safeTitle(this.activity);
     const processing = this.dialog.querySelector('[data-processing-heading]');
     processing.hidden = state !== 'finalizing';
     const mascot = processing.querySelector('[data-processing-mascot]');
@@ -829,7 +865,7 @@ class StudioCamera {
     this.submitButton.hidden = true;
     this.saveButton.hidden = false;
     this.saveButton.disabled = false;
-    this.saveButton.textContent = this.onSubmit ? '제출 계속하기' : '이 브라우저에 저장';
+    this.saveButton.textContent = this.onSubmit ? '심사 제출하기' : '이 브라우저에 저장';
     this.setSaveStatus('');
     this.refreshUnloadGuard();
   }

@@ -87,3 +87,216 @@ body:has(#app-shell) .online-dialog .coupon-product {border-color:#e5e5ef;border
 body:has(#app-shell) .online-dialog .coupon-product[aria-pressed=true] {border-color:#5b59f2;background:#eef0ff}
 body:has(#app-shell) .online-dialog .coupon-test-note {background:#fff4e6;color:#666779;border-radius:12px}
 body:has(#app-shell) .online-dialog .coupon-error {color:#af3154}
+
+/* Restored Figma board 137:2484: native OS chrome is provided by safe areas. */
+body:has(#app-shell) .ego-r3-form-page.online-dialog {
+  --form-line:#e9e9f1;
+  inset:0;width:min(100%,460px);max-width:100%;height:100dvh;max-height:100dvh;
+  margin:0 auto;border:0;border-radius:0;box-shadow:none;overflow:hidden;
+  padding-top:env(safe-area-inset-top);box-sizing:border-box;
+}
+body:has(#app-shell) .ego-r3-form-page.online-dialog[open] {display:flex;flex-direction:column}
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-head {
+  flex:none;position:relative;top:auto;display:grid;grid-template-columns:40px minmax(0,1fr) 40px;
+  height:58px;min-height:58px;padding:0 20px;gap:12px;background:inherit;
+}
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-head h2 {font-size:15px;line-height:23px;font-weight:600;letter-spacing:-.15px;text-align:center;margin:0}
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-head :is([data-close],.ego-form-back) {display:grid;place-items:center;width:40px;height:40px;min-width:40px;min-height:40px;padding:0;border:0;border-radius:0;background:transparent}
+body:has(#app-shell) .ego-r3-form-page .online-dialog-head img {display:block}
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-body {flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px 20px calc(26px + env(safe-area-inset-bottom));background:inherit}
+body:has(#app-shell) .ego-r3-form-page .ego-form-title {margin:0 0 12px;font-size:28px;font-weight:600;line-height:36px;letter-spacing:-.6px;color:#29282d;text-align:left}
+body:has(#app-shell) .ego-r3-form-page :is(.ego-form-description,.coupon-intro) {margin:0 0 24px;font-size:13px;line-height:20px;color:#666779;text-align:left}
+body:has(#app-shell) .ego-r3-form-page :is(.button,.app-button,.cloud-google-button) {font-size:15px;font-weight:600;line-height:23px;letter-spacing:-.15px;box-shadow:none}
+body:has(#app-shell) .ego-r3-form-page .online-form {gap:20px}
+body:has(#app-shell) .ego-r3-form-page .online-form :is(input:not([type=checkbox]):not([type=radio]),select,textarea) {border-color:#e9e9f1;font-size:15px;line-height:23px}
+body:has(#app-shell) .ego-r3-form-page .online-form textarea {min-height:132px}
+body:has(#app-shell) .ego-r3-form-page :is(.ego-form-card,.coupon-product-card) {padding:20px;border:1px solid #e9e9f1;border-radius:24px;background:#fff;margin:20px 0}
+body:has(#app-shell) .ego-r3-form-page .ego-form-card :is(h4,strong) {font-size:17px;line-height:25px;font-weight:600;letter-spacing:-.2px;margin:0 0 12px}
+body:has(#app-shell) .ego-r3-form-page .ego-form-card p {font-size:15px;line-height:23px;color:#666779;margin:0}
+body:has(#app-shell) .ego-r3-form-page :is(.ego-form-notice,.coupon-test-note) {padding:16px;border-radius:16px;background:#fff4e6;color:#666779;font-size:13px;line-height:20px;margin:20px 0}
+body:has(#app-shell) .ego-r3-form-page .is-lavender {background:#eef0ff}
+body:has(#app-shell) .ego-r3-form-page .ego-form-row {position:relative;display:flex;flex-direction:column;justify-content:center;gap:4px;min-height:72px;width:100%;padding:14px 36px 14px 14px;margin:0;border:0;border-radius:16px;background:#fff;color:#29282d;text-align:left;text-decoration:none;font-size:15px;line-height:23px;box-sizing:border-box}
+body:has(#app-shell) .ego-r3-form-page .ego-form-row::after {content:'';position:absolute;right:14px;top:calc(50% - 9px);width:18px;height:18px;background:url('/app/assets/figma-forms/chevron.svg') center no-repeat}
+body:has(#app-shell) .ego-r3-form-page .ego-form-row small {font-size:12px;line-height:18px;color:#666779;font-weight:500}
+body:has(#app-shell) .ego-r3-form-page .ego-form-hero {padding:24px;border-radius:24px;background:linear-gradient(#fee1c4,#fff4e6);margin:0 0 20px;text-align:left}
+body:has(#app-shell) .ego-r3-form-page .ego-form-hero.is-lavender {background:linear-gradient(#eae8ff,#eef0ff)}
+body:has(#app-shell) .ego-r3-form-page .ego-form-hero h3 {font-size:20px;font-weight:600;line-height:28px;letter-spacing:-.3px;text-align:left;margin:0 0 10px}
+body:has(#app-shell) .ego-r3-form-page .ego-form-hero p {font-size:15px;line-height:23px;color:#666779;margin:0 0 10px;text-align:left}
+body:has(#app-shell) .ego-r3-form-page .ego-form-mascot {display:block;width:128px;height:112px;object-fit:contain;margin:0 auto}
+body:has(#app-shell) .ego-r3-form-page .ego-form-bottom {position:sticky;bottom:0;width:100%;margin-top:28px;z-index:1}
+body:has(#app-shell) .ego-r3-form-page .online-dialog-body:has(>.online-form) {display:flex;flex-direction:column}
+body:has(#app-shell) .ego-r3-form-page .online-dialog-body>.online-form {flex:1;align-content:start}
+body:has(#app-shell) .ego-r3-form-page .online-dialog-body>.online-form>button[type=submit] {align-self:end}
+body:has(#app-shell) .ego-r3-form-page .ego-account-form {margin-top:24px}
+body:has(#app-shell) .ego-r3-form-page .online-logout {background:#eef0ff;color:#5b59f2}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page[data-cloud-phase=signedOut][data-cloud-availability=ready] {background:#fff4e6}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page[data-cloud-phase=registered] {background:#eef0ff}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .ego-auth-mark {height:100px;margin:0;display:flex;align-items:center;justify-content:center;background:transparent}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .ego-auth-mark ego-mascot-motion {width:128px;height:112px}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page [data-google-signin] {background:#5b59f2;color:#fff;border-color:#5b59f2;margin:20px 0}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page [data-google-signin] img {display:none}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page [data-apple-signin] {background:#fff!important;color:#5b59f2!important;border-color:#e9e9f1!important;margin:0 0 20px!important}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] {height:100dvh;max-height:100dvh;width:min(100%,460px);max-width:100%;border-radius:0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head {padding:0 20px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head h2 {font-size:15px;font-weight:600;line-height:23px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-head [data-close] {padding:0;background:transparent;border-radius:0;min-width:40px;min-height:40px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-dialog-body {padding:16px 20px calc(26px + env(safe-area-inset-bottom))}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-title {font-size:28px;line-height:36px;font-weight:600;margin:0 0 28px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-identity {background:#fff;padding:14px;margin-bottom:24px;min-height:72px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-check {min-height:39px;padding:8px 0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit] {font-size:15px;line-height:23px;margin-top:24px}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-products {gap:20px;margin-top:20px}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-product-card {display:flex;flex-direction:column;gap:12px;margin:0}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-product-card>strong {margin:0}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-product-card>img {width:100%;height:120px;object-fit:contain;border-radius:20px!important}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-product {min-height:52px;background:#eef0ff;border:0;border-radius:18px;color:#5b59f2;justify-content:center;text-align:center}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog .coupon-product[aria-pressed=true] {box-shadow:inset 0 0 0 1px #5b59f2}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog[data-coupon-step=phone] .online-form {margin-top:24px}
+body:has(#app-shell) .ego-r3-form-page.coupon-dialog[data-coupon-step=done] {background:#eef0ff}
+body:has(#app-shell) .ego-r3-form-page .coupon-complete {padding:0;text-align:left;display:grid;gap:0}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-panel {padding:20px;border:1px solid #e9e9f1;border-radius:24px;background:#fff;display:grid;gap:12px;margin:0}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-panel h4 {margin:0}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-preview:not(:has(img)) {display:none}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-file {position:relative;display:grid;place-items:center;min-height:52px;background:#eef0ff;border-radius:18px;color:#5b59f2;overflow:hidden}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-file input {position:absolute;inset:0;opacity:0;cursor:pointer}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-file:focus-within {outline:3px solid #5b59f2;outline-offset:3px}
+body:has(#app-shell) .ego-r3-form-page .app-device-actions [data-device-save] {flex:1}
+body:has(#app-shell) .ego-r3-form-page .app-device-actions svg {display:none}
+body:has(#app-shell) .legal-sheet {inset:0;width:min(100%,460px);height:100dvh;max-height:100dvh;margin:0 auto;border-radius:0;padding-top:env(safe-area-inset-top)}
+body:has(#app-shell) .legal-sheet::before {display:none}
+body:has(#app-shell) .legal-sheet .legal-header {height:58px;min-height:58px;padding:0 20px;border:0;box-sizing:border-box}
+body:has(#app-shell) .legal-sheet .legal-header h1 {font-size:15px;line-height:23px;font-weight:600;flex:1;text-align:center}
+body:has(#app-shell) .legal-sheet .legal-body {padding:16px 20px}
+body:has(#app-shell) .legal-sheet .legal-body [data-legal-content] {font-size:15px;line-height:23px}
+body:has(#app-shell) .legal-sheet .legal-body h1 {font-size:28px;line-height:36px;color:#29282d;letter-spacing:-.6px}
+body:has(#app-shell) .legal-sheet .legal-body h2 {font-size:17px;line-height:25px;padding:0;border:0;margin-top:28px}
+body:has(#app-shell) .legal-sheet .legal-footer {padding:12px 20px calc(26px + env(safe-area-inset-bottom));border:0}
+body:has(#app-shell) .legal-sheet .legal-footer>button {font-size:15px;background:#eef0ff;color:#5b59f2}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page [data-cloud-content] {min-height:100%;display:flex;flex-direction:column;box-sizing:border-box}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered {min-height:100%;flex:1;display:flex;flex-direction:column;text-align:left}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page[data-cloud-phase=registered] .online-dialog-body {background:#eef0ff}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered-identity {margin:20px 0;gap:4px}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered-identity :is(p,strong) {margin:0;font-size:12px;line-height:18px;text-align:left}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered-identity strong {font-size:15px;line-height:23px}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered-identity img {display:none}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .ego-form-bottom {margin-top:auto;width:100%;text-align:center;flex:none}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .ego-form-title {text-align:left}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-signup-panel {flex:1;display:flex;flex-direction:column}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .cloud-account-identity {padding:0;margin:0 0 24px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form {flex:1;display:flex;flex-direction:column;gap:0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check {min-height:39px;font-size:15px!important;line-height:23px!important;padding:8px 0}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check input {appearance:none;width:22px;height:22px;border:1px solid #e9e9f1;border-radius:6px;background:#fff;display:grid;place-content:center}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check input:checked {background:#5b59f2;border-color:#5b59f2}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .online-check input:checked::after {content:'✓';color:#fff;font-size:15px;line-height:1}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-check a {color:#29282d;text-decoration:none}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form .ego-form-row {flex:none;min-height:52px}
+body:has(#app-shell) #cloud-account-dialog.cloud-signup-design-two.cloud-account-dialog[data-cloud-phase=registrationRequired] .online-form button[type=submit] {margin-top:auto;flex:none}
+body:has(#app-shell) .online-dialog [data-upload-consent] {display:grid;gap:16px}
+body:has(#app-shell) .online-dialog .ego-form-intro h3 {font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px;margin:0 0 12px}
+body:has(#app-shell) .ego-r3-form-page .ego-form-mascot-stage {height:100px;display:flex;justify-content:center}
+body:has(#app-shell) .ego-r3-form-page .ego-form-mascot-stage>span {position:relative;width:86px;height:91px}
+body:has(#app-shell) .ego-r3-form-page .ego-form-mascot-stage .ego-form-mascot {position:absolute;width:191.87%;height:137.73%;left:-46.07%;top:-23.65%;max-width:none;margin:0;object-fit:fill}
+body:has(#app-shell) #cloud-account-dialog.ego-r3-form-page .cloud-registered-identity .cloud-login-method {justify-content:flex-start}
+/* Figma's 32px overlapping status/header becomes 50px after native status removal. */
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-head {height:50px;min-height:50px}
+body:has(#app-shell) .ego-r3-form-page.online-dialog .online-dialog-head :is([data-close],.ego-form-back) {width:44px;height:44px;min-width:44px;min-height:44px;margin-left:-2px}
+body:has(#app-shell) .legal-sheet .legal-header {height:50px;min-height:50px}
+body:has(#app-shell) .ego-r3-form-page .ego-account-form {display:flex;flex-direction:column;gap:20px;margin-top:20px}
+body:has(#app-shell) .ego-r3-form-page .ego-account-form .ego-form-card {margin:0}
+body:has(#app-shell) .ego-r3-form-page .ego-account-form>button[type=submit] {width:100%;margin-top:auto}
+body:has(#app-shell) .ego-r3-form-page .online-logout {min-height:44px;margin:0;background:#fff;border:0;font-size:13px;text-align:right;justify-content:flex-end}
+body:has(#app-shell) .ego-r3-form-page.app-device-settings-dialog .online-dialog-body {padding-bottom:100px}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-panel .app-device-photo-file {color:#5b59f2}
+body:has(#app-shell) .ego-r3-form-page .app-device-photo-panel [data-device-remove] {color:#5b59f2}
+body:has(#app-shell) .ego-r3-form-page .app-device-actions [data-device-cancel] {display:none}
+body:has(#app-shell) .ego-r3-form-page .app-device-actions {position:fixed;bottom:calc(26px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 40px),420px);margin:0;z-index:2}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page .online-dialog-body {display:block;padding-bottom:110px}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page .ego-form-card strong {font-size:inherit;font-weight:400;line-height:inherit}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page .ego-deletion-actions {position:fixed;bottom:calc(26px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 40px),420px);display:flex;gap:12px;z-index:2}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page .ego-deletion-actions .button {flex:1;font-size:12px;padding:12px}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page [data-deletion-cancel] {background:#eef0ff;color:#5b59f2;border:0}
+body:has(#app-shell) .ego-r3-form-page.ego-deletion-page [data-deletion-refresh] {position:fixed;bottom:calc(26px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(calc(100% - 40px),420px);background:#eef0ff;color:#5b59f2}
+body:has(#app-shell) .legal-sheet .legal-header {display:grid;grid-template-columns:40px minmax(0,1fr) 40px;gap:12px}
+body:has(#app-shell) .legal-sheet :is(.legal-close,.legal-back) {background:transparent;border:0;color:#666779;cursor:pointer;width:44px;height:44px;margin-left:-2px;padding:0;display:grid;place-items:center}
+body:has(#app-shell) .legal-sheet .legal-content-title {font-size:28px;line-height:36px;font-weight:600;margin:0 0 28px;letter-spacing:-.6px;color:#29282d}
+body:has(#app-shell) .legal-sheet .legal-footer>p {display:none}
+body:has(#app-shell) .ego-r3-form-page .ego-account-identity {padding-right:76px}
+body:has(#app-shell) .ego-r3-form-page .ego-account-identity::after {display:none}
+body:has(#app-shell) .ego-r3-form-page .ego-account-identity .online-logout {position:absolute;right:0;top:14px;width:auto;padding:8px;min-height:44px;color:#666779}
+body:has(#app-shell) .ego-insufficient-sheet .ego-insufficient-value {display:block;font-size:44px;line-height:52px;font-weight:600;letter-spacing:-1.4px;color:#5b59f2;margin:0 0 10px}
+body:has(#app-shell) .ego-insufficient-sheet progress {display:block;width:100%;height:8px;accent-color:#5b59f2;margin:16px 0}
+/* Figma 137:4095: same-original reconsideration retains explicit consent. */
+body:has(#app-shell) .ego-resubmit-page .ego-resubmit-form {display:flex;flex-direction:column;gap:0;min-height:100%}
+body:has(#app-shell) .ego-resubmit-page h3.ego-form-intro {margin:0 0 8px;color:#29282d;font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px}
+body:has(#app-shell) .ego-resubmit-page .ego-resubmit-description {margin:0 0 20px;color:#666779;font-size:15px;line-height:23px;font-weight:400}
+body:has(#app-shell) .ego-resubmit-page .online-check {display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;align-items:start;margin:0 0 16px;padding:0;border:0;border-radius:0;min-height:46px;background:none;color:#29282d;font-size:15px;line-height:23px;font-weight:400}
+body:has(#app-shell) .ego-resubmit-page .online-check:has([name=recordedInKorea]) {min-height:23px;margin-bottom:20px}
+body:has(#app-shell) .ego-resubmit-page .online-check input {appearance:none;display:grid;place-items:center;width:20px;height:20px;margin:2px 0 0;border:1px solid #e9e9f1;border-radius:4px;background:#fff}
+body:has(#app-shell) .ego-resubmit-page .online-check input:checked {background:#5b59f2;border-color:#5b59f2}
+body:has(#app-shell) .ego-resubmit-page .online-check input:checked::after {content:'✓';color:#fff;font-size:15px;line-height:1}
+body:has(#app-shell) .ego-resubmit-page .online-check a {grid-column:2;color:#514ed8;font-size:12px;line-height:18px}
+body:has(#app-shell) .ego-resubmit-page .ego-form-row {flex:none;margin-bottom:24px;background:#f7f7fb}
+body:has(#app-shell) .ego-resubmit-page .ego-resubmit-note {margin:0 0 16px;color:#666779;font-size:13px;line-height:20px}
+body:has(#app-shell) .ego-resubmit-page .online-status:empty {display:none}
+body:has(#app-shell) .ego-resubmit-page .ego-resubmit-form>button[type=submit] {flex:none;align-self:stretch;width:100%;min-height:52px;margin-top:auto}
+body:has(#app-shell) .ego-resubmit-page .online-check a {display:none}
+/* Restored Figma 35/36/37/39: real video/review data in full-screen forms. */
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .online-dialog-body {display:block;padding:16px 20px 112px}
+body:has(#app-shell) .ego-review-detail .ego-review-video {display:block;width:100%;height:160px;min-height:0;max-height:none;object-fit:cover;border-radius:20px;background:#29282d;margin:0}
+body:has(#app-shell) .ego-review-detail[data-review-status=rejected] .ego-review-video {height:150px}
+body:has(#app-shell) .ego-review-detail .ego-review-caption {font-size:12px;line-height:18px;font-weight:500;margin:8px 0 20px;color:#666779}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-heading {font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px;color:#29282d;margin:0 0 8px}
+body:has(#app-shell) .ego-review-detail .ego-review-status {margin:0 0 20px;line-height:23px}
+body:has(#app-shell) .ego-review-detail .ego-review-status .online-badge {padding:0;background:transparent;color:#666779;font-size:15px;line-height:23px;font-weight:400;border:0}
+body:has(#app-shell) .ego-review-detail .ego-review-progress {display:flex;gap:8px;list-style:none;padding:0;margin:0 0 20px;height:28px}
+body:has(#app-shell) .ego-review-detail .ego-review-progress li {flex:1;padding-top:8px;border-top:4px solid #e9e9f1;font-size:11px;line-height:16px;color:#666779}
+body:has(#app-shell) .ego-review-detail .ego-review-progress li:first-child,body:has(#app-shell) .ego-review-detail .ego-review-progress [aria-current] {border-color:#5b59f2}
+body:has(#app-shell) .ego-review-detail .ego-review-pending {border-radius:24px;background:#eef0ff;padding:20px;margin:0 0 20px}
+body:has(#app-shell) .ego-review-detail .ego-review-pending h4 {font-size:17px;line-height:25px;font-weight:600;margin:0 0 12px}
+body:has(#app-shell) .ego-review-detail .ego-review-pending p {font-size:15px;line-height:23px;margin:0 0 12px;color:#666779}
+body:has(#app-shell) .ego-review-detail :is(.ego-review-pending,.ego-review-reward)>strong {display:block;font-size:44px;line-height:52px;font-weight:600;letter-spacing:-1.4px;color:#5b59f2;margin:0 0 8px}
+body:has(#app-shell) .ego-review-detail .ego-review-pending>small {font-size:12px;line-height:18px;font-weight:500;color:#666779}
+body:has(#app-shell) .ego-review-detail .ego-review-reward {padding:24px;border-radius:24px;background:#eef0ff;margin:0 0 20px}
+body:has(#app-shell) .ego-review-detail .ego-review-reward h3 {font-size:20px;line-height:28px;font-weight:600;margin:0 0 10px;letter-spacing:-.3px}
+body:has(#app-shell) .ego-review-detail .ego-review-reward p {font-size:15px;line-height:23px;margin:0 0 10px;color:#666779}
+body:has(#app-shell) .ego-review-detail .ego-review-reward .ego-form-mascot-stage {height:91px}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-row {display:block;width:100%;padding:14px;margin:20px 0 0;border:1px solid #e9e9f1;border-radius:16px;background:white;text-align:left;text-decoration:none;color:#29282d;font:inherit;box-sizing:border-box}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-row>strong {display:block;font-size:15px;line-height:23px;font-weight:600;margin:0 0 4px}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-row small {display:block;font-size:12px;line-height:18px;font-weight:500;color:#666779}
+body:has(#app-shell) .ego-review-detail .ego-review-history {list-style:none;margin:0;padding:0;font-size:12px;line-height:18px}
+body:has(#app-shell) .ego-review-detail .ego-review-history p {font-size:12px;line-height:18px;margin:4px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) :is(.ego-review-reason,.ego-review-note) {font-size:13px;line-height:20px;font-weight:500;color:#666779;margin:20px 0;white-space:pre-wrap}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-bottom {position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:460px;padding:12px 20px calc(26px + env(safe-area-inset-bottom));display:flex;gap:12px;background:#fff;box-sizing:border-box;z-index:2}
+body:has(#app-shell) :is(.ego-review-detail,.ego-video-deletion) .ego-review-bottom .button {flex:1;text-align:center;min-width:0;min-height:52px;border-radius:18px;font-size:15px;line-height:23px;font-weight:600;display:flex;align-items:center;justify-content:center;text-decoration:none}
+body:has(#app-shell) .ego-video-deletion .ego-review-bottom .primary {font-size:13px}
+body:has(#app-shell) .ego-video-deletion .ego-review-bottom [data-delete-back] {background:#eef0ff;color:#5b59f2;border:0}
+body:has(#app-shell) .ego-video-deletion .ego-review-file-title {font-size:12px;line-height:18px;margin-top:12px;overflow-wrap:anywhere}
+body:has(#app-shell) .ego-review-detail .ego-review-reward>strong {margin-bottom:10px}
+/* Figma 137:3618–3835: file selection, consent, transfer and receipt pages. */
+body:has(#app-shell) .ego-upload-sheet .online-dialog-body {display:flex;flex-direction:column}
+body:has(#app-shell) .ego-upload-sheet .online-form {display:flex;flex-direction:column;gap:20px;flex:1}
+body:has(#app-shell) .ego-upload-sheet .ego-form-intro {margin:0 0 8px;color:#29282d;font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px}
+body:has(#app-shell) .ego-upload-sheet .online-dialog-body>.online-help {margin:0 0 20px;font-size:15px;line-height:23px}
+body:has(#app-shell) .ego-upload-sheet .online-form>label {font-size:15px;line-height:23px;font-weight:600}
+body:has(#app-shell) .ego-upload-sheet [data-upload-consent] {gap:16px}
+body:has(#app-shell) .ego-upload-sheet [data-upload-consent]>.ego-form-intro {margin:0 0 4px}
+body:has(#app-shell) .ego-upload-sheet .online-check {padding:0;border:0;border-radius:0;background:none;align-items:start;gap:12px;color:#29282d;font-size:15px;line-height:23px;font-weight:400}
+body:has(#app-shell) .ego-upload-sheet .online-check input {flex:none;width:20px;height:20px;margin:2px 0 0}
+body:has(#app-shell) .ego-upload-sheet .ego-form-actions {display:flex;gap:12px;margin-top:auto;padding-top:12px;flex:none}
+body:has(#app-shell) .ego-upload-sheet .ego-form-actions>.button {min-height:52px;flex:1}
+body:has(#app-shell) .ego-upload-sheet .online-status:empty {display:none}
+body:has(#app-shell) .ego-upload-sheet .ego-transfer-visual {display:none;height:180px;border-radius:24px;background:#fff4e6;place-items:center;margin:4px 0}
+body:has(#app-shell) .ego-upload-sheet[data-upload-stage=transfer] .ego-transfer-visual {display:grid}
+body:has(#app-shell) .ego-upload-sheet .ego-transfer-visual img {width:210px;height:150px;object-fit:contain}
+body:has(#app-shell) .ego-upload-sheet .online-upload-stages {padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:11px;line-height:17px;color:#666779}
+body:has(#app-shell) .ego-upload-sheet .online-upload-stages li {border-top:4px solid #eef0ff;padding-top:8px}
+body:has(#app-shell) .ego-upload-sheet .online-upload-stages [aria-current] {border-color:#5b59f2;color:#5b59f2}
+body:has(#app-shell) .ego-upload-sheet .online-receipt {display:flex;flex-direction:column;gap:20px;flex:1}
+body:has(#app-shell) .ego-upload-sheet .ego-receipt-hero {padding:24px;border-radius:24px;background:linear-gradient(#fee1c4,#fff4e6)}
+body:has(#app-shell) .ego-upload-sheet .ego-receipt-hero h3 {margin:0 0 10px;font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.3px}
+body:has(#app-shell) .ego-upload-sheet .ego-receipt-hero p {margin:0 0 10px;color:#666779;font-size:15px;line-height:23px}
+body:has(#app-shell) .ego-upload-sheet .online-receipt>p {margin:0;font-size:13px;line-height:20px;color:#666779}
+body:has(#app-shell) .ego-upload-sheet .online-receipt [data-go-history] {width:100%;min-height:52px;margin-top:auto;flex:none}
+body:has(#app-shell) .ego-r3-form-page [hidden] {display:none!important}
+body:has(#app-shell) .online-dialog.ego-upload-sheet .ego-form-intro {color:#29282d;line-height:36px}
+body:has(#app-shell) .online-dialog:is(.ego-upload-sheet,.ego-resubmit-page) .online-check {font-size:15px!important;line-height:23px!important;gap:12px}

@@ -46,6 +46,7 @@ async function showReceipt(saved, initial) {
   // Only the minimal possession-authorized receipt survives logout. Other dialogs stay account-bound.
   const element = dialog('계정 삭제 처리 결과', '<p role="status">처리 결과를 확인하고 있습니다.</p>', { accountBound: false });
   element.setAttribute('data-account-deletion-receipt', '');
+  if(document.querySelector('#app-shell'))element.classList.add('ego-deletion-page');
   const content = element.querySelector('.online-dialog-body');
   const active = () => element.isConnected && element.open && savedReceipt()?.token === saved.token && (!session.user || session.user.id === saved.owner);
   let loading = false;
@@ -53,7 +54,7 @@ async function showReceipt(saved, initial) {
     if (!active()) return;
     const complete = value.status === 'completed';
     const overdue = !complete && value.dueAt && Date.now() > Date.parse(value.dueAt);
-    content.innerHTML = `<h3>${esc(statusNames[value.status] || '처리 상태 확인')}</h3><p>요청 번호: <strong>${esc(value.id)}</strong></p><p>접수일: ${esc(date(value.requestedAt))}<br>처리 기한: ${esc(date(value.dueAt))}</p><p>${complete ? `서비스에서 관리하는 계정과 관련 데이터의 삭제가 완료되었습니다.<br>완료일: ${esc(date(value.completedAt))}` : `${deadlineText} 아직 삭제가 완료된 것은 아닙니다. 인증 계정과 제출 영상, 개인정보의 처리 결과를 확인한 후 완료로 표시합니다.`}</p>${overdue ? '<p role="status">안내한 처리 기한이 지났으며 아직 완료되지 않았습니다. 운영팀에 요청 번호로 문의해주세요.</p>' : ''}${value.status === 'blocked' ? '<p>처리 과정에서 추가 확인이 필요합니다. 운영팀이 확인 후 다시 처리합니다.</p>' : ''}<p>${memoryOnly ? '이 기기에 확인 정보를 저장하지 못했습니다. 현재 열린 화면에서는 확인할 수 있지만, 화면을 닫거나 앱을 종료하면 확인 정보가 사라집니다. 요청 번호를 보관하고 운영팀에 문의해주세요.' : '로그아웃 후에도 이 기기의 같은 화면에서 처리 결과를 확인할 수 있습니다. 앱 삭제·저장 공간 초기화 또는 다른 계정 로그인 시 이 기기의 확인 정보가 없어질 수 있습니다.'}</p><p>기기에 따로 보관한 영상과 다운로드 파일은 직접 삭제해주세요. 별도 계약으로 제공된 사본이나 보관 예외의 처리 범위는 운영팀에 확인해주세요.</p><p><a href="mailto:60base.ai@gmail.com">60base.ai@gmail.com</a></p><p data-receipt-error role="status" aria-live="polite"></p><button type="button" class="button" data-deletion-refresh>처리 상태 새로고침</button>`;
+    content.innerHTML = `<h3 class="ego-form-title">${esc(document.querySelector('#app-shell')&&value.status==='pending'?'삭제 요청을 접수했어요':statusNames[value.status] || '처리 상태 확인')}</h3><p>요청 번호: <strong>${esc(value.id)}</strong></p><p>접수일: ${esc(date(value.requestedAt))}<br>처리 기한: ${esc(date(value.dueAt))}</p><p class="ego-form-notice">${complete ? `서비스에서 관리하는 계정과 관련 데이터의 삭제가 완료되었습니다.<br>완료일: ${esc(date(value.completedAt))}` : `${deadlineText} 아직 삭제가 완료된 것은 아닙니다. 인증 계정과 제출 영상, 개인정보의 처리 결과를 확인한 후 완료로 표시합니다.`}</p>${overdue ? '<p role="status">안내한 처리 기한이 지났으며 아직 완료되지 않았습니다. 운영팀에 요청 번호로 문의해주세요.</p>' : ''}${value.status === 'blocked' ? '<p>처리 과정에서 추가 확인이 필요합니다. 운영팀이 확인 후 다시 처리합니다.</p>' : ''}<p class="ego-form-card">${memoryOnly ? '이 기기에 확인 정보를 저장하지 못했습니다. 현재 열린 화면에서는 확인할 수 있지만, 화면을 닫거나 앱을 종료하면 확인 정보가 사라집니다. 요청 번호를 보관하고 운영팀에 문의해주세요.' : '로그아웃 후에도 이 기기의 같은 화면에서 처리 결과를 확인할 수 있습니다. 앱 삭제·저장 공간 초기화 또는 다른 계정 로그인 시 이 기기의 확인 정보가 없어질 수 있습니다.'}</p><p class="ego-form-card">기기에 따로 보관한 영상과 다운로드 파일은 직접 삭제해주세요. 별도 계약으로 제공된 사본이나 보관 예외의 처리 범위는 운영팀에 확인해주세요.</p><p><a href="mailto:60base.ai@gmail.com">60base.ai@gmail.com</a></p><p data-receipt-error role="status" aria-live="polite"></p><button type="button" class="button" data-deletion-refresh>처리 상태 새로고침</button>`;
     content.querySelector('[data-deletion-refresh]').onclick = () => void load();
   }
   async function load() {
@@ -112,6 +113,7 @@ export async function openAccountDeletion() {
   const owner = session.user.id, epoch = sessionEpoch;
   const current = () => owner === session.user?.id && epoch === sessionEpoch;
   const element = dialog('계정과 데이터 삭제', '<p role="status">삭제 요청 상태를 확인하고 있습니다.</p>');
+  if(document.querySelector('#app-shell'))element.classList.add('ego-deletion-page');
   const content = element.querySelector('.online-dialog-body');
   const active = () => element.isConnected && element.open && current();
   async function receipt(value) {
@@ -123,7 +125,8 @@ export async function openAccountDeletion() {
     await showReceipt(saved, value);
   }
   function form() {
-    content.innerHTML = `<p><strong>${esc(session.user.email)}</strong> 계정의 삭제를 요청합니다.</p><p><strong>${deadlineText}</strong> 접수 후 이 화면에서 처리 상태와 실제 완료일을 확인할 수 있습니다.</p><ul><li>로그인 계정, 가입 정보, 제출 영상과 관련 개인정보가 삭제 대상입니다.</li><li>계정 삭제가 완료되면 제출 내역과 포인트를 복구할 수 없습니다.</li><li>이 기기의 보관 영상과 이미 내려받은 파일은 따로 삭제해야 합니다.</li><li>별도 계약으로 제공된 데이터와 보관 예외가 있으면 처리 범위를 확인합니다.</li></ul><form class="online-form" data-deletion-form><label class="online-check"><input type="checkbox" name="confirm" required>삭제 대상과 복구할 수 없다는 점을 확인했습니다.</label><p role="status" aria-live="polite"></p><button type="submit" class="button">계정과 데이터 삭제 요청</button></form>`;
+    content.innerHTML = `<h3 class="ego-form-title">삭제 범위를<br>먼저 확인해주세요</h3><p class="ego-form-notice">${deadlineText} 접수 후 처리 상태와 실제 완료일을 확인할 수 있어요.</p><section class="ego-form-card"><h4>삭제 대상</h4><p><strong>${esc(session.user.email)}</strong> 로그인 계정, 가입 정보, 제출 영상과 관련 개인정보입니다.</p></section><section class="ego-form-card"><h4>복구할 수 없는 정보</h4><p>계정 삭제가 완료되면 제출 내역과 포인트를 복구할 수 없습니다.</p></section><section class="ego-form-card"><h4>별도로 확인해주세요</h4><p>이 기기의 보관 영상과 이미 내려받은 파일은 따로 삭제해야 합니다. 별도 계약으로 제공된 데이터와 보관 예외가 있으면 처리 범위를 확인합니다.</p></section><form class="online-form" data-deletion-form><label class="online-check"><input type="checkbox" name="confirm" required>삭제 대상과 복구할 수 없다는 점을 확인했습니다.</label><p role="status" aria-live="polite"></p><div class="ego-deletion-actions"><button type="submit" class="button">계정과 데이터 삭제 요청</button><button type="button" class="button" data-deletion-cancel>취소</button></div></form>`;
+    content.querySelector('[data-deletion-cancel]').onclick=()=>element.close();
     const form = content.querySelector('form');
     form.addEventListener('submit', async event => {
       event.preventDefault();

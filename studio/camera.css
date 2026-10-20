@@ -607,3 +607,59 @@
   .studio-processing-heading h2 { font-size:17px; }
   .studio-processing-heading ego-mascot-motion { width:80px; height:60px; }
 }
+
+/* Figma 137:3581 uses real clip metadata; no fixed sample duration. */
+.studio-review-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.studio-review-metrics>div{background:#efeeff;border-radius:18px;padding:16px;text-align:left}
+.studio-review-metrics dt{font-size:12px;line-height:18px;color:#666779}
+.studio-review-metrics dd{margin:6px 0 0;font-size:20px;line-height:28px;font-weight:600;color:#29282d}
+.studio-camera-review-sheet h2{font-size:28px;line-height:36px;letter-spacing:-.6px}
+
+/* Figma 137:3581: portrait review is a white document, separate from the live camera. */
+@media(orientation:portrait){
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-shell{display:flex;flex-direction:column;gap:20px;padding:66px 20px 26px;overflow:auto;background:#fff;color:#29282d}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-stage{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:350/210;flex:none;border-radius:18px;overflow:hidden}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-sheet{position:relative;inset:auto;display:grid;grid-template-columns:1fr;width:100%;margin:0;padding:0;border:0;border-radius:0;background:#fff;color:#29282d;backdrop-filter:none}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-sheet h2{white-space:normal;margin:20px 0;font-size:28px;line-height:36px}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-sheet p{color:#666779;font-size:13px;line-height:21px}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-actions{display:grid;grid-template-columns:1fr;gap:16px}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-actions .button{width:100%;min-height:52px;border:1px solid #e5e5ef;border-radius:18px;background:#fff;color:#5b59f2}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-actions .button.primary{background:#5b59f2;border-color:#5b59f2;color:#fff}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-review-actions .button:disabled{background:#efeeff;border-color:#efeeff;color:#76758a}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-top{background:#fff;color:#29282d}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-top [data-status]{display:none}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-tool{background:transparent;color:#29282d}
+}
+
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-heading{background:transparent;color:#29282d;backdrop-filter:none}
+body:has(#app-shell) .studio-camera-dialog[data-state=review] .studio-camera-tool{box-shadow:none;backdrop-filter:none}
+body:has(#app-shell) .studio-processing-heading{inset:0;height:100%;padding:66px 20px 26px;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:20px;overflow:auto;background:#fff}
+body:has(#app-shell) .studio-processing-heading h2{font-size:28px;line-height:36px;font-weight:600;letter-spacing:-.6px}
+body:has(#app-shell) .studio-processing-heading [data-processing-mascot]{display:flex;justify-content:center;border-radius:18px;background:#fff0df;padding:12px}
+body:has(#app-shell) .studio-processing-heading canvas{width:100%;height:auto;aspect-ratio:350/210;object-fit:cover;border-radius:18px}
+body:has(#app-shell) .studio-processing-heading p{margin:0;color:#666779;font-size:13px;line-height:21px}
+body:has(#app-shell) .studio-processing-heading .button{margin-top:auto;min-height:52px;border:0;border-radius:18px;background:#efeeff;color:#76758a}
+body:has(#app-shell) .studio-processing-heading[hidden]{display:none}
+
+/* Figma 137:3471: explicit camera access entry, before getUserMedia. */
+.studio-camera-permission{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;gap:20px;padding:66px 20px 26px;background:#fff;color:#29282d;overflow:auto}
+.studio-camera-permission[hidden]{display:none}
+.studio-camera-permission h2{font-size:20px;line-height:28px;margin:0 0 10px}
+.studio-camera-permission h3{font-size:15px;line-height:23px;margin:0 0 14px}
+.studio-camera-permission p{font-size:13px;line-height:23px;margin:0;color:#666779}
+.studio-permission-card{padding:24px;border-radius:24px;background:linear-gradient(#ffe1bf,#fff4e6)}
+.studio-permission-card img{display:block;object-fit:contain;margin:16px auto 0}
+.studio-permission-note{padding:20px;border:1px solid #e5e5ef;border-radius:24px}
+.studio-camera-permission .button{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:18px;border:0;background:#efeeff;color:#5b59f2;font-size:15px;font-weight:600}
+.studio-camera-permission .button.primary{margin-top:auto;background:#5b59f2;color:#fff}
+.studio-permission-import{position:relative;overflow:hidden;cursor:pointer}
+.studio-permission-import input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.studio-camera-dialog[data-state=permission] .studio-camera-top{z-index:7;background:#fff;color:#29282d}
+.studio-camera-dialog[data-state=permission] .studio-camera-heading{background:transparent;color:#29282d;backdrop-filter:none}
+.studio-camera-dialog[data-state=permission] .studio-camera-tool{background:transparent;color:#29282d;box-shadow:none;backdrop-filter:none}
+.studio-camera-dialog[data-state=permission] .studio-camera-top [data-status],.studio-camera-dialog[data-state=permission] [data-guide-toggle],.studio-camera-dialog[data-state=permission] [data-camera-flip]{display:none}
+.studio-camera-dialog[data-state=permission] .studio-camera-error{z-index:8}
+
+.studio-permission-mascot{display:block;position:relative;width:86px;height:91px;overflow:hidden;margin:16px auto 0}
+.studio-permission-card .studio-permission-mascot img{position:absolute;max-width:none;width:191.87%;height:137.73%;left:-46.07%;top:-23.65%;object-fit:fill;margin:0}
+.studio-camera-dialog[data-state=permission] .studio-camera-top [data-close]{background:transparent!important}
