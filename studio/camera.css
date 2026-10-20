@@ -521,7 +521,7 @@
   }
 }
 
-/* Keep zoom and shutter in a reserved control area, outside the live picture. */
+/* Portrait controls sit below the preview; landscape controls overlay it. */
 .studio-camera-zoom {
   flex-basis: 100%;
   text-align: center;
@@ -550,19 +550,46 @@
 .studio-camera-dialog[data-zoom="visible"] .studio-camera-scrim { padding-bottom: 190px; }
 
 @media (orientation: landscape) {
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-live { width: calc(100% - 184px - env(safe-area-inset-right)); height: 100%; }
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-bottom {
-    left: auto;
-    width: calc(184px + env(safe-area-inset-right));
-    height: 100%;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) 12px;
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-live { width: 100%; height: 100%; }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-top {
+    grid-template-columns: 44px 44px minmax(0, 1fr) 44px 44px;
+    padding-inline: max(10px, env(safe-area-inset-left), env(safe-area-inset-right));
   }
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-zoom { flex-basis: auto; }
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-top { right: calc(184px + env(safe-area-inset-right)); }
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-scrim { right: calc(184px + env(safe-area-inset-right)); padding-bottom: 16px; }
-  .studio-camera-dialog[data-zoom="visible"] .studio-camera-error { left: calc((100% - 184px - env(safe-area-inset-right)) / 2); bottom: 12px; max-width: calc(100% - 220px - env(safe-area-inset-right)); }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-heading { grid-column: 3; grid-row: 1; }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-tool[data-guide-toggle] { grid-column: 4; grid-row: 1; }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-tool[data-flip] { grid-column: 5; grid-row: 1; }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-bottom {
+    top: 50%;
+    bottom: auto;
+    left: auto;
+    right: max(16px, env(safe-area-inset-right));
+    padding: 0;
+    background: transparent;
+    flex-wrap: nowrap;
+    margin-top: -26px;
+  }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-zoom {
+    position: fixed;
+    top: max(68px, calc(env(safe-area-inset-top) + 58px));
+    left: max(114px, env(safe-area-inset-left));
+    right: max(114px, env(safe-area-inset-right));
+    padding: 0;
+    text-align: center;
+  }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-zoom span {
+    width: fit-content;
+    max-width: 100%;
+    margin: 5px auto 0;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .58);
+  }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-timer { top: max(148px, calc(env(safe-area-inset-top) + 138px)); }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-scrim { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  .studio-camera-dialog[data-zoom="visible"] .studio-camera-error {
+    bottom: max(64px, calc(env(safe-area-inset-bottom) + 54px));
+    max-width: calc(100% - 160px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
 }
 
 /* Finalizing reserves a separate heading row; the mascot never covers footage. */

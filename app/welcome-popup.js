@@ -23,13 +23,15 @@ function popupDialog(config, { preview = false, onAction = () => {} } = {}) {
   heading.id = titleId; heading.textContent = config.title || '안내';
   body.id = titleId + '-body'; body.textContent = config.body || '';
   const image = element.querySelector('img'), art = element.querySelector('.ego-welcome-art'), address = safeImage(config.imageUrl);
-  if (address) { image.alt = config.imageAlt || ''; image.src = address; art.hidden = false; image.onerror = () => { art.hidden = true; }; }
+  // Only the original built-in illustration follows the selected app theme.
+  const source = !preview && address === '/app/icons/symbol.svg' ? '/app/icons/mascot-purple-3d-20261019.png' : address;
+  if (address) { image.alt = config.imageAlt || ''; image.src = source; art.hidden = false; image.onerror = () => { art.hidden = true; }; }
   element.querySelector('.ego-welcome-preview').hidden = !preview;
   const dismiss = element.querySelector('.ego-welcome-close'), action = element.querySelector('.ego-welcome-primary');
   dismiss.textContent = config.closeLabel || '닫기';
   action.textContent = config.ctaLabel || '확인';
   dismiss.onclick = () => element.close();
-  action.onclick = () => { element.close(); if (!preview) onAction(APP_ROUTE.test(config.ctaPath) ? config.ctaPath : '#education'); };
+  action.onclick = () => { element.close(); if (!preview) onAction(APP_ROUTE.test(config.ctaPath) ? config.ctaPath : '#missions'); };
   const trigger = document.activeElement;
   element.addEventListener('close', () => { element.remove(); if (trigger?.isConnected) trigger.focus({ preventScroll: true }); }, { once: true });
   element.addEventListener('click', event => { if (event.target === element) { const bounds = element.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) element.close(); } });

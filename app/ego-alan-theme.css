@@ -1,0 +1,303 @@
+/* Approved EGO R3 / Alan reference. Shared web and Capacitor presentation. */
+body:has(#app-shell) {
+  --ego-primary:#5b59f2; --ego-warm:#fff4e6; --ego-peach:#fee1c4;
+  --ego-lavender:#eef0ff; --ego-ink:#29282d; --ego-muted:#666779;
+  --ego-blue:var(--ego-primary); --ego-orange:var(--ego-primary);
+  --ego-orange-soft:var(--ego-lavender); --ego-canvas:#fff;
+  --ego-background:#fff; --ego-on-canvas:var(--ego-ink);
+  --ego-on-canvas-muted:var(--ego-muted); --ego-border:#e9e9f1;
+  --ego-accent-ink:var(--ego-primary); --ego-surface-muted:var(--ego-lavender);
+  --ego-action:var(--ego-primary); --ego-action-hover:#504edb;
+  --ego-action-pressed:#4543c5; --ego-action-shadow:none; --ego-card-shadow:none;
+  --app-blue:var(--ego-primary); --app-lime:var(--ego-primary);
+  --app-canvas:#fff; --app-muted:var(--ego-muted); --app-navy:var(--ego-ink);
+  --app-line:var(--ego-border); --ink:var(--ego-ink);
+  background:#f0f0f5; color:var(--ego-ink);
+}
+#app-shell, #app-shell:not([data-screen=welcome]) {
+  --ego-canvas:#fff; --ego-background:#fff; --ego-on-canvas:#29282d;
+  --ego-on-canvas-muted:#666779;
+  background:var(--ego-background); color:var(--ego-ink);
+  font-family:Pretendard,"Ego Satoshi",sans-serif;
+}
+#app-shell[data-screen=home], #app-shell[data-screen=welcome] {
+  --ego-canvas:#fff4e6;
+  --ego-background:linear-gradient(180deg,#fee1c4 0,#fff4e6 74%);
+  background:var(--ego-background); color:var(--ego-ink);
+}
+#app-shell #app-header, #app-shell:not([data-screen=welcome]) #app-header {
+  min-height:76px; padding:calc(14px + env(safe-area-inset-top)) 20px 12px;
+  background:transparent; color:var(--ego-ink); border:0;
+}
+#app-shell #app-header:after {height:6px;background:linear-gradient(var(--ego-canvas),transparent)}
+#app-shell #app-main, #app-shell:not([data-screen=welcome]) #app-main {
+  padding:16px 20px calc(112px + env(safe-area-inset-bottom));
+  margin-top:0; margin-bottom:0; color:var(--ego-ink);
+}
+#app-shell .app-header :is(.app-back,.header-spacer) {width:44px;height:44px}
+#app-shell .app-header .app-back {background:transparent;border:0;color:var(--ego-ink);border-radius:12px}
+#app-shell .header-title {font-size:15px;font-weight:600;color:var(--ego-ink)}
+#app-shell .app-brand {display:flex;align-items:center;gap:8px;transform:none;color:var(--ego-ink)}
+#app-shell .app-brand .app-brand {min-height:0}
+#app-shell .alan-brand-mascot {display:block;position:relative;width:28px;height:30px;overflow:hidden}
+#app-shell .alan-brand-mascot img {position:absolute;width:138.37%;max-width:none;height:99%;left:-20%;top:-1%;object-fit:fill;transform:none;filter:none}
+#app-shell .alan-wordmark {display:block;position:relative;width:72px;height:27px;overflow:hidden;transform:none}
+#app-shell .alan-wordmark img {position:absolute;width:135.28%;max-width:none;height:153.8%;left:-16.87%;top:-31.22%;object-fit:fill;transform:none;filter:none}
+#app-shell .header-points .point-pill {padding:8px 18px;border:0;background:#fff;color:var(--ego-primary);font-size:15px;font-weight:600;border-radius:999px}
+#app-shell :is(h1,h2,h3,strong) {color:inherit}
+#app-shell .screen-heading {margin:4px 0 24px}
+#app-shell:not([data-screen=welcome]) .screen-heading h1 {font-size:28px;line-height:36px;font-weight:700;letter-spacing:-.7px;color:var(--ego-ink)}
+#app-shell :is(.screen-heading p,.muted-caption,.guide-explanation) {font-size:14px;line-height:1.65;color:var(--ego-muted)}
+#app-shell :is(.eyebrow,.blue-label,.section-row>a,.text-button) {color:var(--ego-primary)}
+#app-shell .section-row h2 {font-size:20px;line-height:28px;font-weight:650}
+#app-shell .app-button {min-height:52px;border-radius:18px;font-size:15px;line-height:23px;font-weight:600;box-shadow:none}
+#app-shell .app-button.primary {background:var(--ego-primary);border-color:var(--ego-primary);color:#fff;box-shadow:none}
+#app-shell .app-button.secondary {background:var(--ego-lavender);border:0;color:var(--ego-primary)}
+#app-shell .app-button:disabled {background:#e9e9f1;color:var(--ego-muted);box-shadow:none;opacity:1}
+#app-shell :focus-visible {outline:2px solid var(--ego-primary);outline-offset:3px}
+
+/* Entry: artwork, copy and providers reflow rather than overlapping on short phones. */
+#app-shell[data-screen=welcome] #app-main {padding:0;margin:0;min-height:0;overflow-y:auto}
+#app-shell .ego-welcome {
+  display:flex;flex-direction:column;position:relative;gap:0;
+  min-height:calc(100dvh - env(safe-area-inset-top));height:auto;
+  padding:calc(28px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+  background:transparent;color:var(--ego-ink);overflow:visible;
+}
+#app-shell .welcome-brand {margin:0 0 26px;position:static}
+#app-shell .welcome-eyebrow {font-size:12px;line-height:18px;color:var(--ego-muted);margin:0 0 20px;letter-spacing:0}
+#app-shell .welcome-art {position:relative;inset:auto;display:grid;place-items:center;flex:none;width:236px;height:236px;margin:0 auto;background:url('./icons/alan-welcome-halo.svg') center/contain no-repeat;transform:none}
+#app-shell .welcome-art ego-mascot-motion {width:166px;height:174px;transform:none}
+#app-shell .welcome-art-caption {text-align:center;font-size:12px;line-height:18px;color:var(--ego-muted);margin:-10px 0 26px}
+#app-shell .welcome-intro {position:static;padding:0;margin:0 0 26px;z-index:auto}
+#app-shell .welcome-intro h1 {font-size:32px;line-height:40px;letter-spacing:-.8px;font-weight:700;color:var(--ego-ink);margin:0 0 12px;text-shadow:none}
+#app-shell .welcome-description {font-size:15px;line-height:23px;color:var(--ego-muted);margin:0}
+#app-shell .welcome-actions {position:static;display:grid;gap:12px;width:100%;margin-top:auto;padding:0;background:none}
+#app-shell .welcome-provider {min-height:52px;border-radius:18px;border:1px solid var(--ego-border);background:#fff;color:var(--ego-primary);box-shadow:none;font-size:15px;font-weight:600}
+#app-shell .welcome-provider.primary {background:var(--ego-primary);color:#fff;border-color:var(--ego-primary);box-shadow:none}
+#app-shell .welcome-provider:disabled {background:#e9e9f1;color:var(--ego-muted);opacity:1}
+#app-shell .welcome-legal {display:flex;justify-content:center;gap:16px;color:var(--ego-muted);font-size:12px;line-height:18px;margin:12px 0 0}
+#app-shell .welcome-legal a {color:inherit;min-height:44px;display:flex;align-items:center}
+#app-shell .welcome-status {color:var(--ego-muted)}
+
+/* Home preserves live tasks and filters. Only its first real activity is featured. */
+#app-shell[data-screen=home] #app-main {padding:16px 20px calc(108px + env(safe-area-inset-bottom))}
+#app-shell .ego-home-intro {display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 28px;padding:0;min-height:132px}
+#app-shell .ego-home-intro h1 {font-size:28px;font-weight:700;line-height:36px;letter-spacing:-.7px;margin:0 0 12px;color:var(--ego-ink)}
+#app-shell .ego-home-intro p {font-size:12px;line-height:18px;color:var(--ego-muted);margin:0}
+#app-shell .alan-home-mascot {width:116px;height:116px;object-fit:cover;flex:none}
+#app-shell .ego-guide-banner {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 18px;background:#fff;border:0;border-radius:24px;margin:0 0 24px;box-shadow:none}
+#app-shell .ego-guide-banner h2 {font-size:18px;line-height:24px;font-weight:600;margin:0 0 6px;color:var(--ego-ink)}
+#app-shell .ego-guide-banner p {font-size:12px;line-height:18px;margin:0;color:var(--ego-muted)}
+#app-shell .ego-guide-banner>.app-icon {color:var(--ego-primary);width:24px;height:24px;flex:0 0 24px}
+#app-shell .ego-activity-section {background:#fff;margin:0 -20px -112px;padding:24px 20px calc(112px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0}
+#app-shell .ego-activity-section>.section-row {margin:0 0 16px}
+#app-shell .category-rail {display:flex;gap:8px;margin:0 0 20px;padding:0;overflow-x:auto}
+#app-shell .category-rail button {display:flex;flex:none;align-items:center;justify-content:center;min-width:56px;min-height:44px;padding:8px 14px;border:1px solid var(--ego-border);border-radius:999px;background:#fff;color:var(--ego-muted)}
+#app-shell .category-rail button>span:last-child {font-size:14px;line-height:20px}
+#app-shell .category-rail button[aria-pressed=true] {background:var(--ego-lavender);border-color:var(--ego-lavender);color:var(--ego-primary)}
+#app-shell .ego-mission-list {gap:12px}
+#app-shell .ego-choice-card {padding:0;border:1px solid var(--ego-border);border-radius:20px;background:#fff;box-shadow:none;overflow:hidden}
+#app-shell .ego-choice-card .task-card {display:flex;align-items:center;gap:14px;padding:12px;border:0;border-radius:0;background:transparent;box-shadow:none;min-height:96px}
+#app-shell .ego-choice-card .task-card>.task-media, #app-shell .ego-choice-card .task-card>.task-icon-media {width:88px;height:76px;min-width:88px;border-radius:12px;aspect-ratio:auto;flex:none;background:var(--ego-lavender)}
+#app-shell .ego-choice-card .task-media img {width:100%;height:100%;object-fit:cover}
+#app-shell .ego-choice-card .media-label {display:none}
+#app-shell .task-card-copy {padding:0;min-width:0;flex:1}
+#app-shell .task-card-copy h2 {font-size:16px;line-height:23px;color:var(--ego-ink);font-weight:600;margin:4px 24px 8px 0}
+#app-shell .c01-meta {font-size:11px;line-height:16px;color:var(--ego-muted)}
+#app-shell .c01-reward {gap:4px;align-items:center}
+#app-shell .c01-reward>small {font-size:11px;line-height:16px;color:var(--ego-muted)}
+#app-shell .point-pill, #app-shell .point-pill.small {color:var(--ego-primary);background:none;border:0;box-shadow:none;padding:0;font-size:16px;font-weight:650}
+#app-shell .task-save {width:44px;height:44px;min-width:44px;min-height:44px;top:4px;right:2px;background:transparent;color:var(--ego-muted);border:0;box-shadow:none}
+#app-shell .task-save[aria-pressed=true] {color:var(--ego-primary);background:var(--ego-lavender)}
+#app-shell .alan-featured-card {border-radius:22px}
+#app-shell .alan-featured-card .task-card {display:flex;flex-direction:column;gap:0;padding:0;align-items:stretch}
+#app-shell .alan-featured-card .task-card>.task-media {width:100%;height:auto;aspect-ratio:350/140;min-width:0;border-radius:0}
+#app-shell .alan-featured-card .task-card-copy {position:relative;display:flex;flex-direction:column;padding:16px;min-height:104px}
+#app-shell .alan-featured-card .task-card-copy h2 {order:0;margin:0 90px 6px 0}
+#app-shell .alan-featured-card .c01-meta {order:1;max-width:70%}
+#app-shell .alan-featured-card .c01-reward {position:absolute;right:16px;top:16px;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+#app-shell[data-screen=missions] .ego-mission-list {grid-template-columns:repeat(2,minmax(0,1fr))}
+#app-shell[data-screen=missions] .ego-choice-card .task-card {flex-direction:column;align-items:stretch;padding:0;gap:0;height:100%}
+#app-shell[data-screen=missions] .ego-choice-card .task-card>.task-media, #app-shell[data-screen=missions] .ego-choice-card .task-card>.task-icon-media {width:100%;height:94px;min-width:0;border-radius:0}
+#app-shell[data-screen=missions] .task-card-copy {padding:12px}
+#app-shell[data-screen=missions] .task-card-copy h2 {font-size:14px;line-height:20px;margin-right:0}
+#app-shell[data-screen=missions] .c01-reward {display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+#app-shell[data-screen=missions] .task-save {background:#fffffff0;border-radius:999px;top:4px;right:4px}
+
+/* Compact rows, full-width readable preparation choices, and soft information cards. */
+#app-shell :is(.settings-group,.profile-shortcuts,.prep-panel,.app-estimator,.submission-card,.points-summary) {border:0;border-radius:20px;background:#fff;box-shadow:none}
+#app-shell .settings-section {margin:0 0 28px}
+#app-shell .settings-section>h2 {font-size:28px;line-height:36px;margin:0 0 18px;color:var(--ego-ink)}
+#app-shell .settings-row {min-height:68px;padding:10px 14px;gap:12px;border:0;border-radius:12px;background:transparent;box-shadow:none;color:var(--ego-ink)}
+#app-shell .settings-row+.settings-row {border:0}
+#app-shell .settings-row strong {font-size:15px;line-height:23px;font-weight:600;color:var(--ego-ink)}
+#app-shell .settings-row small {font-size:12px;line-height:18px;color:var(--ego-muted);margin-top:4px}
+#app-shell .row-icon {width:36px;height:36px;flex:0 0 36px;border-radius:12px;background:var(--ego-lavender);color:var(--ego-primary)}
+#app-shell .settings-row>.app-icon:last-child {color:var(--ego-muted);width:18px;height:18px;flex:0 0 18px}
+#app-shell :is(.settings-row,.settings-group,.profile-shortcuts) .app-icon {filter:none}
+#app-shell .settings-footer {color:var(--ego-muted)}
+#app-shell .review-filters button {min-height:44px;border:1px solid var(--ego-border);background:#fff;color:var(--ego-muted);border-radius:999px}
+#app-shell .review-filters button[aria-pressed=true] {background:var(--ego-lavender);color:var(--ego-primary);border-color:var(--ego-lavender)}
+#app-shell :is(.app-search,.app-estimator input,.app-estimator select) {min-height:52px;border:1px solid var(--ego-border);border-radius:12px;background:#fff;color:var(--ego-ink)}
+#app-shell :is(.app-alert,.reward-panel,.profile-stat-grid>div,.activity-stats>article,.referral-stats>div) {background:var(--ego-lavender);border:0;border-radius:18px;color:var(--ego-ink);box-shadow:none}
+#app-shell :is(.identity-card,.ego-share-card,.ego-guide-card) {border:0;background:var(--ego-warm);border-radius:24px;box-shadow:none;color:var(--ego-ink)}
+#app-shell .identity-avatar {background:var(--ego-lavender);color:var(--ego-primary)}
+#app-shell :is(.submission-card,.prep-panel) {padding:18px;border:1px solid var(--ego-border);margin-bottom:16px}
+#app-shell :is(.submission-points,.app-estimator output) {background:var(--ego-lavender);color:var(--ego-primary);border-radius:18px}
+#app-shell .submission-icon {background:var(--ego-lavender);color:var(--ego-primary)}
+#app-shell .status-pill.approved {color:#287657;background:#ecf7f0}
+#app-shell .status-pill.rejected {color:#b73557;background:#fdecef}
+#app-shell .status-pill:not(.approved):not(.rejected) {background:var(--ego-lavender);color:var(--ego-muted)}
+#app-shell .guide-visual {border-radius:18px;overflow:hidden}
+#app-shell .quality-comparison {display:flex;flex-direction:column;gap:16px}
+#app-shell .quality-comparison section {width:100%;padding:20px;border:0;border-radius:20px;color:var(--ego-ink)}
+#app-shell .quality-good {order:0;background:var(--ego-lavender)}
+#app-shell .quality-bad {order:1;background:var(--ego-warm)}
+#app-shell .quality-comparison section>span {display:none}
+#app-shell .quality-comparison h2 {font-size:17px;line-height:25px;color:var(--ego-ink)}
+#app-shell .quality-comparison li {font-size:14px;line-height:24px;color:var(--ego-muted)}
+#app-shell .step-chip {color:var(--ego-primary);background:var(--ego-lavender);border:0}
+#app-shell .guide-heading .blue-label {display:none}
+#app-shell .prep-question>div {display:flex;flex-direction:column;gap:10px}
+#app-shell .prep-question button {width:100%;min-height:48px;white-space:normal;text-align:left;border-radius:12px;padding:12px 16px}
+#app-shell .prep-question button[aria-pressed=true] {background:var(--ego-lavender);border-color:var(--ego-primary);color:var(--ego-primary)}
+#app-shell .app-announcements details {border:0;border-bottom:1px solid var(--ego-border);border-radius:0;box-shadow:none}
+#app-shell .app-empty {background:var(--ego-warm);border:0;border-radius:24px;color:var(--ego-ink)}
+#app-shell .empty-icon {background:var(--ego-lavender);color:var(--ego-primary)}
+
+/* Rewards use server values; example amounts from the design are never embedded. */
+#app-shell .balance-card {padding:24px;background:linear-gradient(150deg,#e9eaff,#eef0ff);border:0;border-radius:24px;box-shadow:none;color:var(--ego-ink)}
+#app-shell .balance-card>strong {font-size:44px;line-height:54px;color:var(--ego-primary);font-weight:700}
+#app-shell .balance-card>p {font-size:14px;line-height:23px;color:var(--ego-muted)}
+#app-shell .alan-reward-mascot {display:block;width:110px;height:104px;object-fit:cover;margin:12px auto 4px}
+#app-shell .points-summary {gap:12px;padding:0;margin:20px 0}
+#app-shell .points-summary>div {padding:16px;border:0;border-radius:18px;background:var(--ego-lavender);color:var(--ego-ink)}
+#app-shell .points-summary strong {font-size:22px;line-height:30px}
+#app-shell .points-summary small {font-size:12px;color:var(--ego-muted)}
+#app-shell :is(.wallet-ranking,.wallet-ledger,.coupon-test-history) {border:0;border-radius:18px;background:#fff;box-shadow:none}
+#app-shell :is(.wallet-ranking,.wallet-ledger)>summary {padding:18px 14px;min-height:64px;font-size:15px;color:var(--ego-ink)}
+#app-shell .ego-progress-card {background:var(--ego-peach);border:0;box-shadow:none}
+#app-shell .ego-total-card {background:var(--ego-lavender);border:0;box-shadow:none}
+
+/* Four persistent tabs retain their accessible links and drag/release behavior. */
+#app-shell .app-bottom-nav.ego-glass-nav {
+  width:calc(min(100%,var(--app-width)) - 40px);height:64px;min-height:64px;
+  bottom:calc(16px + env(safe-area-inset-bottom));padding:7px;gap:2px;
+  border:1px solid var(--ego-border);border-radius:999px;background:rgba(255,255,255,.95);box-shadow:none;
+}
+#app-shell .app-bottom-nav.ego-glass-nav>a[data-tab], #app-shell .app-bottom-nav.ego-glass-nav>a[data-tab][aria-current] {min-height:48px;height:48px;padding:0;gap:3px;color:var(--ego-muted)}
+#app-shell .app-bottom-nav.ego-glass-nav>a[data-tab][aria-current], #app-shell .ego-glass-copy-tab[data-current] {color:var(--ego-primary)}
+#app-shell .ego-glass-copy-tab {color:var(--ego-muted);gap:3px}
+#app-shell .ego-glass-copy-track .ego-glass-copy-tab:not([data-current]) {color:color-mix(in srgb,var(--ego-primary) calc(var(--glass-progress)*100%),var(--ego-muted))}
+#app-shell .ego-glass-lens:before {background:var(--ego-lavender)}
+#app-shell .app-bottom-nav.ego-glass-nav>a[data-tab]>.app-icon, #app-shell .ego-glass-copy-tab>.app-icon {width:21px;height:21px;flex-basis:21px}
+#app-shell .app-bottom-nav.ego-glass-nav>a[data-tab]>span:not(.app-icon), #app-shell .ego-glass-copy-tab>span:not(.app-icon) {font-size:11px;line-height:16px;font-weight:400}
+#app-shell .ego-nav-backdrop {height:calc(112px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--ego-canvas) 32px)}
+#app-shell:not([data-screen=welcome]) .screen-footer {
+  padding:16px 20px calc(16px + env(safe-area-inset-bottom));border:0;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+#app-shell .screen-footer:before {content:'';position:absolute;bottom:100%;left:0;right:0;height:32px;background:linear-gradient(transparent,rgba(255,255,255,.94));pointer-events:none}
+#app-shell .screen-footer p {color:var(--ego-muted);font-size:11px;line-height:16px}
+#app-shell .filming-footer .app-button {min-height:52px}
+
+/* Native chrome uses the real iOS safe area. No web imitation status elements. */
+html[data-native-platform=ios] body:has(#app-shell) {background:#fff}
+html[data-native-platform=ios]:has(#app-shell[data-screen=welcome]), html[data-native-platform=ios] body:has(#app-shell[data-screen=welcome]) {background:#fff4e6}
+html[data-native-platform=ios] #app-shell[data-screen=welcome] {background:var(--ego-background)}
+html[data-native-platform=ios] #app-shell #app-header {min-height:calc(76px + env(safe-area-inset-top));padding-top:calc(14px + env(safe-area-inset-top))}
+@media(max-width:359px) {
+  #app-shell .ego-home-intro h1 {font-size:24px;line-height:32px}
+  #app-shell .alan-home-mascot {width:90px;height:100px}
+  #app-shell .welcome-intro h1 {font-size:30px;line-height:38px}
+  #app-shell[data-screen=missions] .ego-mission-list {gap:8px}
+  #app-shell[data-screen=missions] .task-card-copy {padding:10px}
+}
+@media(max-height:750px) {
+  #app-shell .welcome-brand {margin-bottom:18px}
+  #app-shell .welcome-eyebrow {margin-bottom:8px}
+  #app-shell .welcome-art {width:180px;height:180px}
+  #app-shell .welcome-art ego-mascot-motion {width:136px;height:142px}
+  #app-shell .welcome-art-caption {margin:0 0 18px}
+}
+@media(orientation:landscape) and (max-height:600px) {
+  #app-shell .ego-welcome {max-width:560px;margin:auto;padding-top:24px}
+  #app-shell .welcome-art {width:150px;height:150px}
+  #app-shell .app-bottom-nav.ego-glass-nav {left:50%;transform:translateX(-50%);width:calc(100% - 40px - env(safe-area-inset-left) - env(safe-area-inset-right))}
+}
+@media(prefers-reduced-motion:reduce) {#app-shell *, #app-shell *:before, #app-shell *:after {scroll-behavior:auto}}
+
+/* Current reward renderer and inherited separators. */
+#app-shell #app-header {box-shadow:none}
+#app-shell #app-header:before {display:none}
+#app-shell .app-bottom-nav:before, #app-shell .app-bottom-nav:after {display:none}
+#app-shell .settings-group>.settings-row:after {display:none}
+#app-shell .settings-group>.settings-row+.settings-row {border-top:0}
+#app-shell .reward-dashboard {display:grid;gap:20px}
+#app-shell .reward-balance {padding:24px;border:0;border-radius:24px;background:linear-gradient(150deg,#e9eaff,#eef0ff);color:var(--ego-ink);box-shadow:none}
+#app-shell .reward-balance>span {font-size:20px;line-height:28px;font-weight:600;color:var(--ego-ink)}
+#app-shell .reward-balance>strong {font-family:inherit;font-size:44px;line-height:54px;letter-spacing:-1px;font-weight:700;color:var(--ego-primary);margin:12px 0}
+#app-shell .reward-balance>strong small {font-size:32px;color:inherit}
+#app-shell .reward-balance>p {font-size:13px;line-height:21px;color:var(--ego-muted)}
+#app-shell .reward-balance>.app-button {margin-top:12px}
+#app-shell .reward-balance>.app-button:disabled {background:#fff;color:var(--ego-muted)}
+#app-shell .reward-stats {display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0;border:0}
+#app-shell .reward-stats>div {background:var(--ego-lavender);border:0;border-radius:18px;padding:16px;gap:6px}
+#app-shell .reward-stats span,#app-shell .reward-stats small {font-size:12px;line-height:18px;color:var(--ego-muted)}
+#app-shell .reward-stats strong {font-size:22px;line-height:30px;font-weight:600;color:var(--ego-ink)}
+#app-shell .reward-history {border:0;border-radius:18px;background:#fff;box-shadow:none}
+#app-shell .reward-history>summary {min-height:64px;padding:16px 14px;color:var(--ego-ink);font-size:15px}
+#app-shell .reward-history>summary small {color:var(--ego-muted);font-size:12px}
+#app-shell .reward-history>summary:after {color:var(--ego-primary)}
+#app-shell .app-launch {background:var(--ego-warm);color:var(--ego-ink)}
+#app-shell .app-launch-flood {background:var(--ego-peach)}
+#app-shell .app-launch-word,#app-shell .app-launch-tag,#app-shell .app-launch-continue {color:var(--ego-ink)}
+#app-shell .app-launch-blob {fill:var(--ego-primary)}
+
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .c01-link {padding:0;min-height:0}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .task-media {width:100%;height:auto;aspect-ratio:350/140;border-radius:0}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .task-card-copy {padding:16px;min-height:104px}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .task-card-copy h2 {font-size:16px;line-height:23px;margin:0 90px 6px 0;padding:0}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .c01-meta {padding:0;font-size:12px}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .c01-reward {margin:0;gap:6px;align-items:flex-end;justify-content:flex-start}
+#app-shell[data-screen=home] .alan-featured-card.ego-choice-card .point-pill {font-size:18px}
+#app-shell[data-screen=missions] .ego-choice-card .c01-link {padding:0;min-height:0}
+#app-shell[data-screen=missions] .ego-choice-card .task-card-copy {padding:12px}
+#app-shell[data-screen=missions] .ego-choice-card .task-card-copy h2 {font-size:14px;line-height:20px;padding:0;margin:6px 0}
+#app-shell[data-screen=missions] .ego-choice-card .task-card-copy>span {padding:0;font-size:11px}
+#app-shell[data-screen=missions] .ego-choice-card .c01-reward {gap:3px;margin-top:8px}
+#app-shell[data-screen=missions] .ego-choice-card .point-pill {font-size:16px}
+#app-shell .filming-guide .guide-frame-diagram {position:relative;aspect-ratio:350/200;overflow:hidden;border-radius:18px}
+#app-shell .filming-guide .guide-frame-diagram img {position:absolute;max-width:none;width:106.197%;height:113.335%;left:-3.098%;top:-6.485%;object-fit:fill}
+#app-shell .filming-guide .guide-frame-hero figcaption {position:static;padding:8px 0;font-size:12px;color:var(--ego-muted);background:#fff}
+#app-shell .filming-guide .framing-comparison {display:none}
+#app-shell .filming-guide .guide-explanation {padding:0;font-size:15px;line-height:23px}
+#app-shell .filming-guide .guide-frame-hero+.guide-explanation+.framing-comparison+.guide-explanation {background:var(--ego-lavender);padding:16px;border-radius:16px}
+body:has(#app-shell) .ego-welcome-dialog {background:#fff;border:0;border-radius:28px;color:var(--ego-ink)}
+body:has(#app-shell) .ego-welcome-card {padding:24px;background:#fff;color:var(--ego-ink)}
+body:has(#app-shell) .ego-welcome-art {background:var(--ego-warm);border-radius:20px}
+body:has(#app-shell) .ego-welcome-primary {background:var(--ego-primary);color:#fff;border:0;border-radius:18px;min-height:52px}
+body:has(#app-shell) .ego-welcome-close {background:var(--ego-lavender);color:var(--ego-primary);border:0;border-radius:18px;min-height:52px}
+
+/* Landscape capture: centered timer/zoom and a full-width live picture. */
+@media (orientation:landscape) {
+  /* The camera controller hides the idle timer; the approved landscape view shows it. */
+  body:has(#app-shell) .studio-camera-dialog[data-state=ready] .studio-camera-timer[hidden] {display:flex!important}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-live {width:100%;height:100%;object-fit:cover}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-top {left:0;right:0;background:none;display:flex;justify-content:flex-end;gap:8px;padding:16px max(20px,env(safe-area-inset-right)) 0 max(20px,env(safe-area-inset-left))}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-heading {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) [data-close] {order:3;background:transparent}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-timer {display:flex;top:18px;left:50%;right:auto;transform:translateX(-50%);padding:8px 20px;border-radius:999px;background:#19191f;color:white;min-height:36px;font-size:14px}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-timer span:after {content:' / 01:00'}
+  body:has(#app-shell) .studio-camera-dialog[data-state=ready] .studio-camera-timer i {display:none}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-zoom {position:fixed;top:auto;bottom:max(22px,env(safe-area-inset-bottom));left:50%;right:auto;transform:translateX(-50%);padding:0;width:auto;min-width:154px}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-zoom>div {padding:5px;border-radius:999px;background:#19191fe8;display:flex;justify-content:center}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-zoom button {width:44px;height:44px;min-height:44px;background:transparent;border:0;color:white}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-zoom button[aria-pressed=true] {background:#f3f6f3;color:#29282d;border-radius:999px}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-zoom span {position:absolute;bottom:100%;left:50%;transform:translateX(-50%);width:max-content;max-width:65vw;margin:0 0 8px;background:transparent;font-size:11px;line-height:16px;color:white}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-bottom {left:auto;right:max(20px,env(safe-area-inset-right));top:50%;bottom:auto;transform:none;margin:-40px 0 0;background:transparent;padding:0}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-scrim {background:none;padding:0}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-guide {position:absolute;inset:0;border:0;background:linear-gradient(to right,transparent 33.2%,#ffffff44 33.2%,#ffffff44 33.4%,transparent 33.4%,transparent 66.5%,#ffffff44 66.5%,#ffffff44 66.7%,transparent 66.7%),linear-gradient(to bottom,transparent 33.2%,#ffffff44 33.2%,#ffffff44 33.4%,transparent 33.4%,transparent 66.5%,#ffffff44 66.5%,#ffffff44 66.7%,transparent 66.7%)}
+  body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-guide span {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+}

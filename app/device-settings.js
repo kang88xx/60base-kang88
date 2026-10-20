@@ -81,8 +81,8 @@ export function renderDeviceSettings({ profile, photo, icon = () => '', message 
     <div class="app-device-profile">
       <div class="app-device-photo-preview" aria-label="이 기기 프로필 사진 미리보기">${previewMarkup(photo, safeProfile.name)}</div>
       <div>
-        <h3>이 기기 촬영 설정</h3>
-        <p>이름, 촬영 목표, 사진은 현재 브라우저에만 저장됩니다. 에고에서 사용하는 로그인 계정 정보는 <strong>내 정보 수정</strong>에서 관리해주세요.</p>
+        <h3>기기 촬영 설정</h3>
+        <p>이름, 촬영 목표, 사진은 이 기기에만 저장됩니다. 에고에서 사용하는 로그인 계정 정보는 <strong>내 정보 수정</strong>에서 관리해주세요.</p>
       </div>
     </div>
     <label>표시 이름
@@ -144,7 +144,7 @@ export async function openDeviceSettings({ icon } = {}) {
     ensureStylesheet();
     const boundary = boundarySnapshot();
     if (boundary.access !== 'allowed') {
-      dialog('촬영 프로필', '<p>로그인 또는 회원가입을 완료한 뒤 이 기기 촬영 설정을 관리할 수 있어요.</p>');
+      dialog('기기 촬영 설정', '<p>로그인 또는 회원가입을 완료한 뒤 기기 촬영 설정을 관리할 수 있어요.</p>');
       return null;
     }
     let profile = { name: '참여자', goal: 3 };
@@ -152,7 +152,7 @@ export async function openDeviceSettings({ icon } = {}) {
     try {
       profile = await getProfile();
     } catch (error) {
-      profileError = error.message || '이 브라우저의 촬영 설정 저장소를 열지 못했어요.';
+      profileError = error.message || '이 기기의 촬영 설정 저장소를 열지 못했어요.';
     }
     const photo = readPhoto();
     if (!sameBoundary(boundary)) return null;
@@ -166,7 +166,7 @@ export async function openDeviceSettings({ icon } = {}) {
       photoReadError = true;
     }
 
-    const element = dialog('촬영 프로필', renderDeviceSettings({ profile, photo, icon, message: profileError }));
+    const element = dialog('기기 촬영 설정', renderDeviceSettings({ profile, photo, icon, message: profileError }));
     element.classList.add('app-device-settings-dialog');
     element.setAttribute('data-studio-private', '');
     activeDialog = element;
@@ -302,7 +302,7 @@ export async function openDeviceSettings({ icon } = {}) {
         baselineProfile = profileSnapshot(saved);
         baselinePhoto = draftPhoto;
         photoDirty = false;
-        setStatus('이 브라우저의 촬영 설정을 저장했습니다.');
+        setStatus('이 기기의 촬영 설정을 저장했습니다.');
         window.dispatchEvent(new CustomEvent('app-device-settings-changed', { detail: { profile: saved, photoChanged: changedPhoto } }));
         element.close();
       } catch (error) {

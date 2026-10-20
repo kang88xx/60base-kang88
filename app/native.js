@@ -4,6 +4,12 @@ const dependencies=()=>Promise.all([import('@capacitor/core'),import('@capacitor
 let loaded;
 const plugins=()=>loaded||(loaded=dependencies().catch(error=>{loaded=undefined;throw error;}));
 const aborted=signal=>{if(signal?.aborted)throw new DOMException('Request aborted','AbortError');};
+export async function getNativeAppInfo(){
+ if(!isNativeApp())return null;
+ const [,,,,{App}]=await plugins();
+ const info=await App.getInfo();
+ return {version:String(info.version||''),build:String(info.build||'')};
+}
 export async function signInNative(providerId){
  if(!isNativeApp())return null;
  const [, {FirebaseAuthentication}]=await plugins();

@@ -1,4 +1,4 @@
-const CACHE='60base-app-20261019-mascot-motion-v24';
+const CACHE='60base-app-20261020-alan-redesign-v25';
 const SHELL=[
   "/app/",
   "/app/index.html",
@@ -11,6 +11,18 @@ const SHELL=[
   "/app/icons/mascot-purple-3d-20261019.png",
   "/app/ego-experience.css",
   "/app/ego-reference-theme.css",
+  "/app/ego-alan-theme.css",
+  "/app/ego-alan-forms.css",
+  "/app/coupon-rewards.js",
+  "/app/coupon-rewards.css",
+  "/app/assets/rewards/lotte-10000.png",
+  "/app/assets/rewards/mega-2000.png",
+  "/app/assets/rewards/shinsegae-10000.png",
+  "/app/assets/rewards/starbucks-10000.jpg",
+  "/app/assets/rewards/starbucks-americano.jpg",
+  "/app/icons/ego-wordmark-20261019.png",
+  "/app/icons/alan-welcome-halo.svg",
+  "/assets/images/ego-filming-frame-20261019.png",
   "/app/ego-glass-nav.css",
   "/app/ego-glass-nav.js",
   "/app/ego-footer-icons.js",
@@ -44,6 +56,7 @@ const SHELL=[
   "/shared/service-store.js",
   "/studio/online.css",
   "/studio/online.js",
+  "/studio/upload-file.js",
   "/studio/online-api.js",
   "/studio/access.js",
   "/studio/cloud-account.js",

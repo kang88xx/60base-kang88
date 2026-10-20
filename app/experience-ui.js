@@ -4,15 +4,15 @@ import { appleSignInEnabled } from '../studio/cloud-account.js';
 import { checkingAppAccess } from './access-boundary.js';
 
 const number = value => new Intl.NumberFormat('ko-KR').format(Number(value) || 0);
-export const brandLockup = () => '<span class="app-brand"><img src="icons/symbol.svg" width="34" height="36" alt=""><span>ego</span></span>';
+export const brandLockup = () => '<span class="app-brand"><span class="alan-brand-mascot"><img src="icons/mascot-purple-3d-20261019.png" width="34" height="36" alt=""></span><span class="alan-wordmark"><img src="icons/ego-wordmark-20261019.png" alt="ego"></span></span>';
 
-export function welcomeScreen(state, { icon }) {
+export function welcomeScreen(state, { icon, receiptAvailable = false }) {
   const checking = checkingAppAccess(state);
   const error = state.accountConnectionError || '';
   return `<section class="ego-welcome" aria-labelledby="welcome-title">
     <div class="welcome-brand" aria-label="에고">${brandLockup()}</div>
-    <div class="welcome-intro"><p class="welcome-eyebrow">반가워요, 에고입니다</p><h1 id="welcome-title">내 일상이,<br>AI의 배움이<br>되는 곳.</h1><p class="welcome-description">익숙한 순간을 영상으로 담고<br>당신의 기여를 포인트로 돌려받아요.</p></div>
-    <div class="welcome-art" aria-hidden="true">${mascotMotion('welcome')}</div>
+    <p class="welcome-eyebrow">MY EVERYDAY, OUR AI</p><div class="welcome-art" aria-hidden="true">${mascotMotion('welcome')}</div><p class="welcome-art-caption">가벼운 1분, 새로운 시작</p>
+    <div class="welcome-intro"><h1 id="welcome-title">나의 일상,<br>그 이상의 가치.</h1><p class="welcome-description">익숙한 손동작을 담아주세요.<br>당신의 시점이 AI의 배움이 됩니다.</p></div>
     <div class="welcome-actions">
       ${checking ? '<p class="welcome-status" role="status">계정을 확인하고 있어요…</p>' : ''}
       ${error ? `<p class="welcome-error" role="alert">${esc(error)}</p>` : ''}
@@ -20,6 +20,7 @@ export function welcomeScreen(state, { icon }) {
       ${appleSignInEnabled ? `<button class="welcome-provider" data-app-action="login" data-provider="apple" ${checking ? 'disabled' : ''}><img src="../assets/icons/platform-apple.svg" width="23" height="25" alt="">Apple로 계속하기</button>` : ''}
       <button class="welcome-provider" data-app-action="login" data-provider="google" ${checking ? 'disabled' : ''}><img src="../assets/brand/google-signin-g.png" width="23" height="23" alt="">Google로 계속하기</button>
       <button class="welcome-provider primary" data-app-action="login" data-provider="email" ${checking ? 'disabled' : ''}>${icon('envelope')}이메일로 계속하기</button>
+      ${receiptAvailable ? '<button type="button" class="text-button" data-app-action="deletion-receipt">계정 삭제 요청 내역 확인</button>' : ''}
       <p class="welcome-legal"><a href="../studio/terms.html">이용약관</a><span>·</span><a href="../studio/privacy.html">개인정보 처리방침</a></p>
     </div>
   </section>`;
@@ -28,10 +29,10 @@ export function welcomeScreen(state, { icon }) {
 export function homeScreen(state, { tasks, activityCard, categoryRail, icon, ui }) {
   const items = tasks();
   const selected = items.filter(task => ui.category === '전체' || task.category === ui.category);
-  return `<section class="ego-home-intro"><div><p class="eyebrow">MY EVERYDAY, OUR AI</p><h1>오늘은 어떤 일상을<br>담아볼까요?</h1></div><a class="round-button" href="#announcements" aria-label="공지사항">${icon('bell')}</a></section>
-    <a class="ego-guide-banner" href="#education"><div><span>첫 촬영이신가요?</span><h2>시작은 가볍게,<br>좋은 영상은 차근차근.</h2><p>촬영 가이드 확인하기 ${icon('arrow-right')}</p></div><img src="icons/mascot-purple-3d-20261019.png" width="80" height="85" alt=""></a>
-    <section class="ego-activity-section"><div class="section-row"><h2>카테고리</h2><a href="#missions">전체 보기 ${icon('caret-right')}</a></div>${categoryRail()}
-    <div class="ego-mission-list">${selected.map(task => activityCard(task, { homeRow: true })).join('') || '<p class="muted-caption">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;
+  return `<section class="ego-home-intro"><div><h1>오늘의 1분이<br>새로운 배움이 돼요.</h1><p>내 시점으로 기록하는 일상</p></div><img class="alan-home-mascot" src="icons/mascot-purple-3d-20261019.png" width="124" height="124" alt=""></section>
+    <a class="ego-guide-banner" href="#missions"><div><h2>처음이라면, 여기부터</h2><p>좋은 영상의 기준을 함께 확인해요.</p></div>${icon('arrow-right')}</a>
+    <section class="ego-activity-section"><div class="section-row"><h2>오늘의 촬영 활동</h2><a href="#missions">전체 보기</a></div>${categoryRail()}
+    <div class="ego-mission-list">${selected.map((task, index) => activityCard(task, { homeRow: true, featured: index === 0 })).join('') || '<p class="muted-caption">이 카테고리의 활동을 준비하고 있어요.</p>'}</div></section>`;
 }
 
 function progressCard(me, icon) {
@@ -59,8 +60,8 @@ export function profileScreen(state, { icon, getDevicePhoto, reviewFilters, revi
   const videos = me?.videos || [];
   const approved = videos.filter(video => video.status === 'approved');
   const minutes = Math.floor(approved.reduce((sum, video) => sum + (Number(video.duration) || 0), 0) / 60);
-  return `<a class="identity-card" href="#settings"><span class="identity-avatar">${getDevicePhoto() ? `<img src="${getDevicePhoto()}" alt="내 프로필 사진">` : icon('user')}</span><span class="identity-details"><strong>${esc(user?.name || '참여자')}</strong><small>${esc(user?.email || '')}</small><span class="identity-meta">${icon('check-circle')} 승인 ${approved.length}회 <span>·</span> ${icon('clock')} ${minutes}분</span></span>${icon('caret-right')}</a>
+  return `<a class="identity-card" href="#settings"><span class="identity-avatar">${getDevicePhoto() ? `<img src="${getDevicePhoto()}" alt="내 프로필 사진">` : icon('user')}</span><span class="identity-details"><strong>${esc(user?.name || '참여자')}</strong><small>${esc(user?.email || '')}</small><span class="identity-meta">${me?`${icon('check-circle')} 승인 ${approved.length}회 <span>·</span> ${icon('clock')} ${minutes}분`:(state.loading?'승인 내역을 불러오고 있어요.':'승인 내역을 확인하지 못했어요.')}</span></span>${icon('caret-right')}</a>
     ${referral}
-    <div class="profile-shortcuts"><a href="#library">${icon('video-camera')} 보관한 영상 ${icon('caret-right')}</a><a href="#support">${icon('question')} 문의·도움 ${icon('caret-right')}</a></div>
+    <div class="profile-shortcuts"><a href="#reviews">${icon('video-camera')} 제출한 영상 ${icon('caret-right')}</a><a href="#support">${icon('question')} 문의·도움 ${icon('caret-right')}</a></div>
     <section class="profile-submissions"><div class="section-row"><h2>내 제출 내역</h2><a href="#reviews">모두 보기 ${icon('caret-right')}</a></div>${reviewFilters()}${loadingPrivate(state) || reviewList(videos)}</section>`;
 }

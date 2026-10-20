@@ -3,11 +3,11 @@ import { choice, fail, integer, str } from './security.mjs';
 export const DEFAULT_WELCOME_POPUP = Object.freeze({
   enabled: true,
   title: '첫 촬영을 준비해볼까요?',
-  body: '촬영 가이드에서 구도와 주의사항을 확인해보세요. 준비가 끝나면 일상의 활동을 촬영할 수 있어요.',
+  body: '촬영할 활동을 고르고, 구도와 주의사항을 차례로 확인해보세요. 준비가 끝나면 영상을 촬영하거나 가져올 수 있어요.',
   imageUrl: '/app/icons/symbol.svg',
   imageAlt: '에고 캐릭터',
   ctaLabel: '촬영 준비하기',
-  ctaPath: '#education',
+  ctaPath: '#missions',
   closeLabel: '다음에 보기',
   frequency: 'once',
   startsAt: null,
@@ -59,6 +59,14 @@ const koreaDay = date => new Date(date.getTime() + 9 * 3600000).toISOString().sl
 export function createWelcomePopupService(store) {
   const { run, one, transaction, now, audit } = store;
   run('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)', 'welcomePopup', JSON.stringify(DEFAULT_WELCOME_POPUP));
+  // Correct only the untouched original seed. Keep administrator choices and
+  // delivery versions/receipts intact, including explicitly selected education.
+  const saved = one('SELECT value FROM settings WHERE key=?', 'welcomePopup').value;
+  const existing = JSON.parse(saved);
+  const legacy = { ...DEFAULT_WELCOME_POPUP, ctaPath: '#education', body: '촬영 가이드에서 구도와 주의사항을 확인해보세요. 준비가 끝나면 일상의 활동을 촬영할 수 있어요.' };
+  if (Object.keys(existing).length === Object.keys(legacy).length && Object.entries(legacy).every(([key, value]) => existing[key] === value)) {
+    run('UPDATE settings SET value=? WHERE key=? AND value=?', JSON.stringify(DEFAULT_WELCOME_POPUP), 'welcomePopup', saved);
+  }
   const config = () => ({ ...DEFAULT_WELCOME_POPUP, ...JSON.parse(one('SELECT value FROM settings WHERE key=?', 'welcomePopup').value) });
   const scope = (popup, session, at) => popup.frequency === 'session' ? `session:${session.token}` : popup.frequency === 'daily' ? `day:${koreaDay(at)}` : 'once';
   const active = (popup, at) => popup.enabled && (!popup.startsAt || Date.parse(popup.startsAt) <= at.getTime()) && (!popup.endsAt || Date.parse(popup.endsAt) > at.getTime());

@@ -88,7 +88,7 @@ function inspectVideo(blob) {
   });
 }
 
-function buildDialog(activity, canRecord) {
+function buildDialog(activity, canRecord, submission = false) {
   const title = safeTitle(activity);
   const dialog = document.createElement('dialog');
   dialog.className = 'studio-camera-dialog';
@@ -135,13 +135,13 @@ function buildDialog(activity, canRecord) {
         <div>
           <h2>${esc(title)}</h2>
           <p data-meta>촬영 정보를 확인하고 있어요.</p>
-          <p>이 브라우저에 저장됩니다. 자동 제출되지 않으며, 심사 제출은 별도 버튼을 눌러 진행합니다.</p>
+          <p>${submission ? '영상을 확인한 뒤 제출해주세요. 다음 화면에서 이용 범위와 동의를 확인합니다.' : '이 브라우저에 저장됩니다. 자동 제출되지 않으며, 심사 제출은 별도 버튼을 눌러 진행합니다.'}</p>
         </div>
         <p class="studio-camera-save-status" data-save-status role="status" aria-live="polite"></p>
         <div class="studio-camera-review-actions">
           <button class="button" type="button" data-retake>다시 촬영</button>
           <button class="button" type="button" data-download>${icon('download', 17)} 다운로드</button>
-          <button class="button primary" type="button" data-save>이 브라우저에 저장</button>
+          <button class="button primary" type="button" data-save>${submission ? '제출 계속하기' : '이 브라우저에 저장'}</button>
           <button class="button" type="button" data-open-saved hidden>보관한 영상 보기</button>
           <button class="button primary" type="button" data-submit hidden>심사 제출하기</button>
         </div>
@@ -149,7 +149,7 @@ function buildDialog(activity, canRecord) {
       <div class="studio-camera-confirm" data-confirm hidden role="alertdialog" aria-modal="true" aria-labelledby="studio-camera-confirm-title">
         <div>
           <h2 id="studio-camera-confirm-title">촬영한 영상을 버릴까요?</h2>
-          <p>아직 이 브라우저에 저장하지 않았습니다.</p>
+          <p>아직 제출하지 않은 영상입니다.</p>
           <div>
             <button class="button" type="button" data-confirm-cancel>계속 보기</button>
             <button class="button danger" type="button" data-confirm-discard>버리고 닫기</button>
@@ -168,7 +168,7 @@ class StudioCamera {
     this.onSubmit = typeof options.onSubmit === 'function' ? options.onSubmit : null;
     this.trigger = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.mimeType = pickMimeType();
-    this.dialog = buildDialog(this.activity, hasMediaDevices() && hasRecorder());
+    this.dialog = buildDialog(this.activity, hasMediaDevices() && hasRecorder(), Boolean(this.onSubmit));
     this.liveVideo = this.dialog.querySelector('.studio-camera-live');
     this.reviewVideo = this.dialog.querySelector('.studio-camera-review');
     this.statusNode = this.dialog.querySelector('[data-status]');
@@ -190,6 +190,7 @@ class StudioCamera {
     this.submitButton = this.dialog.querySelector('[data-submit]');
     this.openSavedButton = this.dialog.querySelector('[data-open-saved]');
     this.generation = 0;
+    this.metadataGeneration = 0;
     this.closed = false;
     this.devices = [];
     this.deviceIndex = 0;
@@ -235,7 +236,7 @@ class StudioCamera {
     this.zoomButtons.forEach(button => button.addEventListener('click', () => { void this.setZoom(Number(button.dataset.zoom)); }));
     this.dialog.querySelector('[data-retake]').addEventListener('click', () => this.requestRetake());
     this.dialog.querySelector('[data-download]').addEventListener('click', () => this.downloadReview());
-    this.saveButton.addEventListener('click', () => this.saveReview());
+    this.saveButton.addEventListener('click', () => this.onSubmit ? this.submitReview() : this.saveReview());
     this.openSavedButton.addEventListener('click', () => {
       if (!this.savedClip?.id) return;
       const clip = this.savedClip;
@@ -519,6 +520,8 @@ class StudioCamera {
   }
 
   async finalizeRecording() {
+    if (this.closed || !this.dialog.open || !this.isCurrent()) return;
+    const token = this.metadataGeneration = (this.metadataGeneration || 0) + 1;
     clearTimeout(this.limitTimer);
     clearInterval(this.recordTimer);
     this.stopStream();
@@ -532,14 +535,18 @@ class StudioCamera {
     const height = this.streamHeight || this.liveVideo.videoHeight || 0;
     try {
       const details = await inspectVideo(blob);
+      if (!this.isMetadataCurrent(token)) return;
       this.showReview(blob, details, { metadataValid: true });
     } catch (error) {
+      if (!this.isMetadataCurrent(token)) return;
       this.showReview(blob, { duration: this.duration, width, height }, { metadataValid: false });
       this.showError(error.message, true);
     }
   }
 
   async useFallbackFile() {
+    if (this.closed || !this.dialog.open || !this.isCurrent()) return;
+    const token = this.metadataGeneration = (this.metadataGeneration || 0) + 1;
     const file = this.fileInput.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('video/') || file.size > MAX_SIZE) {
@@ -548,12 +555,17 @@ class StudioCamera {
     }
     try {
       const details = await inspectVideo(file);
+      if (!this.isMetadataCurrent(token)) return;
       assertVideoDuration(details.duration);
       this.mimeType = file.type || 'video/mp4';
       this.showReview(file, details, { metadataValid: true });
     } catch (error) {
-      this.showError(error.message, true);
+      if (this.isMetadataCurrent(token)) this.showError(error.message, true);
     }
+  }
+
+  isMetadataCurrent(token) {
+    return !this.closed && this.dialog.open && this.isCurrent() && this.metadataGeneration === token;
   }
 
   showReview(blob, details, { metadataValid = true } = {}) {
@@ -575,7 +587,7 @@ class StudioCamera {
     this.reviewSheet.hidden = false;
     this.dialog.querySelector('[data-meta]').textContent = `${formatDuration(this.reviewMeta.duration)} · ${this.reviewMeta.width || '-'} × ${this.reviewMeta.height || '-'} · ${formatBytes(blob.size)}`;
     if (blob.size > MAX_SIZE) this.showError('영상이 250 MB를 넘었어요. 다운로드로 보관하거나 다시 촬영해주세요.', true);
-    else if (this.stopReason === 'duration') this.showError('1분 촬영을 마쳤어요. 영상을 확인한 뒤 저장해주세요.');
+    else if (this.stopReason === 'duration') this.showError('1분 촬영을 마쳤어요. 영상을 확인한 뒤 제출해주세요.');
     else if (this.stopReason === 'hidden') this.showError('화면이 숨겨져 녹화를 마쳤어요. 촬영분은 아래에서 확인할 수 있습니다.');
     else if (this.stopReason === 'track-ended') this.showError('카메라 연결이 종료되어 녹화를 마쳤어요. 촬영분은 아래에서 확인할 수 있습니다.');
     this.setState('review');
@@ -590,6 +602,35 @@ class StudioCamera {
       this.saveButton.disabled = true;
       this.submitButton.hidden = true;
       this.setSaveStatus('영상 정보를 읽지 못해 저장할 수 없어요. 다운로드하거나 다시 촬영해주세요.', true);
+    }
+  }
+
+  async submitReview() {
+    if (this.submitting || !this.reviewBlob || !this.reviewMeta || !this.isCurrent()) return;
+    const error = !this.metadataValid ? '영상 정보를 확인하지 못했어요. 다시 촬영해주세요.'
+      : videoDurationError(this.reviewMeta.duration) || (this.reviewBlob.size > MAX_SIZE ? '250 MB 이하 영상만 제출할 수 있어요.' : '');
+    if (error) { this.setSaveStatus(error, true); return; }
+    const blob = this.reviewBlob;
+    const isCurrent = () => !this.closed && this.dialog.open && this.reviewBlob === blob && this.isCurrent();
+    this.submitting = true;
+    this.saveButton.disabled = true;
+    this.setSaveStatus('제출 화면을 준비하고 있어요...');
+    try {
+      const accepted = await this.onSubmit({
+        id: 'camera-pending', blob, title: safeTitle(this.activity),
+        activityId: safeActivityId(this.activity), duration: this.reviewMeta.duration,
+      }, { isCurrent });
+      if (!isCurrent()) {
+        if (!this.closed && this.dialog.open) this.setSaveStatus('계정이나 영상이 바뀌었어요. 다시 열어 제출해주세요.', true);
+        return;
+      }
+      if (accepted === true) this.close(true);
+      else this.setSaveStatus('제출 화면을 열지 못했어요. 다시 시도해주세요.', true);
+    } catch (error) {
+      if (isCurrent()) this.setSaveStatus(error?.message || '제출 화면을 열지 못했어요. 다시 시도해주세요.', true);
+    } finally {
+      this.submitting = false;
+      this.saveButton.disabled = false;
     }
   }
 
@@ -667,7 +708,7 @@ class StudioCamera {
   }
 
   requestClose() {
-    if ((this.reviewBlob && !this.saved) || this.recorder?.state === 'recording') {
+    if (this.state === 'finalizing' || (this.reviewBlob && !this.saved) || this.recorder?.state === 'recording') {
       this.showConfirm(() => this.close(true), '버리고 닫기');
       return;
     }
@@ -772,6 +813,7 @@ class StudioCamera {
   }
 
   clearReview() {
+    this.metadataGeneration = (this.metadataGeneration || 0) + 1;
     this.saved = false;
     this.savedClip = null;
     this.reviewBlob = null;
@@ -787,7 +829,7 @@ class StudioCamera {
     this.submitButton.hidden = true;
     this.saveButton.hidden = false;
     this.saveButton.disabled = false;
-    this.saveButton.textContent = '이 브라우저에 저장';
+    this.saveButton.textContent = this.onSubmit ? '제출 계속하기' : '이 브라우저에 저장';
     this.setSaveStatus('');
     this.refreshUnloadGuard();
   }
@@ -817,7 +859,8 @@ class StudioCamera {
   }
 
   onVisibilityChange(nativeBackground = false) {
-    if (!document.hidden && !nativeBackground) return;
+    if (this.closed || (!document.hidden && !nativeBackground)) return;
+    if (this.state === 'finalizing') return;
     if (this.recorder?.state === 'recording') {
       this.stopRecording('hidden');
       return;
@@ -847,12 +890,12 @@ class StudioCamera {
         this.close(true);
         return;
       }
-      this.showError('화면 전환으로 녹화를 마쳤어요. 촬영분은 확인 후 저장할 수 있습니다.');
+      this.showError('화면 전환으로 녹화를 마쳤어요. 촬영분은 확인 후 제출할 수 있습니다.');
       this.stopRecording(reason);
       return;
     }
     if (this.reviewBlob && !this.saved) {
-      this.showError('화면 전환이 감지됐어요. 촬영분은 저장하거나 다시 촬영할 수 있습니다.');
+      this.showError('화면 전환이 감지됐어요. 촬영분은 제출하거나 다시 촬영할 수 있습니다.');
       return;
     }
     this.close(true);
