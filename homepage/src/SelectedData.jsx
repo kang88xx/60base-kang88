@@ -53,7 +53,8 @@ function SampleThumbnail({ sample, title, watch, onOpenFilm, filmOpen }) {
 }
 
 export function SelectedData({ t, samples, localeIndex, onOpenFilm, filmOpen = false }) {
-  const catalogSamples = samples.slice(0, 4);
+  const [expanded, setExpanded] = useState(false);
+  const catalogSamples = expanded ? samples : samples.slice(0, 4);
   const localized = value => Array.isArray(value) ? value[localeIndex] : value;
 
   return (
@@ -67,7 +68,7 @@ export function SelectedData({ t, samples, localeIndex, onOpenFilm, filmOpen = f
         </div>
 
         <div className="catalog-main">
-          <div className="works-grid catalog-grid">
+          <div className="works-grid catalog-grid" id="sample-catalog">
             {catalogSamples.map(sample => {
               const title = localized(sample.title);
               return (
@@ -78,12 +79,13 @@ export function SelectedData({ t, samples, localeIndex, onOpenFilm, filmOpen = f
                   <p className="catalog-card-description">{localized(sample.desc)}</p>
                   <div className="catalog-card-actions">
                     <button className="catalog-action editorial-film" type="button" aria-label={`${t.watch}: ${title}`} onClick={event => onOpenFilm(sample.id, title, event)}><span className="editorial-play" aria-hidden="true" />{t.watch}</button>
-                    <a className="catalog-action editorial-hf" href="https://huggingface.co/datasets/60base/korea-household-egocentric-samples" target="_blank" rel="noopener noreferrer"><img src="/assets/brand/huggingface-logo.svg" className="editorial-hf-logo" alt="" aria-hidden="true" width="16" height="16" /><span>SAMPLE ON HUGGING FACE</span><img src="/assets/icons/selected-data-arrow-up-right.svg" className="editorial-arrow" alt="" aria-hidden="true" width="16" height="16" /></a>
+                    <a className="catalog-action editorial-hf" href={`https://huggingface.co/datasets/60base/korea-household-egocentric-samples/blob/main/videos/${sample.id}.mp4`} target="_blank" rel="noopener noreferrer"><img src="/assets/brand/huggingface-logo.svg" className="editorial-hf-logo" alt="" aria-hidden="true" width="16" height="16" /><span>SAMPLE ON HUGGING FACE</span><img src="/assets/icons/selected-data-arrow-up-right.svg" className="editorial-arrow" alt="" aria-hidden="true" width="16" height="16" /></a>
                   </div>
                 </article>
               );
             })}
           </div>
+          {samples.length > 4 && <button className="button catalog-expand" type="button" aria-expanded={expanded} aria-controls="sample-catalog" onClick={() => setExpanded(value => !value)}>{localeIndex === 1 ? (expanded ? '샘플 접기' : `전체 샘플 ${samples.length}개 보기`) : (expanded ? 'SHOW FEWER SAMPLES' : `VIEW ALL ${samples.length} SAMPLES`)}</button>}
           <div className="catalog-mobile-summary">
             <div className="catalog-mobile-hf">
               <a className="catalog-action editorial-hf" href="https://huggingface.co/datasets/60base/korea-household-egocentric-samples" target="_blank" rel="noopener noreferrer"><img src="/assets/brand/huggingface-logo.svg" className="editorial-hf-logo" alt="" aria-hidden="true" width="16" height="16" /><span>SAMPLE ON HUGGING FACE</span><img src="/assets/icons/selected-data-arrow-up-right.svg" className="editorial-arrow" alt="" aria-hidden="true" width="16" height="16" /></a>

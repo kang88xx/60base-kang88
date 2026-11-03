@@ -174,6 +174,22 @@
           "before": "  \"/app/community.js\",\n  \"/app/referrals.js\",\n  \"/app/experience-ui.js\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-glass-nav.css\",\n",
           "after": "  \"/app/community.js\",\n  \"/app/referrals.js\",\n  \"/app/experience-ui.js\",\n  \"/app/mascot-motion.js\",\n  \"/app/icons/mascot-purple-3d-20261019.png\",\n  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-glass-nav.css\",\n",
           "review": "owner-approved-mascot-motion-20261019"
+        },
+        {
+          "before": "const CACHE='60base-app-20261019-mascot-motion-v24';\nconst SHELL=[\n  \"/app/\",\n  \"/app/index.html\",\n",
+          "after": "const CACHE='60base-app-20261020-restored-figma-v26';\nconst SHELL=[\n  \"/app/icons/figma-filming-frame-137.png\",\n  \"/app/icons/figma-home-halo-137.svg\",\n  \"/app/assets/figma-forms/back.svg\",\n  \"/app/assets/figma-forms/close.svg\",\n  \"/app/assets/figma-forms/chevron.svg\",\n  \"/app/assets/figma-forms/mascot.png\",\n  \"/app/assets/figma-forms/shinsegae.png\",\n  \"/app/assets/figma-forms/lotte.png\",\n  \"/app/assets/figma-forms/starbucks.png\",\n  \"/app/assets/figma-forms/mega.png\",\n  \"/app/assets/figma-forms/americano.png\",\n\n  \"/app/\",\n  \"/app/index.html\",\n"
+        },
+        {
+          "before": "  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-glass-nav.css\",\n  \"/app/ego-glass-nav.js\",\n",
+          "after": "  \"/app/ego-experience.css\",\n  \"/app/ego-reference-theme.css\",\n  \"/app/ego-alan-theme.css\",\n  \"/app/ego-alan-forms.css\",\n  \"/app/coupon-rewards.js\",\n  \"/app/coupon-rewards.css\",\n  \"/app/assets/rewards/lotte-10000.png\",\n  \"/app/assets/rewards/mega-2000.png\",\n  \"/app/assets/rewards/shinsegae-10000.png\",\n  \"/app/assets/rewards/starbucks-10000.jpg\",\n  \"/app/assets/rewards/starbucks-americano.jpg\",\n  \"/app/icons/ego-wordmark-20261019.png\",\n  \"/app/icons/alan-welcome-halo.svg\",\n  \"/assets/images/ego-filming-frame-20261019.png\",\n  \"/app/ego-glass-nav.css\",\n  \"/app/ego-glass-nav.js\",\n"
+        },
+        {
+          "before": "  \"/studio/online.css\",\n  \"/studio/online.js\",\n  \"/studio/online-api.js\",\n  \"/studio/access.js\",\n",
+          "after": "  \"/studio/online.css\",\n  \"/studio/online.js\",\n  \"/studio/upload-file.js\",\n  \"/studio/online-api.js\",\n  \"/studio/access.js\",\n"
+        },
+        {
+          "before": "const CACHE='60base-app-20261020-restored-figma-v26';",
+          "after": "const CACHE='60base-app-20261103-filming-feedback-v27';"
         }
       ]
     },

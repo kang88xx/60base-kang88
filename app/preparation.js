@@ -218,10 +218,10 @@ function quizMarkup(training, icon, esc) {
 
 function preflightMarkup(training, activity, icon, esc, returnStep) {
   const checks = [
-    ['headgear', '카메라가 양손과 작업 대상을 함께 담는 위치에 있어요.'],
-    ['landscape', '가로 화면으로 촬영할 준비가 됐어요.'],
-    ['oneMinute', '1분 동안 평소 속도로 촬영할 수 있어요.'],
-    ['privacy', '얼굴, 주소, 문서, 차량번호 같은 개인정보를 치웠어요.'],
+    ['headgear', '카메라를 머리에 단단히 고정했어요. 가슴·어깨에는 장착하지 않아요.'],
+    ['landscape', '가로 화면·0.5배 광각을 설정하고, 10초 테스트로 양손과 작업 대상을 확인했어요.'],
+    ['oneMinute', '1분 안에 마칠 작은 작업을 골랐고, 편집 없이 평소 속도로 촬영할 수 있어요.'],
+    ['privacy', '얼굴·어린이·반려동물·주소·문서·차량번호가 보이지 않고 사적인 대화가 들어가지 않아요.'],
   ];
   const count = preflightCount(training);
   return `<section class="prep-panel prep-preflight" aria-labelledby="prep-preflight-title">
@@ -232,7 +232,7 @@ function preflightMarkup(training, activity, icon, esc, returnStep) {
       <a class="app-button secondary" href="#library">${icon('video-camera')}보관함</a>
       <a class="app-button secondary" href="#reviews">${icon('cloud-check')}심사</a>
       <button type="button" class="app-button secondary" data-prep-action="reset-preflight" ${count ? '' : 'disabled'}>점검 초기화</button>
-      ${activity ? `<a class="app-button primary" href="#guide/${encodeURIComponent(activity.id)}/${returnStep}">${icon('arrow-right')}${returnStep === 3 ? '촬영 가이드로 돌아가기' : '가이드로 촬영'}</a>` : '<a class="app-button primary" href="#missions">활동 고르기</a>'}
+      ${activity ? `<a class="app-button primary" href="#guide/${encodeURIComponent(activity.id)}/${returnStep}">${icon('arrow-right')}${[3, 4].includes(returnStep) ? '촬영 가이드로 돌아가기' : '가이드로 촬영'}</a>` : '<a class="app-button primary" href="#missions">활동 고르기</a>'}
     </div>
   </section>`;
 }
@@ -330,7 +330,8 @@ export function renderEducation(options = {}) {
     ${state.notice ? `<div class="app-alert" role="status">${esc(state.notice)}</div>` : ''}
     <section class="prep-lesson" aria-label="촬영 예시">
       ${activeExample ? `<button type="button" class="prep-lesson-hero" data-app-action="sample" data-example="${esc(activeExample.id)}" aria-label="${esc(activeExample.title)} 예시 영상 재생"><img src="${esc(activeExample.poster)}" alt=""><span>${esc(activeExample.label)} 실제 촬영 예시</span></button><div class="prep-lesson-list">${examples.slice(0,3).map(example=>`<button type="button" class="prep-lesson-row" data-app-action="sample" data-example="${esc(example.id)}"><span class="prep-lesson-play" aria-hidden="true">${icon('play')}</span><span><strong>${esc(example.title)}</strong><small>${esc(example.note)}</small></span></button>`).join('')}</div>` : `<p class="prep-example-empty">${activity ? `${esc(activity.title)} 예시 영상이 아직 준비되지 않았어요.` : '촬영할 활동을 먼저 선택해주세요.'}</p>`}
-      <p class="prep-lesson-note">가로 화면 · 양손과 작업 대상 · 자연스러운 속도<br>개인정보가 보이지 않는지 확인해주세요.</p>
+      <details class="prep-activity-picker"><summary>다른 촬영 예시 보기</summary><p class="prep-lesson-note">20초 무음 공개 발췌본이에요. 활동 예시이며, 실제 제출은 현재 공개된 활동과 조건을 따라주세요.</p><div class="prep-lesson-list">${examples.slice(3).map(example=>`<button type="button" class="prep-lesson-row" data-app-action="sample" data-example="${esc(example.id)}"><span class="prep-lesson-play" aria-hidden="true">${icon('play')}</span><span><strong>${esc(example.title)}</strong><small>${esc(example.note)}</small></span></button>`).join('')}</div></details>
+      <p class="prep-lesson-note">머리 고정 · 가로 화면 · 0.5배 광각 · 10초 테스트<br>양손과 작업 대상, 개인정보 노출 여부를 확인해주세요.</p>
     </section>
     <details class="prep-activity-picker"${options.activityPickerOpen ? ' open' : ''}><summary id="prep-activity-picker-summary"><span>${activity ? `활동 변경 · ${esc(activity.title)}` : '촬영 활동 선택'}</span></summary>
     <section class="prep-panel" aria-labelledby="prep-activity-title">
@@ -344,7 +345,7 @@ export function renderEducation(options = {}) {
     </section>
     <button type="button" class="app-button primary prep-education-next" data-prep-action="education-step" data-prep-step="2">촬영 기준 확인하기</button>
     ${quizMarkup(state.training, icon, esc)}
-    ${preflightMarkup(state.training, activity, icon, esc, options.returnStep === 3 && options.returnActivity === encodeURIComponent(activity?.id) ? 3 : 1)}
+    ${preflightMarkup(state.training, activity, icon, esc, [3, 4].includes(options.returnStep) && options.returnActivity === encodeURIComponent(activity?.id) ? options.returnStep : 1)}
     <button type="button" class="app-button secondary prep-education-back" data-prep-action="education-step" data-prep-step="${educationStep === 3 ? 2 : 1}">이전 단계</button>
     <section class="prep-faq">
       <details><summary><span>촬영 활동을 고르면 바로 신청되나요?</span></summary><p>활동 선택은 촬영할 내용을 정하는 단계입니다. 촬영하거나 가져온 영상은 동의를 확인하고 제출해야 접수됩니다.</p></details>

@@ -461,3 +461,10 @@ body:has(#app-shell) .ego-welcome-close {background:var(--ego-lavender);color:va
   body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-guide {position:absolute;inset:0;border:0;background:linear-gradient(to right,transparent 33.2%,#ffffff44 33.2%,#ffffff44 33.4%,transparent 33.4%,transparent 66.5%,#ffffff44 66.5%,#ffffff44 66.7%,transparent 66.7%),linear-gradient(to bottom,transparent 33.2%,#ffffff44 33.2%,#ffffff44 33.4%,transparent 33.4%,transparent 66.5%,#ffffff44 66.5%,#ffffff44 66.7%,transparent 66.7%)}
   body:has(#app-shell) .studio-camera-dialog:is([data-state=ready],[data-state=recording]) .studio-camera-guide span {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 }
+
+/* Filming reference ideas remain separate from the published activity list. */
+#app-shell .filming-activity-ideas summary { min-height:44px; padding:12px 0; cursor:pointer; font-weight:700; }
+#app-shell .filming-activity-ideas details + details { border-top:1px solid var(--ego-border); }
+#app-shell .filming-activity-ideas h3 { margin:16px 0 8px; font-size:15px; }
+#app-shell .filming-activity-ideas ul { padding-left:20px; line-height:1.7; }
+#app-shell .filming-guide .alan-info-card ul { padding-left:20px; line-height:1.7; }

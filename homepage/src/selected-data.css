@@ -1,4 +1,8 @@
-/* Four existing filming samples in the owner's selected catalog-card layout. */
+/* Filming excerpts in the existing catalog-card layout. */
+.section-data .catalog-expand {
+  margin-top: 28px;
+  min-height: 44px;
+}
 .section-data.data-catalog {
   padding-top: 84px;
   padding-bottom: 84px;

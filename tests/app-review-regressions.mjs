@@ -19,7 +19,7 @@ for (const role of ['admin', 'member']) {
 }
 const popup = JSON.parse(service.store.one('SELECT value FROM settings WHERE key=?', 'welcomePopup').value);
 service.store.run('UPDATE settings SET value=? WHERE key=?', JSON.stringify({ ...popup, enabled: false }), 'welcomePopup');
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) });
 const errors = [], external = [], checks = [], layout = [], contrast = [];
 let page;
 try {
@@ -61,7 +61,7 @@ try {
   await page.screenshot({ path: path.join(output, 'new-activity-390.png'), fullPage: true });
   await navigate('missions');
   await page.locator(`[data-app-action=save-activity][data-id="${newId}"]`).click();
-  await navigate(`guide/${newId}/3`);
+  await navigate(`guide/${newId}/4`);
   await page.locator('[data-app-action=prepare-activity]').click();
   await page.waitForURL(/#education(?:\/.*)?$/);
   assert.equal((await plan()).plan.selected, newId);
@@ -146,7 +146,7 @@ try {
   await navigate(`activity/${newId}`);
   assert.match(await page.locator('#app-main').innerText(), /현재 공개되지 않은 활동/);
   assert.equal(await page.locator('[data-app-action=prepare-activity]').count(), 0);
-  for (const step of [1, 3]) {
+  for (const step of [1, 3, 4]) {
     await navigate(`guide/${newId}/${step}`);
     assert.match(await page.locator('#app-main').innerText(), /현재 공개되지 않은 활동/);
     assert.equal(await page.locator('[data-app-action=record]').count(), 0, 'an archived guide never records the first task as a fallback');

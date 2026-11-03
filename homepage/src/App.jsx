@@ -94,6 +94,13 @@ const copy = {
 };
 
 const samples = [
+  { id: 'folding-clothes-2', category: 'home', title: ['Folding clothes 2', '빨래 개기 2'], desc: ['Opening, folding and arranging clothes by hand.', '옷을 펼치고 접어 정리하는 손의 움직임.'], tags: ['HOME', 'FIRST-PERSON'] },
+  { id: 'dishwashing-10', category: 'kitchen', title: ['Washing dishes 10', '설거지 10'], desc: ['Washing and rinsing dishes at the sink.', '싱크대에서 식기를 씻고 헹구는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'cleaning-stove', category: 'kitchen', title: ['Wiping a stove', '가스레인지 닦기'], desc: ['Wiping around a stove burner with a cloth.', '천으로 가스레인지 화구 주변을 닦는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'cleaning-refrigerator', category: 'kitchen', title: ['Organizing a refrigerator', '냉장고 정리'], desc: ['Handling produce and arranging refrigerator contents.', '냉장고 안의 식재료를 꺼내고 정리하는 과정.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'cleaning-desk', category: 'home', title: ['Organizing a desk', '책상 정리'], desc: ['Arranging mugs and small objects. Screens and photographs are masked.', '컵과 작은 물건을 정리하는 동작. 화면과 사진은 가렸습니다.'], tags: ['HOME', 'FIRST-PERSON'] },
+  { id: 'cleaning-desk-2', category: 'home', title: ['Organizing a desk 2', '책상 정리 2'], desc: ['Arranging a notebook and small objects. Screens and notes are masked.', '노트와 작은 물건을 정리하는 동작. 화면과 메모는 가렸습니다.'], tags: ['HOME', 'FIRST-PERSON'] },
+  { id: 'cleaning-fish-tank', category: 'home', title: ['Cleaning a fish tank', '어항 청소'], desc: ['Working inside an aquarium by hand and with a net.', '어항 안에 손을 넣어 작업하고 뜰채로 건져내는 동작.'], tags: ['HOME', 'FIRST-PERSON'] },
   { id: 'cutting-vegetables', category: 'kitchen', title: ['Cutting vegetables', '채소 손질'], desc: ['Preparing ingredients, one movement at a time.', '재료를 손질하는 손의 움직임.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
   { id: 'dishwashing', category: 'kitchen', title: ['Washing dishes', '설거지'], desc: ['Hands, utensils and the everyday washing routine.', '손과 식기, 반복되는 설거지 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
   { id: 'folding-clothes', category: 'home', title: ['Folding clothes', '빨래 개기'], desc: ['Grasping, folding and arranging familiar fabrics.', '옷감을 잡고 접어 정리하는 과정.'], tags: ['HOME', 'FIRST-PERSON'] },
@@ -233,7 +240,7 @@ export function App() {
           <div className="about-content" data-reveal><h2 id="about-title"><Multiline text={t.aboutTitle} /></h2><div className="about-bottom"><p>{t.aboutCopy}</p><div className="about-links"><a className="text-link" href="https://huggingface.co/60base" target="_blank" rel="noreferrer"><span className="about-huggingface-label"><img className="about-huggingface-logo" src="/assets/brand/huggingface-logo.svg" alt="" aria-hidden="true" width="20" height="20" />HUGGING FACE</span><Arrow diagonal /></a><button className="text-link" type="button" disabled>{t.profile}<Arrow diagonal /></button></div></div></div>
         </section>
 
-        <SelectedData t={t} samples={samples.slice(0, 4)} localeIndex={localeIndex} onOpenFilm={openFilm} filmOpen={Boolean(film)} />
+        <SelectedData t={t} samples={samples} localeIndex={localeIndex} onOpenFilm={openFilm} filmOpen={Boolean(film)} />
 
         <section className="section-services section-pad" id="services" aria-labelledby="services-title">
           <SectionLabel>{t.servicesLabel}</SectionLabel>
