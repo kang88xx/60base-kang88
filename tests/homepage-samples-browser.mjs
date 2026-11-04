@@ -74,6 +74,8 @@ try {
   const thumbnail = page.locator('.catalog-card').filter({has:page.locator('img[src$="/cooking-tteokgalbi.jpg"]')}).locator('.sample-image');
   const preview = thumbnail.locator('video');
   assert.equal(await preview.getAttribute('src'),null,'Hover preview is lazy before interaction');
+  // Enter the viewport so the scroll-triggered card reveal can make hover actionable.
+  await thumbnail.scrollIntoViewIfNeeded();
   await thumbnail.hover();
   await page.waitForFunction(()=>{
     const video=document.querySelector('img[src$="/cooking-tteokgalbi.jpg"]')?.parentElement.querySelector('video');
