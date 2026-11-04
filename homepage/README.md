@@ -15,6 +15,8 @@ npm run preview:production -- 4411
 
 The existing Vercel configuration keeps the API functions, canonical redirects and all other public routes. The build generates `dist/index.html`, `dist/index.en.html` and `dist/index.ko.html`, using the existing production canonical/Open Graph/Twitter metadata. English remains the default; `/?lang=ko` selects Korean.
 
+The Selected Data catalog in `src/App.jsx` contains 19 public samples (HOME 7, KITCHEN 12). Both hover previews and film dialogs load the sample MP4 directly from `https://huggingface.co/datasets/60base/korea-household-egocentric-samples/resolve/main/videos/`; each card also links to its Hugging Face file page. Poster JPGs remain in `public/assets/media/`. To add a reviewed public sample, add its catalog entry and poster; do not copy its MP4 into the site. The separate hand-tracking and review service examples retain their local video sources. Source-flagged review examples are excluded from the catalog.
+
 `index.html` at the repository root retains the previous homepage as rollback source and as the production SEO metadata source. It is not the new homepage entry. Future homepage edits should use `homepage/src/`.
 
 To explicitly refresh the source from the separate design prototype before a release, run `npm run homepage:sync -- /absolute/path/to/60base-loco-20261009`. This copies only source and public assets; proposal options, screenshots, Figma handoff, evidence and dependencies are excluded. This sync is never run automatically by production builds.

@@ -21,7 +21,7 @@ function SampleThumbnail({ sample, title, watch, onOpenFilm, filmOpen }) {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     const isReduced = () => reduced.matches || document.documentElement.dataset.reducedMotion === 'true' || Boolean(window.__FIGMA_CAPTURE__);
     const controller = createSamplePreview(video.current, {
-      source: `/assets/media/${sample.id}.mp4`, isReduced, isHidden: () => document.hidden || filmBlocked.current,
+      source: sample.videoUrl, isReduced, isHidden: () => document.hidden || filmBlocked.current,
       onPlaying: () => setPreviewing(true), onReset: () => setPreviewing(false),
     });
     playback.current = controller;
@@ -44,7 +44,7 @@ function SampleThumbnail({ sample, title, watch, onOpenFilm, filmOpen }) {
       window.removeEventListener('pagehide', pagehide);
       window.removeEventListener('pageshow', pageshow);
     };
-  }, [sample.id]);
+  }, [sample.videoUrl]);
 
   return <button className={`sample-image catalog-thumbnail${previewing ? ' is-previewing' : ''}`} type="button" aria-label={`${watch}: ${title}`} onPointerEnter={event => { if (event.pointerType !== 'touch') playback.current?.start(); }} onFocus={event => { if (event.currentTarget.matches(':focus-visible')) playback.current?.start(); }} onClick={event => onOpenFilm(sample.id, title, event)}>
     <img src={`/assets/media/${sample.id}.jpg`} alt={title} loading="lazy" width="720" height="405" />

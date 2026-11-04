@@ -107,7 +107,16 @@ const samples = [
   { id: 'vacuuming', category: 'home', title: ['Vacuuming', '바닥 청소'], desc: ['Moving through a real home with a handheld tool.', '도구를 다루며 생활 공간을 이동하는 동작.'], tags: ['HOME', 'FIRST-PERSON'] },
   { id: 'folding-towels', category: 'home', title: ['Folding towels', '수건 접기'], desc: ['A small sequence of precise, repeatable actions.', '수건을 가지런히 접는 연속 동작.'], tags: ['HOME', 'FIRST-PERSON'] },
   { id: 'dishwashing-2', category: 'kitchen', title: ['Rinsing dishes', '식기 헹구기'], desc: ['Following the flow from washing to rinsing.', '세척에서 헹굼으로 이어지는 움직임.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
-];
+  { id: 'cooking-tteokgalbi', category: 'kitchen', title: ['Pan cooking', '팬 조리'], desc: ['Stirring and turning meat patties in a frying pan.', '프라이팬에서 고기 패티를 젓고 뒤집는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'cutting-apple', category: 'kitchen', title: ['Preparing an apple', '사과 손질'], desc: ['Peeling and cutting an apple over a cutting board.', '도마 위에서 사과를 깎고 자르는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'arranging-fruit', category: 'kitchen', title: ['Organizing fruit', '과일 정리'], desc: ['Moving apples from a bag into a refrigerator drawer.', '봉지에 담긴 사과를 냉장고 서랍으로 옮겨 정리하는 과정.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'dishwashing-4', category: 'kitchen', title: ['Washing dishes 4', '식기 세척 4'], desc: ['Washing cups and utensils with gloved hands at the sink.', '장갑을 낀 손으로 싱크대에서 컵과 도구를 씻는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'dishwashing-5', category: 'kitchen', title: ['Washing dishes 5', '식기 세척 5'], desc: ['Scrubbing dishes and cookware over a kitchen sink.', '주방 싱크대에서 식기와 조리 도구를 문질러 씻는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+  { id: 'dishwashing-7', category: 'kitchen', title: ['Washing dishes 7', '식기 세척 7'], desc: ['Scrubbing plates and spoons with a cloth or scrubber.', '행주나 수세미로 접시와 숟가락을 문질러 씻는 동작.'], tags: ['KITCHEN', 'FIRST-PERSON'] },
+].map(sample => ({
+  ...sample,
+  videoUrl: `https://huggingface.co/datasets/60base/korea-household-egocentric-samples/resolve/main/videos/${sample.id}.mp4`,
+}));
 
 function Arrow({ diagonal = false }) {
   return <span className="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" focusable="false"><path d={diagonal ? 'M6 18 18 6M6 6h12v12' : 'M4 12h16M14 6l6 6-6 6'} /></svg></span>;
@@ -190,7 +199,7 @@ export function App() {
     if (film && dialog.current) { if (!dialog.current.open) dialog.current.showModal(); dialogVideo.current?.play().catch(() => {}); }
   }, [film]);
 
-  function openFilm(id, title, event) { filmOpener.current = event.currentTarget; setFilm({ id, title }); }
+  function openFilm(id, title, event) { filmOpener.current = event.currentTarget; setFilm({ id, title, videoUrl: samples.find(sample => sample.id === id)?.videoUrl || `/assets/media/${id}.mp4` }); }
   function replayStep(index) {
     setStepRestart(values => values.map((value, step) => value + (step === index ? 1 : 0)));
     replayStepRule(index);
@@ -299,7 +308,7 @@ export function App() {
       </main>
       <FixedPromo language={language} />
 
-      <dialog className="film-dialog" ref={dialog} aria-labelledby="film-title" aria-describedby={film ? 'film-description' : undefined} onClose={onDialogClosed} onCancel={() => dialogVideo.current?.pause()} onClick={(event) => { if (event.target === event.currentTarget) closeFilm(); }}><div className="film-heading"><div><span className="mono">60BASE / {t.excerpt}</span><h2 id="film-title">{film?.title}</h2></div><button className="button button-dark" type="button" onClick={closeFilm} autoFocus>{t.close}<span aria-hidden="true">×</span></button></div>{film && <><video ref={dialogVideo} src={`/assets/media/${film.id}.mp4`} poster={`/assets/media/${film.id}.jpg`} controls playsInline muted preload="metadata" /><p id="film-description">{samples.find(sample => sample.id === film.id)?.desc[localeIndex]}</p></>}</dialog>
+      <dialog className="film-dialog" ref={dialog} aria-labelledby="film-title" aria-describedby={film ? 'film-description' : undefined} onClose={onDialogClosed} onCancel={() => dialogVideo.current?.pause()} onClick={(event) => { if (event.target === event.currentTarget) closeFilm(); }}><div className="film-heading"><div><span className="mono">60BASE / {t.excerpt}</span><h2 id="film-title">{film?.title}</h2></div><button className="button button-dark" type="button" onClick={closeFilm} autoFocus>{t.close}<span aria-hidden="true">×</span></button></div>{film && <><video ref={dialogVideo} src={film.videoUrl} poster={`/assets/media/${film.id}.jpg`} controls playsInline muted preload="metadata" /><p id="film-description">{samples.find(sample => sample.id === film.id)?.desc[localeIndex]}</p></>}</dialog>
     </>
   );
 }
