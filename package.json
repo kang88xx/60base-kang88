@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node dev-server.mjs",
     "build": "node scripts/build.mjs",
+    "build:app": "node scripts/build.mjs --app",
     "check": "node tests/static-check.mjs",
     "test": "node tests/service-playwright.mjs",
     "test:company": "node tests/company-renewal.mjs",
@@ -38,7 +39,7 @@
     "hf:deploy": "node scripts/hf-deploy.mjs",
     "hf:smoke": "node scripts/hf-live-smoke.mjs",
     "hf:operations": "node scripts/hf-live-operations.mjs",
-    "mobile:prepare": "npm run build && npm --prefix mobile run sync",
+    "mobile:prepare": "npm run build:app && npm --prefix mobile run sync",
     "mobile:check": "npm --prefix mobile run check",
     "mobile:release-check": "npm --prefix mobile run release:check",
     "test:mobile": "node tests/native-adapter.mjs && node tests/mobile-readiness-backend.mjs && node tests/mobile-auth-integration.mjs && node tests/account-deletion.mjs && node tests/firebase-erasure.mjs && node tests/hf-erasure.mjs && node tests/apple-tokens.mjs && node tests/firebase-identity.mjs && node tests/cloud-account-apple.mjs && node tests/account-deletion-browser.mjs",
