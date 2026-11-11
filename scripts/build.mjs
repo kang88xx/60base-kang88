@@ -54,5 +54,14 @@ if (Object.values(firebaseConfig).some(Boolean)) {
 await copyAsset('studio/service-status.json');
 // Publish only this reviewed document; other local documents stay private.
 await copyAsset('docs/60BASE-Company-Profile-KO.pdf');
+// The website no longer offers web participation; only the native app build (--app) keeps its shell.
+if (!process.argv.includes('--app')) {
+  for (const entry of ['app/index.html', 'studio/index.html', 'app/manifest.webmanifest']) {
+    await rm(path.join(output, entry), { force: true });
+  }
+  // Replace previously installed web service workers with one that clears caches and unregisters itself.
+  const retireWorker = "self.addEventListener('install',()=>self.skipWaiting());\nself.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())await caches.delete(key);await self.registration.unregister();for(const client of await self.clients.matchAll({type:'window'}))client.navigate(client.url);})()));\n";
+  for (const worker of ['sw.js', 'app/sw.js']) await writeFile(path.join(output, worker), retireWorker);
+}
 console.log(`Built ${count} public frontend assets in dist/`);
 await buildHomepage(output);

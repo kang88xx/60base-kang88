@@ -26,6 +26,20 @@
       "status": 308
     },
     {
+      "src": "^/(?:app|studio)(?:/(?:index\\.html)?)?$",
+      "headers": {
+        "Location": "/"
+      },
+      "status": 308
+    },
+    {
+      "src": "^/support/?$",
+      "headers": {
+        "Location": "/#contact"
+      },
+      "status": 308
+    },
+    {
       "src": "^/\\.well-known(?:/.*)?$"
     },
     {

@@ -50,15 +50,46 @@ test('homepage public assets are complete and stay in their own namespace', asyn
   await assert.rejects(stat(path.join(output, 'homepage/design-options')), { code: 'ENOENT' });
 });
 
-test('Studio, administrator, app and shared public files survive the build unchanged', async () => {
+// Web participation is retired on the website (default build); only the native app build (--app) keeps these files.
+const retiredEntries = new Set(['app/index.html', 'studio/index.html', 'app/manifest.webmanifest']);
+async function assertRetiredWorker(relative) {
+  const worker = await readFile(path.join(output, relative), 'utf8');
+  assert.match(worker, /caches\.delete\(key\)/, `${relative} must clear old caches`);
+  assert.match(worker, /registration\.unregister\(\)/, `${relative} must unregister itself`);
+}
+
+test('web build retires participation entry points and keeps legal, administrator and shared files unchanged', async () => {
   for (const directory of ['studio', 'admin', 'app', 'shared', 'fonts', 'assets']) {
     for (const file of await files(path.join(root, directory))) {
-      const relative = path.relative(root, file);
+      const relative = path.relative(root, file).replaceAll('\\', '/');
       if (!publicExtensions.has(path.extname(file))) continue;
-      if (relative.replaceAll('\\', '/') === 'studio/firebase-config.js') continue; // Vercel injects public project identifiers.
+      if (relative === 'studio/firebase-config.js') continue; // Vercel injects public project identifiers.
+      if (retiredEntries.has(relative)) {
+        await assert.rejects(stat(path.join(output, relative)), { code: 'ENOENT' }, relative);
+        continue;
+      }
+      if (relative === 'app/sw.js') { await assertRetiredWorker(relative); continue; }
       assert.deepEqual(await readFile(path.join(output, relative)), await readFile(file), relative);
     }
   }
+  await assertRetiredWorker('sw.js');
+});
+
+test('website routes retired participation and support paths to the homepage', async () => {
+  const { routes, buildCommand } = JSON.parse(await readFile(path.join(root, 'vercel.json'), 'utf8'));
+  assert.equal(buildCommand, 'npm run build');
+  const redirect = pathname => {
+    for (const route of routes) {
+      if (route.handle) return null;
+      if (route.has || !new RegExp(route.src).test(pathname)) continue;
+      if (route.status >= 300 && route.status < 400) return route.headers.Location;
+      if (route.dest) return null;
+    }
+    return null;
+  };
+  for (const pathname of ['/app', '/app/', '/app/index.html', '/studio', '/studio/', '/studio/index.html']) assert.equal(redirect(pathname), '/', pathname);
+  for (const pathname of ['/support', '/support/']) assert.equal(redirect(pathname), '/#contact', pathname);
+  for (const pathname of ['/studio/privacy.html', '/studio/terms.html', '/studio/delete-account.html', '/admin/', '/app/icons/symbol.svg']) assert.equal(redirect(pathname), null, pathname);
 });
 
 test('production behavior stays byte exact apart from reviewed EGO substitutions and receipt restoration', async () => {
