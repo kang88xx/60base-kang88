@@ -1,12 +1,13 @@
 import {icon} from '../shared/ui.js';
 import {api as requestApi,session,sessionReady,refreshSession,showAccount,dialog as baseDialog,esc,money,points,date,size,badge,statusLine,busy,labels} from '../studio/online-api.js';
-const pages=[['overview','대시보드','grid'],['members','회원 관리','user'],['videos','영상·심사','video'],['tasks','촬영 활동','book'],['data','데이터 현황','folder'],['finance','매출·비용','wallet'],['payouts','출금 관리','bank'],['commerce','상품·주문','package'],['tickets','문의 관리','help'],['notices','공지 관리','bell'],['audit','변경 기록','clock'],['settings','운영 설정','settings']];
+import {createFilmingKit} from './filming-kit.js';
+const pages=[['overview','대시보드','grid'],['members','회원 관리','user'],['kit','촬영 키트','camera'],['videos','영상·심사','video'],['tasks','촬영 활동','book'],['data','데이터 현황','folder'],['finance','매출·비용','wallet'],['payouts','출금 관리','bank'],['commerce','상품·주문','package'],['tickets','문의 관리','help'],['notices','공지 관리','bell'],['audit','변경 기록','clock'],['settings','운영 설정','settings']];
 const videoStatuses=['pending','submitted','reviewing','approved','rejected','uploaded','deleting','deleted'];
 // Review stages as the service stores them. The first three wait for a decision; 'complete' is the final approval.
 const reviewStageKeys=['ai','manual','client'],videoStages=[...reviewStageKeys,'complete'];
 function routeFilters(){const [page,query]=location.hash.slice(1).split('?'),params=new URLSearchParams(query),status=params.get('status'),stage=params.get('stage'),videos=page==='videos';return {query:'',status:videos&&videoStatuses.includes(status)?status:'all',stage:videos&&videoStages.includes(stage)?stage:''};}
 const videoRouteHash=({status='all',stage=''}={})=>{const query=new URLSearchParams();if(status!=='all')query.set('status',status);if(stage)query.set('stage',stage);const text=query.toString();return '#videos'+(text?'?'+text:'');};
-const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null,videoPage:null,stageCounts:null,videoCursor:'',videoCursors:[]},main=document.querySelector('#admin-main');
+const state={data:null,overview:null,kit:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null,videoPage:null,stageCounts:null,videoCursor:'',videoCursors:[]},main=document.querySelector('#admin-main');
 let sessionRecovery=null,videoSearchTimer;
 let cloudAccount=null,cloudInitialization=null,googlePending=false,googlePopup=false,googleBridge=false,adminSigningOut=false,googleMessage='';
 function syncAdminGoogle(){
@@ -88,7 +89,7 @@ function closeAdminDialogs(){
   element.close();element.remove();
  });
 }
-function clearAdminData(){clearTimeout(videoSearchTimer);state.videoPage=null;state.stageCounts=null;state.videoCursor='';state.videoCursors=[];state.data=null;state.overview=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
+function clearAdminData(){clearTimeout(videoSearchTimer);state.videoPage=null;state.stageCounts=null;state.videoCursor='';state.videoCursors=[];state.data=null;state.overview=null;state.kit=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
 function dialog(title,content,options){const element=baseDialog(title,content,options);element.dataset.adminPrivate='';return element;}
 function showLoadError(message){
  main.removeAttribute('aria-busy');
@@ -115,7 +116,7 @@ async function api(path,options){
   throw error;
  }
 }
-const navigationGroups=[['운영',['overview','videos','tasks','data']],['참여자',['members','tickets','notices']],['관리',['finance','payouts','commerce']],['설정',['audit','settings']]];
+const navigationGroups=[['운영',['overview','videos','tasks','data']],['참여자',['members','kit','tickets','notices']],['관리',['finance','payouts','commerce']],['설정',['audit','settings']]];
 document.querySelector('#admin-nav').innerHTML=navigationGroups.map(([group,ids])=>`<div class="admin-nav-group"><span class="admin-nav-label">${group}</span>${ids.map(id=>{const [,title,glyph]=pages.find(page=>page[0]===id);return `<a href="#${id}" data-admin-nav="${id}" title="${title}">${icon(glyph,18)}<span>${title}</span></a>`;}).join('')}</div>`).join('');
 const menuToggle=document.querySelector('#admin-menu-toggle');
 function setMenuOpen(open){menuToggle.setAttribute('aria-expanded',String(open));menuToggle.textContent=open?'메뉴 닫기':'메뉴';document.querySelector('.admin-sidebar').classList.toggle('is-menu-open',open);}
@@ -151,10 +152,11 @@ async function load(){
  if(state.loadedRoute!==route())main.innerHTML='<p role="status">운영 데이터를 불러오는 중입니다.</p>';
  main.setAttribute('aria-busy','true');
  try{
-  const [data,overview,videoPage,stageCounts]=await Promise.all([api('/admin/data'),api('/admin/overview?days='+state.days),route()==='videos'?api(videoListPath()):null,['videos','overview'].includes(route())?loadStageCounts():null]);
+  // The kit list is audited server-side, so it is read only while its own page is open.
+  const kitRoute=route()==='kit',[data,overview,videoPage,stageCounts,kit]=await Promise.all([kitRoute?null:api('/admin/data'),kitRoute?null:api('/admin/overview?days='+state.days),route()==='videos'?api(videoListPath()):null,['videos','overview'].includes(route())?loadStageCounts():null,kitRoute?api('/admin/filming-kit-claims'):null]);
   if(epoch!==state.epoch||!canManage())return;
   if(videoPage)data.videos=videoPage.videos;
-  Object.assign(state,{data,overview,videoPage,stageCounts,loadedRoute:route()});render();
+  Object.assign(state,{data,overview,videoPage,stageCounts,kit,loadedRoute:route()});render();
   if(focusId&&main.querySelector('#'+CSS.escape(focusId)))main.querySelector('#'+CSS.escape(focusId)).focus({preventScroll:true});
   else if(refreshFocused)main.querySelector('[data-refresh]')?.focus({preventScroll:true});
   document.querySelector('#admin-last-update').textContent='마지막 확인 '+date(new Date());
@@ -168,7 +170,7 @@ const kpi=(label,value,sub='')=>`<article class="online-kpi"><span>${label}</spa
 const exportButton=type=>`<a class="button admin-export" href="/api/admin/export?type=${type}">CSV 내보내기</a>`;
 const empty=message=>`<div class="online-empty"><h3>${message}</h3></div>`;
 const button=(text,action,id)=>`<button type="button" class="button" data-admin-action="${action}" data-id="${esc(id)}">${text}</button>`;
-function render(){navigation();const key=route();({overview:overviewPage,members:membersPage,videos:videosPage,tasks:tasksPage,data:dataPage,finance:financePage,payouts:payoutsPage,commerce:commercePage,tickets:ticketsPage,notices:noticesPage,audit:auditPage,settings:settingsPage}[key])();renderReviewFeedback();main.querySelector('[data-refresh]')?.addEventListener('click',load);main.querySelectorAll('[data-admin-action]').forEach(b=>b.onclick=()=>perform(b.dataset.adminAction,b.dataset.id));}
+function render(){navigation();const key=route();({overview:overviewPage,members:membersPage,kit:()=>filmingKit.render(state.kit),videos:videosPage,tasks:tasksPage,data:dataPage,finance:financePage,payouts:payoutsPage,commerce:commercePage,tickets:ticketsPage,notices:noticesPage,audit:auditPage,settings:settingsPage}[key])();renderReviewFeedback();main.querySelector('[data-refresh]')?.addEventListener('click',load);main.querySelectorAll('[data-admin-action]').forEach(b=>b.onclick=()=>perform(b.dataset.adminAction,b.dataset.id));}
 function renderReviewFeedback(){
  if(!state.reviewFeedback||!['videos','overview'].includes(route()))return;
  const feedback=state.reviewFeedback,pending=state.data.videos.filter(video=>['submitted','reviewing'].includes(video.status)),current=pending.find(video=>video.id===feedback.id),next=pending.find(video=>video.id===feedback.nextId)||pending.find(video=>video.id!==feedback.id);
@@ -284,6 +286,7 @@ function searchable(rows,renderRows,{placeholder='검색',statuses=[]}={}){
   apply();
  }};
 }
+const filmingKit=createFilmingKit({main,api,dialog,reload:load,rerender:render,heading,kpi,exportButton,tableMarkup,rowData,bindTableSort,filters:()=>state.filters});
 function walletPoints(user,field='available'){return user.wallet&&Number.isFinite(Number(user.wallet[field]))?points(user.wallet[field]):'<span class="admin-muted-text">확인 필요</span>';}
 function reviewStageLabel(stage,status){
  if(status==='approved'||stage==='complete')return '완료';
@@ -391,7 +394,7 @@ function settingsPage(){
 }
 function field(label,name,value='',type='text',extra=''){if(type==='textarea')return `<label>${label}<textarea name="${name}" ${extra}>${esc(value)}</textarea></label>`;if(type==='checkbox')return `<label class="online-check"><input type="checkbox" name="${name}" ${value?'checked':''} ${extra}>${label}</label>`;return `<label>${label}<input type="${type}" name="${name}" value="${esc(value)}" ${extra}></label>`;}
 function formDialog(title,fields,onSubmit,{wide=false,submit='저장'}={}){const d=dialog(title,`<form class="online-form">${fields}${statusLine}<button type="submit" class="button primary">${submit}</button></form>`,{wide});const form=d.querySelector('form'),requestKey=crypto.randomUUID();form.onsubmit=async e=>{e.preventDefault();busy(form,true);try{await onSubmit({...Object.fromEntries(new FormData(form)),requestKey},form,d);d.close();await load();}catch(error){form.querySelector('[role="status"]').textContent=error.message;}finally{busy(form,false);}};return d;}
-async function perform(action,id){if(['product','payout','order'].includes(action))return;const version=state.accessVersion;try{
+async function perform(action,id){if(['product','payout','order'].includes(action))return;if(action==='kit')return filmingKit.open(id);const version=state.accessVersion;try{
  if(action==='member'){const u=state.data.members.find(u=>u.id===id),w=u.wallet;formDialog('회원 관리',`<dl class="admin-detail-grid"><div><dt>이름</dt><dd>${esc(u.name)}</dd></div><div><dt>이메일</dt><dd>${esc(u.email)}</dd></div><div><dt>가입일</dt><dd>${date(u.createdAt)}</dd></div><div><dt>등록 영상</dt><dd>${u.videoCount}건</dd></div><div><dt>현재 보유 포인트</dt><dd>${w?points(w.available):'불러오기 필요'}</dd></div><div><dt>누적 적립 포인트</dt><dd>${w?points(w.earned):'불러오기 필요'}</dd></div></dl><label>계정 상태<select name="status"><option value="active" ${u.status==='active'?'selected':''}>이용 중</option><option value="suspended" ${u.status==='suspended'?'selected':''} ${u.role==='admin'?'disabled':''}>이용 정지</option></select></label>${field('운영 메모','notes',u.notes,'textarea','maxlength="2000"')}`,b=>api('/admin/members/'+id,{method:'PATCH',body:b}));}
  if(action==='video')await reviewDialog(id);
  if(action==='task'){const t=state.data.tasks.find(t=>t.id===id)||{};formDialog(id?'촬영 활동 수정':'촬영 활동 추가',field('활동명','title',t.title,'text','required maxlength="150"')+field('분류','category',t.category||'주방','text','required maxlength="60"')+field('촬영 안내','instructions',t.instructions,'textarea','required maxlength="6000"')+field('영상 최종 승인 포인트 (P)','reward',1000,'number','readonly aria-readonly="true"')+field('참여자에게 공개','published',t.published,'checkbox'),(b,form)=>api('/admin/tasks',{method:'POST',body:{...b,id:id||undefined,reward:Number(b.reward),published:form.elements.published.checked}}));}

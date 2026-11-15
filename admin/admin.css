@@ -317,3 +317,15 @@
 .admin-review-field-help{font-size:13px;line-height:1.65;color:#565b66;margin:0 0 12px}
 .admin-review-decision [aria-invalid="true"]{outline:2px solid #ad322a;outline-offset:2px}
 .admin-review-feedback [tabindex="-1"]:focus{outline:2px solid #0024ff;outline-offset:4px}
+
+/* Filming kit claims: status dots follow the review stage chip; copy buttons sit beside each delivery field. */
+.admin-stage-chip[data-kit-status=address_required]::before{background:#c98a2b}
+.admin-stage-chip[data-kit-status=overdue]::before{background:#a13435}
+.admin-stage-chip[data-kit-status=preparing]::before{background:#5f7fd9}
+.admin-stage-chip[data-kit-status=shipped]::before{background:#3d9a63}
+.admin-kit-value{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.admin-kit-value>span{min-width:0;overflow-wrap:anywhere}
+.admin-body .admin-kit-value .button{flex:none;padding:6px 12px;font-size:13px}
+.admin-kit-cancel{display:grid;gap:12px;padding-top:16px;border-top:1px solid var(--admin-line)}
+.admin-kit-field-error{color:#a13435}
+.admin-ticket-compose [aria-invalid="true"]{outline:2px solid #ad322a;outline-offset:2px}
