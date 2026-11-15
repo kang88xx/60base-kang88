@@ -2,8 +2,11 @@ import {icon} from '../shared/ui.js';
 import {api as requestApi,session,sessionReady,refreshSession,showAccount,dialog as baseDialog,esc,money,points,date,size,badge,statusLine,busy,labels} from '../studio/online-api.js';
 const pages=[['overview','대시보드','grid'],['members','회원 관리','user'],['videos','영상·심사','video'],['tasks','촬영 활동','book'],['data','데이터 현황','folder'],['finance','매출·비용','wallet'],['payouts','출금 관리','bank'],['commerce','상품·주문','package'],['tickets','문의 관리','help'],['notices','공지 관리','bell'],['audit','변경 기록','clock'],['settings','운영 설정','settings']];
 const videoStatuses=['pending','submitted','reviewing','approved','rejected','uploaded','deleting','deleted'];
-function routeFilters(){const [page,query]=location.hash.slice(1).split('?'),status=new URLSearchParams(query).get('status');return {query:'',status:page==='videos'&&videoStatuses.includes(status)?status:'all'};}
-const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null,videoPage:null,videoCursor:'',videoCursors:[]},main=document.querySelector('#admin-main');
+// Review stages as the service stores them. The first three wait for a decision; 'complete' is the final approval.
+const reviewStageKeys=['ai','manual','client'],videoStages=[...reviewStageKeys,'complete'];
+function routeFilters(){const [page,query]=location.hash.slice(1).split('?'),params=new URLSearchParams(query),status=params.get('status'),stage=params.get('stage'),videos=page==='videos';return {query:'',status:videos&&videoStatuses.includes(status)?status:'all',stage:videos&&videoStages.includes(stage)?stage:''};}
+const videoRouteHash=({status='all',stage=''}={})=>{const query=new URLSearchParams();if(status!=='all')query.set('status',status);if(stage)query.set('stage',stage);const text=query.toString();return '#videos'+(text?'?'+text:'');};
+const state={data:null,overview:null,days:30,epoch:0,accessVersion:0,loadedRoute:null,commerce:'orders',filters:routeFilters(),sort:{scope:null,index:null,direction:'asc'},reviewFeedback:null,videoPage:null,stageCounts:null,videoCursor:'',videoCursors:[]},main=document.querySelector('#admin-main');
 let sessionRecovery=null,videoSearchTimer;
 let cloudAccount=null,cloudInitialization=null,googlePending=false,googlePopup=false,googleBridge=false,adminSigningOut=false,googleMessage='';
 function syncAdminGoogle(){
@@ -85,7 +88,7 @@ function closeAdminDialogs(){
   element.close();element.remove();
  });
 }
-function clearAdminData(){clearTimeout(videoSearchTimer);state.videoPage=null;state.videoCursor='';state.videoCursors=[];state.data=null;state.overview=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
+function clearAdminData(){clearTimeout(videoSearchTimer);state.videoPage=null;state.stageCounts=null;state.videoCursor='';state.videoCursors=[];state.data=null;state.overview=null;state.loadedRoute=null;state.reviewFeedback=null;document.querySelector('#admin-last-update').textContent='';}
 function dialog(title,content,options){const element=baseDialog(title,content,options);element.dataset.adminPrivate='';return element;}
 function showLoadError(message){
  main.removeAttribute('aria-busy');
@@ -148,10 +151,10 @@ async function load(){
  if(state.loadedRoute!==route())main.innerHTML='<p role="status">운영 데이터를 불러오는 중입니다.</p>';
  main.setAttribute('aria-busy','true');
  try{
-  const [data,overview,videoPage]=await Promise.all([api('/admin/data'),api('/admin/overview?days='+state.days),route()==='videos'?api(videoListPath()):null]);
+  const [data,overview,videoPage,stageCounts]=await Promise.all([api('/admin/data'),api('/admin/overview?days='+state.days),route()==='videos'?api(videoListPath()):null,['videos','overview'].includes(route())?loadStageCounts():null]);
   if(epoch!==state.epoch||!canManage())return;
   if(videoPage)data.videos=videoPage.videos;
-  Object.assign(state,{data,overview,videoPage,loadedRoute:route()});render();
+  Object.assign(state,{data,overview,videoPage,stageCounts,loadedRoute:route()});render();
   if(focusId&&main.querySelector('#'+CSS.escape(focusId)))main.querySelector('#'+CSS.escape(focusId)).focus({preventScroll:true});
   else if(refreshFocused)main.querySelector('[data-refresh]')?.focus({preventScroll:true});
   document.querySelector('#admin-last-update').textContent='마지막 확인 '+date(new Date());
@@ -197,8 +200,8 @@ function overviewPage(){
  };
  const uploaded=o.trend.reduce((sum,row)=>sum+row.count,0);
  main.innerHTML=heading('운영 현황','',daysSelect()+exportButton('videos'))+`
-  <div class="online-kpis admin-overview-kpis">${kpi('전체 회원',o.members+'명',`선택 기간 신규 ${o.newMembers}명`)}${kpi('누적 영상',o.videos+'건',(o.seconds/60).toFixed(1)+'분 · '+size(o.bytes))}${kpi('최종 승인',o.approved+'건','누적 승인 상태')}${kpi('심사 대기',o.pendingReviews+'건','다음 심사가 필요한 영상')}</div>
-  <div class="admin-chart-grid admin-overview-charts"><section class="online-panel admin-trend-panel"><header class="admin-panel-heading"><h2>영상 업로드 추이</h2><span>최근 ${state.days}일</span></header><div class="admin-panel-body"><div class="admin-chart-summary"><span>선택 기간 업로드 <strong>${uploaded.toLocaleString('ko-KR')}<small>건</small></strong></span><span class="admin-chart-key">업로드 건수</span></div>${trendChart(o.trend)}<p class="admin-chart-footnote">업로드가 있는 최근 ${Math.min(14,o.trend.length)}개 날짜 · 업로드일 기준 · 단위: 건</p></div></section><section class="admin-priority online-panel" aria-labelledby="admin-status-title"><header class="admin-panel-heading"><h2 id="admin-status-title">영상 상태별 현황</h2><span>전체 기간</span></header><div class="admin-panel-body"><div class="admin-status-summary"><span>누적 영상</span><strong>${o.videos.toLocaleString('ko-KR')}<small>건</small></strong></div>${statusChart(o.statuses)}<div class="admin-priority-actions"><h3 id="admin-work-title">다음 검수를 이어가세요</h3><a class="button primary" href="#videos?status=pending">대기 영상 검수 <span>${o.pendingReviews}건</span> ${icon('arrow',16)}</a><a class="admin-priority-inbox" href="#tickets">답변 대기 ${o.openTickets}건 ${icon('arrow',14)}</a></div></div></section></div>
+  <div class="online-kpis admin-overview-kpis">${kpi('전체 회원',o.members+'명',`선택 기간 신규 ${o.newMembers}명`)}${kpi('누적 영상',o.videos+'건',(o.seconds/60).toFixed(1)+'분 · '+size(o.bytes))}${kpi('최종 승인',o.approved+'건','누적 승인 상태')}${kpi('심사 대기',o.pendingReviews+'건',reviewStageKeys.every(stage=>stageCount(stage)!=null)?reviewStageKeys.map(stage=>`${stageNumber(stage)}단계 ${stageCount(stage)}`).join(' · '):'다음 심사가 필요한 영상')}</div>
+  <div class="admin-chart-grid admin-overview-charts"><section class="online-panel admin-trend-panel"><header class="admin-panel-heading"><h2>영상 업로드 추이</h2><span>최근 ${state.days}일</span></header><div class="admin-panel-body"><div class="admin-chart-summary"><span>선택 기간 업로드 <strong>${uploaded.toLocaleString('ko-KR')}<small>건</small></strong></span><span class="admin-chart-key">업로드 건수</span></div>${trendChart(o.trend)}<p class="admin-chart-footnote">업로드가 있는 최근 ${Math.min(14,o.trend.length)}개 날짜 · 업로드일 기준 · 단위: 건</p></div></section><section class="admin-priority online-panel" aria-labelledby="admin-status-title"><header class="admin-panel-heading"><h2 id="admin-status-title">영상 상태별 현황</h2><span>전체 기간</span></header><div class="admin-panel-body"><div class="admin-status-summary"><span>누적 영상</span><strong>${o.videos.toLocaleString('ko-KR')}<small>건</small></strong></div>${statusChart(o.statuses)}<div class="admin-priority-actions"><h3 id="admin-work-title">다음 검수를 이어가세요</h3><a class="button primary" href="#videos?status=pending">대기 영상 검수 <span>${o.pendingReviews}건</span> ${icon('arrow',16)}</a><div class="admin-stage-links" role="group" aria-label="심사 단계별 대기 영상">${reviewStageKeys.map(stage=>`<a href="${videoRouteHash({status:'pending',stage})}"><span>${reviewStageCopy[stage].title}</span><strong>${stageCount(stage)==null?'보기':stageCount(stage)+'건'}</strong></a>`).join('')}</div><a class="admin-priority-inbox" href="#tickets">답변 대기 ${o.openTickets}건 ${icon('arrow',14)}</a></div></div></section></div>
   <section class="online-panel admin-recent"><header class="admin-panel-heading"><h2>최근 영상</h2><div class="admin-recent-tools"><label class="admin-recent-search">${icon('search',15)}<span class="sr-only">최근 영상 ${recent.length}건에서 검색</span><input id="admin-recent-search" type="search" placeholder="최근 ${recent.length}건에서 검색" value="${esc(state.filters.query)}" autocomplete="off"></label><a class="button" href="#videos">전체 영상 보기 ${icon('arrow',14)}</a></div></header><div class="admin-recent-results">${recentTable()}</div><p class="admin-data-legend">최근 업로드 최대 1,000건 중 접수일 기준 ${recent.length}건 · 미제출은 업로드일 기준</p></section>
   <div class="admin-chart-grid"><section class="online-panel"><h2>촬영 활동별 영상</h2><p class="admin-data-legend">누적 영상 ${o.videos}건 기준</p>${breakdown(o.categories.map(row=>({label:row.category,count:row.count})),o.videos)}</section><section class="online-panel"><h2>선택 기간의 매출·비용</h2><div class="admin-finance-values">${kpi('확인된 매출',money(o.income),'수기 매출 + 입금 확인 − 환불')}${kpi('확인된 비용',money(o.expenses),'수기 비용 + 지급 확인 출금')}${kpi('매출 − 비용',money(o.net),'기록된 현금 흐름 기준')}</div><a class="button" href="#finance">거래 기록 보기</a></section></div>`;
  main.querySelector('#admin-recent-search').addEventListener('input',event=>{
@@ -291,14 +294,34 @@ function reviewStageLabel(stage,status){
 function membersPage(){const items=state.data.members,rows=items=>items.map(u=>rowData([`<strong>${esc(u.name)}</strong><small>${esc(u.email)}</small>`,u.role==='admin'?'관리자':'참여자',badge(u.status),u.videoCount+'건',walletPoints(u),date(u.createdAt),button('상세·관리','member',u.id)],[u.name,u.role,u.status,u.videoCount,u.wallet?.available,u.createdAt,''])),search=searchable(items,rows,{placeholder:'이름 또는 이메일 검색',statuses:['active','suspended']});tableView('회원 관리','회원의 활동과 보유 포인트를 확인합니다.',['회원','권한','상태','영상','보유 포인트','가입일','관리'],rows(items),{actions:exportButton('members'),filters:search.filters});search.bind();}
 function videoListPath(){
  const query=new URLSearchParams({status:state.filters.status,q:state.filters.query.trim(),limit:'50'});
+ if(state.filters.stage)query.set('stage',state.filters.stage);
  if(state.videoCursor)query.set('cursor',state.videoCursor);
  return '/admin/videos?'+query;
 }
+// Videos waiting for a decision at each stage. The list endpoint already reports the filtered total,
+// so one single-row request per stage is enough. A failed count hides the numbers, never the list.
+async function loadStageCounts(){
+ try{
+  const totals=await Promise.all(reviewStageKeys.map(stage=>api('/admin/videos?'+new URLSearchParams({status:'pending',stage,limit:'1'}))));
+  return Object.fromEntries(reviewStageKeys.map((stage,index)=>[stage,Number.isSafeInteger(totals[index]?.total)?totals[index].total:null]));
+ }catch(error){if(error.name==='AbortError')throw error;return null;}
+}
+const stageCount=stage=>{const value=state.stageCounts?.[stage];return Number.isSafeInteger(value)?value:null;};
+const stageNumber=stage=>reviewStageKeys.indexOf(stage)+1;
+function reviewStageChip(stage,status){
+ const key=status==='approved'||stage==='complete'?'complete':reviewStageKeys.includes(stage)?stage:'ai';
+ return `<span class="admin-stage-chip" data-stage="${key}">${esc(reviewStageLabel(stage,status))}</span>`;
+}
+function stageTabs(){
+ const current=state.filters.stage||'',counts=state.videoPage?.counts,approved=counts?counts.approved||0:null;
+ const tab=(stage,label,count,unit)=>`<button type="button" class="button" id="admin-stage-${stage||'all'}" data-video-stage="${stage}" aria-pressed="${current===stage}"><span>${label}</span>${count==null?'':`<strong>${count.toLocaleString('ko-KR')}</strong><span class="sr-only">${unit}</span>`}</button>`;
+ return `<div class="admin-tabs admin-stage-tabs" role="group" aria-label="심사 단계별 보기">${tab('','전체',null,'')}${reviewStageKeys.map(stage=>tab(stage,reviewStageCopy[stage].title,stageCount(stage),'건 대기')).join('')}${tab('complete','완료',Number.isSafeInteger(approved)?approved:null,'건 승인')}</div>`;
+}
 function videosPage(){
  const page=state.videoPage,items=page.videos;
- const rows=items=>items.map(v=>rowData([`<strong>${esc(v.title)}</strong><small>${esc(v.taskTitle)}</small>`,`<strong>${esc(v.memberName)}</strong><small>${esc(v.memberEmail)}</small>`,badge(v.status),`<span>${esc(reviewStageLabel(v.reviewStage,v.status))}</span>`,Math.round(v.duration)+'초 / '+size(v.size),date(v.submittedAt||v.createdAt),['deleting','deleted'].includes(v.status)?'<span>'+labels[v.status]+'</span>':button('검수 열기','video',v.id)],[v.title,v.memberName,v.status,reviewStageLabel(v.reviewStage,v.status),v.duration,v.submittedAt||v.createdAt,'']));
+ const rows=items=>items.map(v=>rowData([`<strong>${esc(v.title)}</strong><small>${esc(v.taskTitle)}</small>`,`<strong>${esc(v.memberName)}</strong><small>${esc(v.memberEmail)}</small>`,badge(v.status),reviewStageChip(v.reviewStage,v.status),Math.round(v.duration)+'초 / '+size(v.size),date(v.submittedAt||v.createdAt),['deleting','deleted'].includes(v.status)?'<span>'+labels[v.status]+'</span>':button('검수 열기','video',v.id)],[v.title,v.memberName,v.status,reviewStageLabel(v.reviewStage,v.status),v.duration,v.submittedAt||v.createdAt,'']));
  const search=searchable(items,rows,{placeholder:'영상, 회원, 촬영 활동 검색',statuses:videoStatuses});
- tableView('영상·심사','전체 영상에서 검색합니다. 열 정렬은 현재 페이지에 적용됩니다.',['영상','제출자','상태','심사 단계','길이·용량','접수일','검수'],rows(items),{actions:exportButton('videos'),filters:search.filters});
+ tableView('영상·심사','심사 단계를 골라 그 단계에서 기다리는 영상만 볼 수 있습니다. 열 정렬은 현재 페이지에 적용됩니다.',['영상','제출자','상태','심사 단계','길이·용량','접수일','검수'],rows(items),{actions:exportButton('videos'),filters:stageTabs()+search.filters});
  main.querySelector('.admin-count').textContent=`검색 결과 ${page.total.toLocaleString('ko-KR')}건 · 현재 ${items.length}건 · 전체 검수 대기 ${page.counts.pending.toLocaleString('ko-KR')}건`;
  const controls=document.createElement('nav');controls.className='online-toolbar-actions';controls.setAttribute('aria-label','영상 목록 페이지');
  controls.innerHTML=`<button type="button" class="button" data-video-prev ${state.videoCursors.length?'':'disabled'}>이전 페이지</button><span>${state.videoCursors.length+1}페이지</span><button type="button" class="button" data-video-next ${page.nextCursor?'':'disabled'}>다음 페이지</button>`;
@@ -306,16 +329,20 @@ function videosPage(){
  controls.querySelector('[data-video-prev]').onclick=()=>{if(!state.videoCursors.length)return;state.videoCursor=state.videoCursors.pop();void load();};
  controls.querySelector('[data-video-next]').onclick=()=>{if(!page.nextCursor)return;state.videoCursors.push(state.videoCursor);state.videoCursor=page.nextCursor;void load();};
  const input=main.querySelector('#admin-search'),filter=main.querySelector('#admin-filter'),reset=main.querySelector('#admin-search-reset');
+ let stage=state.filters.stage||'';
  const update=(delay=0)=>{
-  clearTimeout(videoSearchTimer);state.filters={query:input.value,status:filter.value};state.videoCursor='';state.videoCursors=[];
-  history.replaceState(null,'',location.pathname+location.search+'#videos'+(filter.value==='all'?'':'?status='+encodeURIComponent(filter.value)));
+  clearTimeout(videoSearchTimer);state.filters={query:input.value,status:filter.value,stage};state.videoCursor='';state.videoCursors=[];
+  controls.querySelectorAll('button').forEach(button=>{button.disabled=true;});
+  history.replaceState(null,'',location.pathname+location.search+videoRouteHash(state.filters));
   const epoch=++state.epoch;
   if(delay)videoSearchTimer=setTimeout(()=>{if(epoch===state.epoch&&route()==='videos'&&canManage())void load();},delay);
   else void load();
  };
  input.oninput=()=>update(300);filter.onchange=()=>update();
- reset.disabled=!input.value&&filter.value==='all';
- reset.onclick=()=>{input.value='';filter.value='all';input.focus();update();};
+ // A waiting stage opens on the videos that still need a decision there and 'complete' on the approved ones; the status filter can widen it afterwards.
+ main.querySelectorAll('[data-video-stage]').forEach(tab=>tab.onclick=()=>{stage=tab.dataset.videoStage;filter.value=reviewStageKeys.includes(stage)?'pending':stage==='complete'?'approved':'all';main.querySelectorAll('[data-video-stage]').forEach(other=>other.setAttribute('aria-pressed',String(other===tab)));update();});
+ reset.disabled=!input.value&&filter.value==='all'&&!stage;
+ reset.onclick=()=>{input.value='';filter.value='all';stage='';input.focus();update();};
 }
 function tasksPage(){tableView('촬영 활동','촬영 조건과 승인 포인트, 모집 공개 여부를 관리합니다.',['활동','분류','승인 포인트','공개 상태','관리'],state.data.tasks.map(t=>rowData([`<strong>${esc(t.title)}</strong><small>${esc(t.instructions.slice(0,85))}</small>`,esc(t.category),points(t.reward),t.published?'공개':'비공개',button('수정','task',t.id)],[t.title,t.category,t.reward,t.published,''])),{actions:button('활동 추가','task','')});}
 function dataPage(){const o=state.overview;main.innerHTML=heading('데이터 현황','누적 수집량과 촬영 분포, 심사 결과를 확인합니다.',exportButton('videos'))+`<div class="online-kpis">${kpi('누적 영상',o.videos+'건')}${kpi('촬영 시간',(o.seconds/3600).toFixed(2)+'시간')}${kpi('영상 저장량',size(o.bytes),`한도 ${size(o.settings.totalStorageBytes)}`)}${kpi('승인율',(o.approved+o.rejected?Math.round(o.approved/(o.approved+o.rejected)*100):0)+'%','승인 ÷ 결과가 확정된 영상')}</div><div class="admin-chart-grid"><section class="online-panel"><h3>촬영 활동 분포</h3>${breakdown(o.categories.map(r=>({label:r.category,count:r.count})),o.videos)}</section><section class="online-panel"><h3>심사 상태별 구성</h3>${breakdown(o.statuses.map(r=>({label:labels[r.status]||r.status,count:r.count})),o.videos)}</section></div><section class="online-panel"><h3>데이터 확인 기준</h3><div class="admin-columns-three"><div><strong>원본 파일</strong><p class="admin-info-line">서버에서 영상 길이와 해상도를 읽고, 파일 중복 여부를 확인합니다.</p></div><div><strong>검수 기록</strong><p class="admin-info-line">구도·손·개인정보·완료 여부를 확인한 결과와 심사 차수를 남깁니다.</p></div><div><strong>동의와 구간 라벨</strong><p class="admin-info-line">제출 시 확인한 이용 동의와 시간별 작업 라벨을 영상에 연결합니다.</p></div></div></section>`;}
