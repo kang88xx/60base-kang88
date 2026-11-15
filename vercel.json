@@ -95,6 +95,14 @@
       "continue": true
     },
     {
+      "src": "^/studio/postcode\\.html$",
+      "headers": {
+        "X-Robots-Tag": "noindex, nofollow",
+        "Content-Security-Policy": "default-src 'none'; script-src 'self' https://t1.kakaocdn.net; style-src 'self' 'unsafe-inline'; frame-src https://postcode.map.kakao.com; base-uri 'none'; form-action 'none'; frame-ancestors capacitor://localhost https://localhost http://localhost:5183 http://127.0.0.1:5183"
+      },
+      "continue": true
+    },
+    {
       "src": "^/api(?:/(.*))$",
       "headers": {
         "Cache-Control": "no-store"
