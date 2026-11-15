@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
-import http from 'node:http';
 import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { serveConsole } from './helpers/console-proxy.mjs';
 
 // The 촬영 키트 admin page against the real kit backend (CONTRACT "Operator"), not the older server/ copy.
 // Production is a same-origin Vercel proxy, so this test serves the console files and forwards /api to the backend.
@@ -24,21 +24,7 @@ const kst = text => Date.parse(text + '+09:00');
 let now = kst('2026-08-01T12:00:01');
 const service = createService({ directory, origin: base, filmingKitEvent: { clock: () => now, claimLimit: 10 } });
 await new Promise(resolve => service.server.listen(backendPort, '127.0.0.1', resolve));
-const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2' };
-const proxy = http.createServer(async (req, res) => {
-  const url = new URL(req.url, base);
-  if (url.pathname.startsWith('/api/')) {
-    const upstream = http.request({ host: '127.0.0.1', port: backendPort, method: req.method, path: req.url, headers: req.headers }, response => { res.writeHead(response.statusCode, response.headers); response.pipe(res); });
-    upstream.on('error', () => { if (!res.headersSent) res.writeHead(502); res.end(); });
-    req.pipe(upstream); return;
-  }
-  let relative = decodeURIComponent(url.pathname); if (relative.endsWith('/')) relative += 'index.html';
-  const file = path.resolve(repo, '.' + relative);
-  if (!/^\/(?:admin|studio|shared|app|assets|fonts)\//.test(relative) || relative.split('/').some(part => part.startsWith('.')) || !file.startsWith(repo + path.sep)) { res.writeHead(404).end(); return; }
-  try { const content = await readFile(file); res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream' }); res.end(content); }
-  catch { res.writeHead(404).end(); }
-});
-await new Promise(resolve => proxy.listen(port, '127.0.0.1', resolve));
+const proxy = await serveConsole({ port, backendPort });
 
 const password = 'Local-admin-kit-only-2026!', created = service.store.now();
 const people = { admin: { role: 'admin', name: '키트 관리자' } };
@@ -308,5 +294,5 @@ try {
   console.error('Browser errors:', errors); throw error;
 } finally {
   await browser.close(); for (const { api } of Object.values(clients)) await api.dispose();
-  await new Promise(resolve => proxy.close(resolve)); await service.close(); await rm(directory, { recursive: true, force: true });
+  await proxy.close(); await service.close(); await rm(directory, { recursive: true, force: true });
 }
