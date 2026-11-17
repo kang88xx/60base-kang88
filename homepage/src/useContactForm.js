@@ -10,9 +10,9 @@ const text = {
     sending: 'Sending your inquiry…', sent: 'Your inquiry has been sent. We will reply to your email.',
     validation: 'Check your name (100 characters), email (254), brief (5000) and data type (180).',
     rateLimited: 'Too many attempts. Please wait a few minutes before trying again.',
-    unavailable: 'Sending is temporarily unavailable. Please try again later or email 60base.ai@gmail.com.',
+    unavailable: 'Sending is temporarily unavailable. Please try again later or email hello@60base.ai.',
     invalid: 'Please check your details and try again. Your inquiry has been kept.',
-    unconfirmed: 'We could not confirm sending. Your inquiry has been kept. Please retry or email 60base.ai@gmail.com.',
+    unconfirmed: 'We could not confirm sending. Your inquiry has been kept. Please retry or email hello@60base.ai.',
     storage: 'Local browser storage is unavailable. You can still edit the draft on this page.',
     errors: {
       name: 'Enter your name or company (up to 100 characters).',
@@ -26,9 +26,9 @@ const text = {
     sending: '문의를 보내고 있습니다…', sent: '문의가 발송되었습니다. 입력하신 이메일로 답변드리겠습니다.',
     validation: '이름(100자), 이메일(254자), 문의 내용(5,000자), 수집 데이터 타입(180자)을 확인해주세요.',
     rateLimited: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.',
-    unavailable: '현재 문의를 보낼 수 없습니다. 잠시 후 다시 시도하거나 60base.ai@gmail.com으로 연락해주세요.',
+    unavailable: '현재 문의를 보낼 수 없습니다. 잠시 후 다시 시도하거나 hello@60base.ai으로 연락해주세요.',
     invalid: '입력 내용을 확인하고 다시 시도해주세요. 문의 내용은 보관되어 있습니다.',
-    unconfirmed: '발송 여부를 확인하지 못했습니다. 문의 내용은 보관되어 있습니다. 다시 시도하거나 60base.ai@gmail.com으로 연락해주세요.',
+    unconfirmed: '발송 여부를 확인하지 못했습니다. 문의 내용은 보관되어 있습니다. 다시 시도하거나 hello@60base.ai으로 연락해주세요.',
     storage: '브라우저 저장소를 사용할 수 없습니다. 이 페이지에서 문의 내용을 계속 편집할 수 있습니다.',
     errors: {
       name: '이름 또는 회사명을 100자 이내로 입력해주세요.',

@@ -165,7 +165,7 @@ async function assertSubmissionProcess(page) {
   const instructions=page.locator('#collection-instructions');
   assert.match(await instructions.innerText(),/심사 제출하기.*동의 내용을 확인/, 'submission explains local recording followed by explicit consent and review submission');
   const contactLinks=await instructions.locator('a[href^="mailto:"]').evaluateAll(links=>links.map(link=>link.getAttribute('href')));
-  assert.ok(contactLinks.length>0 && contactLinks.every(href=>href.split('?')[0]==='mailto:60base.ai@gmail.com'),'contact links use the confirmed operations email');
+  assert.ok(contactLinks.length>0 && contactLinks.every(href=>href.split('?')[0]==='mailto:hello@60base.ai'),'contact links use the confirmed operations email');
   assert.equal(await instructions.locator('#collection-message').inputValue(),'참여 희망','reuses the confirmed participation message');
   await instructions.locator('[data-detail-close]').click();
 }

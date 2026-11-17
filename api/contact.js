@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-const TO = '60base.ai@gmail.com';
+const TO = 'hello@60base.ai';
 const MAX_BYTES = 24_576;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const limits = new Map();

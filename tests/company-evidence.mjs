@@ -84,7 +84,7 @@ async function assertContactMailto(page) {
   });
   await page.locator('#contact-form [type="submit"]').click();
   const mailto = await page.evaluate(() => window.__mail.at(-1) || '');
-  assert.match(mailto, /^mailto:60base\.ai@gmail\.com\?/i);
+  assert.match(mailto, /^mailto:hello@60base\.ai\?/i);
   assert.match(decodeURIComponent(mailto.replace(/\+/g, ' ')), /1인칭 RGB 영상|주방 작업|Legacy|old@example\.com/);
   assert.match(await page.locator('#form-status').innerText(), /Review and send your inquiry in your email app\.|이메일 앱에서 (?:문의 )?내용을 확인한 뒤 보내주세요/);
 }

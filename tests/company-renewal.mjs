@@ -472,9 +472,9 @@ async function assertContact(page, context) {
   assert.equal(await page.evaluate(() => localStorage.getItem('koreo:inquiry-draft') !== null), true, 'contact submit saves under unchanged draft key');
   const mailtoAttempts = await page.evaluate(() => window.__mailtoAttempts || []);
   const mailtoSource = mailtoAttempts.at(-1)
-    || await page.locator('a[href^="mailto:60base.ai@gmail.com"]').last().getAttribute('href').catch(() => '')
+    || await page.locator('a[href^="mailto:hello@60base.ai"]').last().getAttribute('href').catch(() => '')
     || page.url();
-  assert.match(mailtoSource, /^mailto:60base\.ai@gmail\.com\?/i, `submit opens or prepares 60base.ai@gmail.com mailto: ${mailtoSource}`);
+  assert.match(mailtoSource, /^mailto:hello@60base\.ai\?/i, `submit opens or prepares hello@60base.ai mailto: ${mailtoSource}`);
   const decodedMailto = decodeURIComponent(mailtoSource.replace(/\+/g, ' '));
   assert.match(decodedMailto, /subject=/i, 'mailto includes a subject');
   assert.match(decodedMailto, /body=/i, 'mailto includes a body');

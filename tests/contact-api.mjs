@@ -50,7 +50,7 @@ test('missing configuration returns generic unavailable response',async()=>{
 test('accepted message uses fixed recipient, visitor reply-to and server sender',async()=>{
   calls=[];const body={...valid(),to:'attacker@example.test',from:'attacker@example.test'};
   const result=await request(body);assert.equal(result.status,200);assert.deepEqual(result.body,{ok:true});
-  const payload=JSON.parse(calls[0].body);assert.deepEqual(payload.to,['60base.ai@gmail.com']);assert.equal(payload.reply_to,body.email);assert.equal(payload.from,process.env.CONTACT_FROM);
+  const payload=JSON.parse(calls[0].body);assert.deepEqual(payload.to,['hello@60base.ai']);assert.equal(payload.reply_to,body.email);assert.equal(payload.from,process.env.CONTACT_FROM);
   assert.match(payload.text,/Please quote kitchen footage/);assert.equal(calls[0].url,'https://api.resend.com/emails');
   assert.match(calls[0].headers['Idempotency-Key'],/^contact-[a-f0-9]{64}$/);
   assert.equal(result.headers['Cache-Control'],'no-store');assert.equal(JSON.stringify(result).includes('re_test_placeholder'),false);
