@@ -576,14 +576,14 @@
         setStatus(response.status === 429
           ? 'Too many attempts. Please wait a few minutes before trying again.'
           : response.status === 503
-            ? 'Sending is temporarily unavailable. Please try again later or email 60base.ai@gmail.com.'
+            ? 'Sending is temporarily unavailable. Please try again later or email hello@60base.ai.'
             : response.status === 400
               ? 'Please check your details and try again. Your inquiry has been kept.'
-              : 'We could not confirm sending. Your inquiry has been kept. Please retry or email 60base.ai@gmail.com.');
+              : 'We could not confirm sending. Your inquiry has been kept. Please retry or email hello@60base.ai.');
       }
     } catch {
       inquiryButton.dataset.state = 'Error';
-      setStatus('We could not confirm sending. Your inquiry has been kept. Please retry or email 60base.ai@gmail.com.');
+      setStatus('We could not confirm sending. Your inquiry has been kept. Please retry or email hello@60base.ai.');
     } finally {
       clearTimeout(timeout);
       sending = false;

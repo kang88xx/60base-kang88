@@ -42,7 +42,7 @@ function assertInsideRoot(path, message) {
 function isAllowedHomepageMailto(file, ref) {
   const normalizedFile = normalize(file);
   return ['index.html', 'studio/delete-account.html', 'dist/index.html', 'dist/index.ko.html', 'dist/index.en.html'].map(file => normalize(join(ROOT, file))).includes(normalizedFile)
-    && /^mailto:60base\.ai@gmail\.com(?:\?|$)/i.test(ref);
+    && /^mailto:hello@60base\.ai(?:\?|$)/i.test(ref);
 }
 
 async function collectFiles(dir, extensions, output = []) {

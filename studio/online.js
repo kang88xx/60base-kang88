@@ -10,7 +10,7 @@ import {bindSupportFaq} from './support-faq.js';
 import {getStudioAccess,requiresStudioAccount} from './access.js';
 let releaseSupportFaq=()=>{};
 const consentFields=`<label class="online-check"><input type="checkbox" name="filming" required>제가 촬영한 영상이며, 촬영 장소와 등장 인물의 동의를 확인했습니다.</label><label class="online-check"><input type="checkbox" name="privacy" required>얼굴·주소·개인 문서·사적 대화가 포함되지 않았는지 확인했습니다.</label><label class="online-check"><input type="checkbox" name="usage" required>영상과 작업 정보를 피지컬 AI 학습·연구 및 계약된 데이터 제공에 이용하는 데 동의합니다. <a href="/studio/privacy.html" target="_blank" rel="noopener">이용 범위</a></label><label class="online-check"><input type="checkbox" name="training" required>촬영 교육과 가로 화면·손/작업 대상의 가시성 기준을 확인했습니다.</label><label class="online-check"><input type="checkbox" name="recordedInKorea" required>대한민국 내에서 직접 촬영한 영상입니다.</label>`;
-const supportEmail='60base.ai@gmail.com';
+const supportEmail='hello@60base.ai';
 const uploadMark='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m-4 4 4-4 4 4M5 15v5h14v-5"/></svg>';
 let currentMount=null,mountVersion=0;
 let bridgeInFlight=null,bridgeAttemptKey='',bridgeError=null,logoutInFlight=false,suppressBridge=false;
